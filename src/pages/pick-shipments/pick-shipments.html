@@ -1,0 +1,31 @@
+<ion-header>
+    <ion-navbar>
+        <button ion-button menuToggle>
+            <ion-icon name="menu"></ion-icon>
+        </button>
+        <ion-title>
+            Pick Shipments
+        </ion-title>
+    </ion-navbar>
+</ion-header>
+<ion-content padding id="page6">
+    <form id="pick-shipments-form1">
+        <ion-list id="login-list3">
+            <ion-item id="shipment-number">
+                <ion-label>
+                    Shipment #
+                </ion-label>
+                <ion-input autofocus type="text" placeholder=""></ion-input>
+                <button ion-button icon-only item-right (click)="scanShipment()">
+                    <ion-icon name="barcode"></ion-icon>
+                </button>
+            </ion-item>
+            <ion-item id="shipment-type">
+                <ion-label>
+                    Shipment Type
+                </ion-label>
+                <ion-input type="text" placeholder="" readonly></ion-input>
+            </ion-item>
+        </ion-list>
+    </form>
+</ion-content>

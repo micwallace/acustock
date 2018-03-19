@@ -1,0 +1,36 @@
+<ion-menu [content]="mainContent">
+    <ion-header>
+        <ion-toolbar>
+            <ion-title>
+                Menu
+            </ion-title>
+        </ion-toolbar>
+    </ion-header>
+    <ion-content id="side-menu21">
+        <ion-list id="menu-list1">
+            <ion-item color="none" menuClose="" on-click="goToHome()" id="menu-list-item1">
+                Home
+            </ion-item>
+            <ion-item color="none" menuClose="" on-click="goToPickShipments()" id="menu-list-item2">
+                Pick Shipments
+            </ion-item>
+            <ion-item color="none" menuClose="" on-click="goToItemLookup()" id="menu-list-item3">
+                Item Lookup
+            </ion-item>
+            <ion-item color="none" menuClose="" on-click="goToBinLookup()" id="menu-list-item7">
+                Bin Lookup
+            </ion-item>
+            <ion-item color="none" menuClose="" id="menu-list-item8">
+                Physical Count
+            </ion-item>
+            <ion-item color="none" menuClose="" on-click="showPreferences()" id="menu-list-item9">
+                Settings
+            </ion-item>
+            <!--<ion-item color="none" menuClose="" id="menu-list-item10">
+              Logout
+            </ion-item>-->
+        </ion-list>
+    </ion-content>
+</ion-menu>
+
+<ion-nav #mainContent [root]="rootPage"></ion-nav>

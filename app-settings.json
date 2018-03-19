@@ -1,0 +1,34 @@
+[
+    {
+        "type":"group",
+        "title":"Connection",
+        "items":[{
+				"title":"URL",
+				"type":"textfield",
+				"keyboard":"uri",
+				"key":"url"
+			},
+			{
+				"title":"Username",
+				"type":"textfield",
+				"key":"username"
+			},
+			{
+				"title":"Password",
+				"type":"textfield",
+				"keyboard":"password",
+				"key":"password"
+			},
+			{
+				"title":"Company ID",
+				"type":"textfield",
+				"key":"company"
+			},
+			{
+				"title":"Debug",
+				"type":"toggle",
+				"default":false,
+				"key":"debug"
+		}]
+    }
+]
