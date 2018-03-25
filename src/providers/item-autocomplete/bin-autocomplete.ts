@@ -18,12 +18,7 @@ export class LocationAutocompleteService implements AutoCompleteService {
     constructor(public cacheProvider:CacheProvider) {
         this.cacheProvider.getBinList().then((res:any) => {
 
-            var allBins = [];
-            for (var i = 0; i < res.length; i++) {
-                allBins = allBins.concat(res[i].Locations);
-            }
-
-            this.binList = allBins;
+            this.binList = res;
 
             console.log(JSON.stringify(this.binList[0]));
 

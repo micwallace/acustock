@@ -39,12 +39,7 @@ export class MyApp {
                         let loader = context.loadingCtrl.create({content: "Logging in..."});
                         loader.present();
 
-                        context.api.testConnection().then((res) => {
-                            if (res !== true) {
-                                context.navCtrl.setRoot(SetupPage);
-                                alert("Login failed, please check connection. Error: " + res);
-                                return;
-                            }
+                        context.api.testConnection().then(() => {
 
                             loader.dismiss();
 
@@ -55,14 +50,19 @@ export class MyApp {
                                 console.log("Initial data load failed: " + err)
                             });
 
-                        }).catch((res) => {
+                        }).catch((err) => {
+                            loader.dismiss();
                             context.navCtrl.setRoot(SetupPage);
-                            alert("Login failed, please check connection. Error: " + JSON.stringify(res));
+                            alert("Login failed, please check connection. " +err.error);
                         });
                     }
+                }).catch((err) => {
+                    alert("Failed to load the cordova platform. " + err.message);
                 });
 
             //}, 2000);
+
+        }).catch((err) => {
 
         });
     }

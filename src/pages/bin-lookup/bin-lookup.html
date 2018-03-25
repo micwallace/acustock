@@ -30,12 +30,12 @@
         <span [innerHTML]="attrs.data.LocationID.value | boldprefix:attrs.keyword"></span>
     </ng-template>
 
-    <ion-auto-complete [dataProvider]="binAutocompleteService" [template]="listItem"
+    <ion-auto-complete  [(ngModel)]="selectedLocation" [dataProvider]="binAutocompleteService" [template]="listItem"
                        (itemSelected)="loadBinContents($event)"></ion-auto-complete>
 
     <ion-scroll style="height: calc(100% - 100px);" scrollY="true" no-padding>
         <ion-list>
-            <ion-item *ngFor="let item of binContents" (click)="itemTapped($event, item)">
+            <ion-item *ngFor="let item of binContents" (click)="openDetailsModal($event, item)">
                 <ion-label>{{item.InventoryID.value}}</ion-label>
                 <div class="item-note" item-end style="width: 120px;">
                     <ion-row>
@@ -50,4 +50,5 @@
             </ion-item>
         </ion-list>
     </ion-scroll>
+    <barcode-listener (scan)='onBarcodeScan($event)'></barcode-listener>
 </ion-content>

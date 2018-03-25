@@ -16,8 +16,9 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { AutoCompleteModule } from 'ionic2-auto-complete';
 
-import { Api, CacheProvider, ItemAutocompleteService, LocationAutocompleteService } from '../providers/providers';
+import { Api, CacheProvider, BarcodeListenerComponent, ItemAutocompleteService, LocationAutocompleteService } from '../providers/providers';
 import { HTTP } from '@ionic-native/http';
+import { ItemLookupDetailsPage } from "../pages/item-lookup-details/item-lookup-details";
 
 @NgModule({
     declarations: [
@@ -26,8 +27,10 @@ import { HTTP } from '@ionic-native/http';
         LoginPage,
         PickShipmentsPage,
         ItemLookupPage,
+        ItemLookupDetailsPage,
         BinLookupPage,
-        SetupPage
+        SetupPage,
+        BarcodeListenerComponent
     ],
     imports: [
         BrowserModule,
@@ -41,8 +44,9 @@ import { HTTP } from '@ionic-native/http';
         LoginPage,
         PickShipmentsPage,
         ItemLookupPage,
+        ItemLookupDetailsPage,
         BinLookupPage,
-        SetupPage
+        SetupPage,
     ],
     providers: [
         StatusBar,
@@ -54,7 +58,7 @@ import { HTTP } from '@ionic-native/http';
         HTTP,
         CacheProvider,
         ItemAutocompleteService,
-        LocationAutocompleteService
+        LocationAutocompleteService,
     ]
 })
 export class AppModule {

@@ -54,7 +54,22 @@ export class SetupPage {
             if (barcodeData.cancelled)
                 return;
 
-            var values = JSON.parse(barcodeData.text);
+            this.loadBarcodeConfiguration(barcodeData.text);
+
+        }, (err) => {
+            // An error occurred
+            alert("Error accessing barcode device: " + err);
+        });
+    }
+
+    onBarcodeScan(barcodeText){
+        this.loadBarcodeConfiguration(barcodeText);
+    }
+
+    loadBarcodeConfiguration(barcodeText){
+
+        try {
+            var values = JSON.parse(barcodeText);
 
             if (values)
                 for (var i in values) {
@@ -62,10 +77,10 @@ export class SetupPage {
                 }
 
             this.testConnection();
-        }, (err) => {
-            // An error occurred
-            alert("Error accessing barcode device: " + err);
-        });
+
+        } catch (e){
+            alert("Invalid configuration barcode.");
+        }
     }
 
     private testConnection() {
@@ -79,13 +94,10 @@ export class SetupPage {
         this.api.testConnection().then((res) => {
 
             loader.dismiss();
+            this.navCtrl.setRoot(PickShipmentsPage);
 
-            if (res === true) {
-                this.navCtrl.setRoot(PickShipmentsPage);
-            } else {
-                alert("Connection failed: " + res);
-            }
-
+        }).catch((err) => {
+            alert("Connection failed: " + err.error);
         });
     }
 

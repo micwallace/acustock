@@ -53,7 +53,12 @@ export class CacheProvider {
 
     public initialLoad() {
         return new Promise((resolve, reject) => {
-            this.api.getBinList().then((binList) => {
+            this.api.getWarehouseList().then((warehouseList : any) => {
+
+                var binList = [];
+                for (var i = 0; i < warehouseList.length; i++) {
+                    binList = binList.concat(warehouseList[i].Locations);
+                }
 
                 this.binList = binList;
 

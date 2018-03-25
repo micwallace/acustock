@@ -51,21 +51,21 @@ export class Api {
         return new Promise((resolve, reject) => {
             this.updateSettings().then(() => {
                 this.login().then((res) => {
-                    console.log(JSON.stringify(res));
 
-                    if (res.status === 204) {
-                        resolve(true);
-                    } else {
-                        if (res.status === 500) {
-                            var error = JSON.parse(res.data);
-                            resolve(error.message + ' ' + error.exceptionMessage);
-                        } else {
-                            resolve("HTTP Error " + res.status + ': ' + res.error);
-                        }
-                    }
+                    resolve();
 
                 }, (err) => {
-                    reject(err);
+
+                    try {
+                        var error = JSON.parse(err.error);
+                        if (error.hasOwnProperty('exceptionMessage'))
+                            err.error = error.hasOwnProperty('exceptionMessage') ? error.exceptionMessage : error.message;
+                        err.errorData = error;
+
+                        reject(err);
+                    } catch (e){
+                        reject(err);
+                    }
                 });
             });
         });
@@ -89,7 +89,7 @@ export class Api {
         return this.get('StockItem?$expand=CrossReferences');
     }
 
-    getBinList() {
+    getWarehouseList() {
         // TODO: add warehouse filter
         return this.get("Warehouse?$expand=Locations");
     }
@@ -100,7 +100,23 @@ export class Api {
     }
 
     getLocationContents(locationId:string) {
-        return this.get("InventoryLocations?$filter=Location eq '" + locationId + "'");
+        return this.get("InventoryLocations?$filter=LocationID eq '" + locationId + "'");
+    }
+
+    getItemBatches(itemId:string, warehouseId:string, locationId:string){
+
+        let filter = [];
+
+        if (itemId)
+            filter.push("InventoryID eq '"+itemId+"'");
+
+        if (warehouseId)
+            filter.push("WarehouseID eq '"+warehouseId+"'");
+
+        if (locationId)
+            filter.push("LocationID eq '"+locationId+"'");
+
+        return this.get("InventoryLotSerials" + (filter.length ? "?$filter=" + filter.join(" and ") : ""));
     }
 
     get(endpoint:string, params?:any, reqOpts?:any) {
@@ -135,30 +151,44 @@ export class Api {
                     break;
 
                 case "put":
-                    this.http.put(url, body, reqOpts);
+                    promise = this.http.put(url, body, reqOpts);
                     break;
 
                 case "delete":
-                    this.http.delete(url, params, reqOpts);
+                    promise = this.http.delete(url, params, reqOpts);
                     break;
             }
 
             promise.then((res) => {
+
                 if (res.status > 199 && res.status < 300) {
 
-                    var data = JSON.parse(res.data);
-
-                    if (data) {
-                        resolve(data);
+                    try {
+                        var data = JSON.parse(res.data);
+                    } catch (e){
+                        reject({"message": "JSON parse error"});
                         return;
                     }
 
-                    reject({"message": "JSON parse error"});
-                    return;
+                    resolve(data);
                 }
 
-                reject(res.error);
+                reject("Unknown error:" + res.error);
+
             }, (err) => {
+
+                try {
+                    var error = JSON.parse(err.error);
+                    if (error.hasOwnProperty('exceptionMessage'))
+                        err.error = "API Error: " + error.hasOwnProperty('exceptionMessage') ? error.exceptionMessage : error.message;
+                    err.errorData = error;
+
+                    reject(err);
+                } catch (e){
+                    reject(err);
+                }
+
+            }).catch((err) => {
                 reject(err);
             });
 

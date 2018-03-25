@@ -29,7 +29,7 @@ export class ItemAutocompleteService implements AutoCompleteService {
 
     getResults(keyword:string) {
         return this.itemList.filter(
-            item => {
+            (item: any) => {
                 //noinspection TypeScriptUnresolvedVariable
                 if (item.InventoryID.value.toLowerCase().indexOf(keyword.toLowerCase()) !== -1)
                     return true;
