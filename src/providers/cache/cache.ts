@@ -33,6 +33,42 @@ export class CacheProvider {
         });
     }
 
+    public getItemById(id){
+
+        return new Promise((resolve, reject)=>{
+
+            this.getItemList().then((itemList: any)=>{
+
+                for (var i=0; i<itemList.length; i++){
+
+                    if (itemList[i].InventoryID.value == id){
+
+                        resolve(itemList[i]);
+                        return;
+                    }
+
+
+                    for (var x=0; x<itemList[i].CrossReferences.length; x++){
+
+                        if (itemList[i].CrossReferences[x].AlternateID.value == id){
+
+                            resolve(itemList[i]);
+                            return;
+                        }
+
+                    }
+                }
+
+                reject({message: "No item found with ID "+id});
+
+                // TODO: Perform fresh lookup on cache expiry
+
+            }).catch((err)=>{
+                reject(err);
+            })
+        });
+    }
+
     public getBinList() {
 
         return new Promise((resolve, reject) => {
@@ -49,6 +85,28 @@ export class CacheProvider {
             resolve(this.binList);
         });
 
+    }
+
+    public getBinById(id){
+        return new Promise((resolve, reject)=>{
+
+            this.getBinList().then((binList: any)=>{
+
+                for (var i=0; i<binList.length; i++){
+                    if (binList[i].LocationID.value == id){
+
+                        resolve(binList[i]);
+                        return;
+                    }
+                }
+
+                reject({message: "No location found with ID "+id});
+
+                // TODO: Perform fresh lookup on cache expiry
+            }).catch((err) => {
+                reject(err);
+            });
+        });
     }
 
     public initialLoad() {

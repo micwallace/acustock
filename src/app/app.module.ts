@@ -16,9 +16,14 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { AutoCompleteModule } from 'ionic2-auto-complete';
 
-import { Api, CacheProvider, BarcodeListenerComponent, ItemAutocompleteService, LocationAutocompleteService } from '../providers/providers';
+import { Api, CacheProvider, BarcodeListenerComponent, ItemAutocompleteService, LocationAutocompleteService, PickProvider } from '../providers/providers';
 import { HTTP } from '@ionic-native/http';
 import { ItemLookupDetailsPage } from "../pages/item-lookup-details/item-lookup-details";
+import { PickShipmentsListPage } from "../pages/pick-shipments-list/pick-shipments-list";
+import { PickShipmentsPickPage } from "../pages/pick-shipments-pick/pick-shipments-pick";
+import { PickTab} from "../pages/pick-shipments-pick/tabs/pick";
+import { PickListTab } from "../pages/pick-shipments-pick/tabs/pick-list";
+import { UnpickedListTab } from "../pages/pick-shipments-pick/tabs/unpicked-list";
 
 @NgModule({
     declarations: [
@@ -26,6 +31,11 @@ import { ItemLookupDetailsPage } from "../pages/item-lookup-details/item-lookup-
         HomePage,
         LoginPage,
         PickShipmentsPage,
+        PickShipmentsListPage,
+        PickShipmentsPickPage,
+        PickTab,
+        PickListTab,
+        UnpickedListTab,
         ItemLookupPage,
         ItemLookupDetailsPage,
         BinLookupPage,
@@ -43,6 +53,11 @@ import { ItemLookupDetailsPage } from "../pages/item-lookup-details/item-lookup-
         HomePage,
         LoginPage,
         PickShipmentsPage,
+        PickShipmentsListPage,
+        PickShipmentsPickPage,
+        PickTab,
+        PickListTab,
+        UnpickedListTab,
         ItemLookupPage,
         ItemLookupDetailsPage,
         BinLookupPage,
@@ -59,6 +74,7 @@ import { ItemLookupDetailsPage } from "../pages/item-lookup-details/item-lookup-
         CacheProvider,
         ItemAutocompleteService,
         LocationAutocompleteService,
+        PickProvider,
     ]
 })
 export class AppModule {

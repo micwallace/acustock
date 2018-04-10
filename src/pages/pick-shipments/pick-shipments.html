@@ -15,8 +15,8 @@
                 <ion-label>
                     Shipment #
                 </ion-label>
-                <ion-input autofocus type="text" placeholder=""></ion-input>
-                <button ion-button icon-only item-right (click)="scanShipment()">
+                <ion-input autofocus type="text" placeholder="" (keyup.enter)="loadShipment($event.target.value)"></ion-input>
+                <button type="button" ion-button icon-only item-right (click)="scanShipment()">
                     <ion-icon name="barcode"></ion-icon>
                 </button>
             </ion-item>
@@ -24,8 +24,34 @@
                 <ion-label>
                     Shipment Type
                 </ion-label>
-                <ion-input type="text" placeholder="" readonly></ion-input>
+                <ion-input name="shipment-type" type="text" placeholder="" [ngModel]="pickProvider.currentShipment?.Type?.value" readonly></ion-input>
             </ion-item>
         </ion-list>
+        <ion-grid *ngIf="pickProvider.currentShipment">
+            <ion-row>
+                <ion-col>
+                    <label>Total Items:</label>
+                </ion-col>
+                <ion-col>
+                    {{totalItems}}
+                </ion-col>
+            </ion-row>
+            <ion-row>
+                <ion-col>
+                    <label>Unpicked Items:</label>
+                </ion-col>
+                <ion-col>
+                    {{unpickedItems}}
+                </ion-col>
+            </ion-row>
+            <ion-row>
+                <ion-col>
+                    <button type="button" ion-button (click)="openPickDialog()">Start Picking</button>
+                </ion-col>
+                <ion-col>
+                    <button type="button" ion-button (click)="openItemsDialog()">Review Items</button>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
     </form>
 </ion-content>

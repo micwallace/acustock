@@ -58,14 +58,22 @@ export class Api {
 
                     try {
                         var error = JSON.parse(err.error);
-                        if (error.hasOwnProperty('exceptionMessage'))
-                            err.error = error.hasOwnProperty('exceptionMessage') ? error.exceptionMessage : error.message;
-                        err.errorData = error;
+
+                        if (error.hasOwnProperty('exceptionMessage')){
+                            err.errorData = error;
+                            err.message = error.exceptionMessage;
+                        } else {
+                            err.message = err.error;
+                        }
 
                         reject(err);
                     } catch (e){
+                        err.message = err.error;
                         reject(err);
                     }
+                }).catch((err)=>{
+                    err.message = err.error;
+                    reject(err);
                 });
             });
         });
@@ -78,8 +86,6 @@ export class Api {
             password: this.password,
             company: this.company
         };
-
-        //let headers = new Headers({ 'Content-Type': 'application/json' });
 
         return this.http.post(this.url + '/entity/auth/login', data, {});
     }
@@ -117,6 +123,14 @@ export class Api {
             filter.push("LocationID eq '"+locationId+"'");
 
         return this.get("InventoryLotSerials" + (filter.length ? "?$filter=" + filter.join(" and ") : ""));
+    }
+
+    getShipment(shipmentNbr){
+        return this.get("Shipment?$expand=Details,Details/Allocations&$filter=ShipmentNbr eq '" + shipmentNbr + "' and Operation eq 'Issue'");
+    }
+
+    getShipmentList(){
+        return this.get("ShipmentPriorityList");
     }
 
     get(endpoint:string, params?:any, reqOpts?:any) {
@@ -173,22 +187,23 @@ export class Api {
                     resolve(data);
                 }
 
-                reject("Unknown error:" + res.error);
+                reject({message: "Unknown error:" + res.error});
 
             }, (err) => {
 
                 try {
                     var error = JSON.parse(err.error);
-                    if (error.hasOwnProperty('exceptionMessage'))
-                        err.error = "API Error: " + error.hasOwnProperty('exceptionMessage') ? error.exceptionMessage : error.message;
+                    err.message = "API Error: " + (error.hasOwnProperty('exceptionMessage') ? error.exceptionMessage : error.message);
                     err.errorData = error;
 
                     reject(err);
                 } catch (e){
+                    err.message = err.error;
                     reject(err);
                 }
 
             }).catch((err) => {
+                err.message = err.error;
                 reject(err);
             });
 

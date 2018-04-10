@@ -9,7 +9,7 @@ import { PickShipmentsPage } from '../pages/pick-shipments/pick-shipments';
 import { ItemLookupPage } from '../pages/item-lookup/item-lookup';
 import { BinLookupPage } from '../pages/bin-lookup/bin-lookup';
 import { SetupPage } from '../pages/setup/setup';
-import { Api, CacheProvider } from '../providers/providers';
+import { Api, CacheProvider, PickProvider } from '../providers/providers';
 
 @Component({
     templateUrl: 'app.html'
@@ -53,7 +53,8 @@ export class MyApp {
                         }).catch((err) => {
                             loader.dismiss();
                             context.navCtrl.setRoot(SetupPage);
-                            alert("Login failed, please check connection. " +err.error);
+                            console.log(JSON.stringify(err));
+                            alert("Login failed, please check connection. " +err.message);
                         });
                     }
                 }).catch((err) => {

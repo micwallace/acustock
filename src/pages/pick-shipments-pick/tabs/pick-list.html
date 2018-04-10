@@ -1,0 +1,34 @@
+<!--
+  Generated template for the PickShipmentsListPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Picked Items</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-grid>
+    <div class="row header">
+      <ion-col col-5>Location</ion-col>
+      <ion-col col-5>LotSerial</ion-col>
+      <ion-col col-2>Qty</ion-col>
+    </div>
+    <ion-item tappable no-margin no-padding *ngFor="let item of pickProvider.pickedItems" (click)="openPickItem(item);">
+      <strong>{{item.InventoryID.value}}</strong>
+      <div no-margin no-padding>
+        <ion-row *ngFor="let allocation of item.Allocations">
+          <ion-col col-5>{{allocation.LocationID.value}}</ion-col>
+          <ion-col col-5>{{allocation.LotSerialNbr.value}}</ion-col>
+          <ion-col col-2>{{allocation.Qty.value}}</ion-col>
+        </ion-row>
+      </div>
+    </ion-item>
+  </ion-grid>
+</ion-content>

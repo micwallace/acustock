@@ -129,7 +129,7 @@ export class BinLookupPage {
         }).catch((err) => {
 
             loader.dismiss();
-            alert(err.error);
+            alert(err.message);
         });
 
     }

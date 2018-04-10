@@ -145,7 +145,7 @@ export class ItemLookupPage {
         }).catch((err) => {
 
             loader.dismiss();
-            alert(err.error);
+            alert(err.message);
         });
 
     }

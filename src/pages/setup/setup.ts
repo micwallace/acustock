@@ -97,7 +97,9 @@ export class SetupPage {
             this.navCtrl.setRoot(PickShipmentsPage);
 
         }).catch((err) => {
-            alert("Connection failed: " + err.error);
+
+            loader.dismiss();
+            alert("Connection failed: " + err.message);
         });
     }
 

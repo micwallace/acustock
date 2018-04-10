@@ -35,7 +35,7 @@
 
     <ion-scroll style="height: calc(100% - 100px);" scrollY="true" no-padding>
         <ion-list>
-            <ion-item *ngFor="let item of binContents" (click)="openDetailsModal($event, item)">
+            <ion-item tappable *ngFor="let item of binContents" (click)="openDetailsModal($event, item)">
                 <ion-label>{{item.InventoryID.value}}</ion-label>
                 <div class="item-note" item-end style="width: 120px;">
                     <ion-row>
