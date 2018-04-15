@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Api } from "../api/api";
+import { PreferencesProvider } from "../preferences/preferences";
 
 /*
  Generated class for the CacheProvider provider.
@@ -12,8 +13,9 @@ export class CacheProvider {
 
     itemList = null;
     binList = null;
+    warehouseList = null;
 
-    constructor(public api:Api) {
+    constructor(public api:Api, public prefs: PreferencesProvider) {
         console.log('Hello CacheProvider Provider');
     }
 
@@ -109,16 +111,26 @@ export class CacheProvider {
         });
     }
 
+    public generateBinList(){
+        for (var i = 0; i < this.warehouseList.length; i++) {
+            if (this.warehouseList[i].WarehouseID.value == this.prefs.getPreference('warehouse')) {
+                this.binList = this.warehouseList[i].Locations;
+                return;
+            }
+        }
+
+        // Warehouse not found, default to first loaded warehouse
+        this.binList = this.warehouseList[0].Locations;
+        this.prefs.setPreference('warehouse', this.warehouseList[0].WarehouseID.value, true);
+    }
+
     public initialLoad() {
         return new Promise((resolve, reject) => {
             this.api.getWarehouseList().then((warehouseList : any) => {
 
-                var binList = [];
-                for (var i = 0; i < warehouseList.length; i++) {
-                    binList = binList.concat(warehouseList[i].Locations);
-                }
+                this.warehouseList = warehouseList;
 
-                this.binList = binList;
+                this.generateBinList();
 
                 this.api.getItemList().then((itemList) => {
 

@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Platform, LoadingController } from 'ionic-angular';
-import { Subscription } from 'rxjs';
+import { IonicPage, NavController, NavParams, LoadingController, Events } from 'ionic-angular';
 
-import { AppPreferences } from '@ionic-native/app-preferences';
 import { PickShipmentsPage } from "../pick-shipments/pick-shipments";
 import { Api } from '../../providers/providers';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
+import { PreferencesProvider } from "../../providers/preferences/preferences";
+import { PreferencesPage } from "../preferences/preferences";
 
 /**
  * Generated class for the SetupPage page.
@@ -20,9 +20,8 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner';
     templateUrl: 'setup.html',
 })
 export class SetupPage {
-    private onResumeSubscription:Subscription;
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public platform:Platform, public appPreferences:AppPreferences, public api:Api, public barcodeScanner:BarcodeScanner, public loadingCtrl:LoadingController) {
+    constructor(public navCtrl:NavController, public navParams:NavParams, public prefs:PreferencesProvider, public api:Api, public barcodeScanner:BarcodeScanner, public loadingCtrl:LoadingController, public events:Events) {
 
     }
 
@@ -31,21 +30,16 @@ export class SetupPage {
     }
 
     showPreferences() {
-        this.onResumeSubscription = this.platform.resume.subscribe(() => {
-            this.appPreferences.fetch('url').then((url) => {
-                console.log(url);
-                if (url == "") {
-                    alert("Please configure connection preferences to continue");
-                    return;
-                }
+        this.events.subscribe('preferencesSaved', ()=>{
+            if (this.prefs.getPreference('url') == "") {
+                alert("Please configure connection preferences to continue");
+                return;
+            }
 
-                this.testConnection();
-            });
+            this.testConnection();
         });
 
-        this.appPreferences.show().catch((err) => {
-            alert(err);
-        });
+        this.navCtrl.push(PreferencesPage);
     }
 
     public scanBarcode() {
@@ -71,10 +65,16 @@ export class SetupPage {
         try {
             var values = JSON.parse(barcodeText);
 
-            if (values)
+            if (values) {
                 for (var i in values) {
-                    this.appPreferences.store(i, values[i]);
+                    if (this.prefs.defaults.hasOwnProperty("connection_" + i)) {
+                        this.prefs.setPreference("connection_" + i, values[i]);
+                    } else if (this.prefs.defaults.hasOwnProperty(i)) {
+                        this.prefs.setPreference(i, values[i]);
+                    }
                 }
+                this.prefs.savePreferences();
+            }
 
             this.testConnection();
 
@@ -85,8 +85,7 @@ export class SetupPage {
 
     private testConnection() {
 
-        if (this.onResumeSubscription)
-            this.onResumeSubscription.unsubscribe();
+        this.events.unsubscribe('preferencesSaved');
 
         let loader = this.loadingCtrl.create({content: "Loading..."});
         loader.present();

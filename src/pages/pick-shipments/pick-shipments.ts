@@ -15,7 +15,8 @@ export class PickShipmentsPage {
     unpickedItems = 0;
 
     constructor(public navCtrl:NavController, private barcodeScanner:BarcodeScanner, public pickProvider: PickProvider, public modalCtrl:ModalController) {
-
+        if (pickProvider.currentShipment)
+            this.calculateItems();
     }
 
     scanShipment() {

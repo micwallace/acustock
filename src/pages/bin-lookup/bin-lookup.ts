@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import 'rxjs/add/operator/map'
 import { IonicPage, NavController, NavParams, LoadingController, ModalController } from 'ionic-angular';
-import { Api, CacheProvider, LocationAutocompleteService } from '../../providers/providers';
+import { Api, CacheProvider, LocationAutocompleteService, PreferencesProvider } from '../../providers/providers';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { ItemLookupDetailsPage } from '../item-lookup-details/item-lookup-details'
 
@@ -33,7 +33,8 @@ export class BinLookupPage {
                 public loadingCtrl:LoadingController,
                 public barcodeScanner: BarcodeScanner,
                 public cache: CacheProvider,
-                public modalCtrl: ModalController) {
+                public modalCtrl: ModalController,
+                public prefs: PreferencesProvider) {
     }
 
     ionViewDidLoad() {
@@ -48,7 +49,7 @@ export class BinLookupPage {
             this.loader.present();
         }
 
-        this.api.getLocationContents(item.LocationID.value).then((res:any) => {
+        this.api.getLocationContents(item.LocationID.value, this.prefs.getPreference('warehouse')).then((res:any) => {
             this.binContents = res;
             console.log(JSON.stringify(res));
             this.dismissLoader();

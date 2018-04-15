@@ -23,9 +23,9 @@
     <ion-grid>
         <ion-row>
             <ion-col>
-                <ion-item>
+                <ion-item no-margin no-padding>
                     <ion-label color="primary" stacked>Bin:</ion-label>
-                    <ion-input [ngModel]="getCurrentItem()?.LocationID?.value" readonly></ion-input>
+                    <ion-input [ngModel]="getCurrentItemAllocation()?.LocationID?.value" readonly></ion-input>
                 </ion-item>
             </ion-col>
             <ion-col>
@@ -37,7 +37,7 @@
         </ion-row>
         <ion-row>
             <ion-col>
-                <ion-item>
+                <ion-item no-margin no-padding>
                     <ion-label color="primary" stacked>SKU:</ion-label>
                     <ion-input [ngModel]="getCurrentItem()?.InventoryID?.value" readonly></ion-input>
                 </ion-item>
@@ -67,7 +67,7 @@
             <ion-col>
                 <ion-item>
                     <ion-label color="primary" stacked>Qty:</ion-label>
-                    <ion-input [ngModel]="getCurrentItemAllocation()?.Qty?.value" readonly></ion-input>
+                    <ion-input [ngModel]="getSuggestedPickQty()" readonly></ion-input>
                 </ion-item>
             </ion-col>
             <ion-col>
@@ -82,10 +82,24 @@
     <div class="fixed-outside">
         <div class="row">
             <div class="col">
-                <button type="button" ion-button (click)="previousItem()">Previous</button>
+                <button type="button" ion-button (click)="previousItem()"><ion-icon name="arrow-back"></ion-icon></button>
             </div>
             <div class="col">
-                <button type="button" ion-button (click)="nextItem()">Next</button>
+                <button type="button" ion-button (click)="nextItem()"><ion-icon name="arrow-forward"></ion-icon></button>
+            </div>
+            <div class="col">
+                <button type="button" ion-button (click)="addPick()">Save</button>
+            </div>
+            <div class="col">
+                <button type="button" ion-button (click)="resetForm()">Cancel</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <button type="button" ion-button (click)="savePicks()">Save Shipment</button>
+            </div>
+            <div class="col">
+                <button type="button" ion-button (click)="cancelPicks()">Cancel All</button>
             </div>
         </div>
     </div>

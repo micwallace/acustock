@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ViewController, Events } from 'ionic-angular';
 import { PickTab } from "./tabs/pick";
 import { PickListTab } from "./tabs/pick-list";
 import { UnpickedListTab } from "./tabs/unpicked-list";
@@ -22,8 +22,14 @@ export class PickShipmentsPickPage {
   tab2Root = UnpickedListTab;
   tab3Root = PickListTab;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController, public events: Events) {
+    events.subscribe('closeModal', () => {
+      this.dismiss();
+    });
+  }
 
+  public dismiss(){
+    this.viewCtrl.dismiss();
   }
 
 }

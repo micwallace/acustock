@@ -20,8 +20,9 @@
       <ion-col col-5>LotSerial</ion-col>
       <ion-col col-2>Qty</ion-col>
     </div>
-    <ion-item tappable no-margin no-padding *ngFor="let item of pickProvider.unpickedItems" (click)="openPickItem(item);">
+    <ion-item tappable no-margin no-padding *ngFor="let item of pickProvider.unpickedItems; let i = index" (click)="openPickItem(item);">
       <strong>{{item.InventoryID.value}}</strong>
+      <span style="float: right;">Picked {{pickProvider.getItemPickedQty(i)}} of {{item.ShippedQty.value}}</span>
       <div no-margin no-padding>
         <ion-row *ngFor="let allocation of item.Allocations">
           <ion-col col-5>{{allocation.LocationID.value}}</ion-col>

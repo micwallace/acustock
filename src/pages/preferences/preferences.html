@@ -1,0 +1,33 @@
+<!--
+  Generated template for the PreferencesPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+    <ion-navbar>
+        <ion-title>Preferences</ion-title>
+    </ion-navbar>
+
+</ion-header>
+
+
+<ion-content no-padding>
+    <ng-container *ngFor="let group of preferences.schema">
+        <ion-list>
+            <ion-list-header>{{group.title}}</ion-list-header>
+            <ion-item *ngFor="let pref of group.preferences">
+                <ion-label color="primary">{{pref.title}}</ion-label>
+
+                <ion-input *ngIf="['text', 'password', 'url', 'number'].indexOf(pref.type) > -1" placeholder="{{pref.placeholder}}" type="{{pref.type}}" [value]="pref.def_value" [(ngModel)]="preferences.preferences[pref.key]"></ion-input>
+
+                <ion-toggle *ngIf="pref.type == 'toggle'" [checked]="pref.def_value" [(ngModel)]="preferences.preferences[pref.key]"></ion-toggle>
+
+                <ion-select *ngIf="pref.type == 'select'" [(ngModel)]="preferences.preferences[pref.key]">
+                    <ion-option *ngFor="let option of getPreferenceOptions(pref)" [value]="option.value">{{option.label}}</ion-option>
+                </ion-select>
+            </ion-item>
+        </ion-list>
+    </ng-container>
+</ion-content>

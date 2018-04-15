@@ -4,6 +4,7 @@ import { BarcodeListenerComponent } from './barcode-listener/barcode-listener.co
 import { ItemAutocompleteService } from './item-autocomplete/item-autocomplete';
 import { LocationAutocompleteService } from './item-autocomplete/bin-autocomplete';
 import { PickProvider } from './pick/pick';
+import { PreferencesProvider } from './preferences/preferences';
 
 export {
     Api,
@@ -11,5 +12,6 @@ export {
     ItemAutocompleteService,
     LocationAutocompleteService,
     BarcodeListenerComponent,
-    PickProvider
+    PickProvider,
+    PreferencesProvider
 };

@@ -16,7 +16,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { AutoCompleteModule } from 'ionic2-auto-complete';
 
-import { Api, CacheProvider, BarcodeListenerComponent, ItemAutocompleteService, LocationAutocompleteService, PickProvider } from '../providers/providers';
+import { Api, CacheProvider, BarcodeListenerComponent, ItemAutocompleteService, LocationAutocompleteService, PickProvider, PreferencesProvider } from '../providers/providers';
 import { HTTP } from '@ionic-native/http';
 import { ItemLookupDetailsPage } from "../pages/item-lookup-details/item-lookup-details";
 import { PickShipmentsListPage } from "../pages/pick-shipments-list/pick-shipments-list";
@@ -24,6 +24,7 @@ import { PickShipmentsPickPage } from "../pages/pick-shipments-pick/pick-shipmen
 import { PickTab} from "../pages/pick-shipments-pick/tabs/pick";
 import { PickListTab } from "../pages/pick-shipments-pick/tabs/pick-list";
 import { UnpickedListTab } from "../pages/pick-shipments-pick/tabs/unpicked-list";
+import { PreferencesPage } from "../pages/preferences/preferences";
 
 @NgModule({
     declarations: [
@@ -40,7 +41,8 @@ import { UnpickedListTab } from "../pages/pick-shipments-pick/tabs/unpicked-list
         ItemLookupDetailsPage,
         BinLookupPage,
         SetupPage,
-        BarcodeListenerComponent
+        PreferencesPage,
+        BarcodeListenerComponent,
     ],
     imports: [
         BrowserModule,
@@ -62,6 +64,7 @@ import { UnpickedListTab } from "../pages/pick-shipments-pick/tabs/unpicked-list
         ItemLookupDetailsPage,
         BinLookupPage,
         SetupPage,
+        PreferencesPage
     ],
     providers: [
         StatusBar,
@@ -75,6 +78,7 @@ import { UnpickedListTab } from "../pages/pick-shipments-pick/tabs/unpicked-list
         ItemAutocompleteService,
         LocationAutocompleteService,
         PickProvider,
+        PreferencesProvider
     ]
 })
 export class AppModule {

@@ -1,7 +1,7 @@
 import { HTTP } from '@ionic-native/http';
 import { Injectable } from '@angular/core';
 
-import { AppPreferences } from '@ionic-native/app-preferences';
+import { PreferencesProvider } from "../preferences/preferences";
 
 /**
  * Api is a generic REST Api handler. Set your API url first.
@@ -15,7 +15,7 @@ export class Api {
     private password:string = '';
     private company:string = '';
 
-    constructor(public http:HTTP, public appPreferences:AppPreferences) {
+    constructor(public http:HTTP, public prefs: PreferencesProvider) {
         this.updateSettings();
 
         this.http.setHeader('Content-Type', 'application/json');
@@ -24,57 +24,42 @@ export class Api {
     }
 
     updateSettings() {
-
-        return new Promise((resolve, reject) => {
-            this.appPreferences.fetch('url').then((res) => {
-                this.url = res;
-
-                this.appPreferences.fetch('username').then((res) => {
-                    this.username = res;
-
-                    this.appPreferences.fetch('password').then((res) => {
-                        this.password = res;
-
-                        this.appPreferences.fetch('company').then((res) => {
-                            this.company = res;
-
-                            resolve();
-                        });
-                    });
-                });
-            });
-        });
+        this.url = this.prefs.getPreference('connection_url');
+        this.username = this.prefs.getPreference('connection_username');
+        this.password = this.prefs.getPreference('connection_password');
+        this.company = this.prefs.getPreference('connection_company');
     }
 
     public testConnection() {
 
         return new Promise((resolve, reject) => {
-            this.updateSettings().then(() => {
-                this.login().then((res) => {
 
-                    resolve();
+            this.updateSettings();
 
-                }, (err) => {
+            this.login().then((res) => {
 
-                    try {
-                        var error = JSON.parse(err.error);
+                resolve();
 
-                        if (error.hasOwnProperty('exceptionMessage')){
-                            err.errorData = error;
-                            err.message = error.exceptionMessage;
-                        } else {
-                            err.message = err.error;
-                        }
+            }, (err) => {
 
-                        reject(err);
-                    } catch (e){
+                try {
+                    var error = JSON.parse(err.error);
+
+                    if (error.hasOwnProperty('exceptionMessage')){
+                        err.errorData = error;
+                        err.message = error.exceptionMessage;
+                    } else {
                         err.message = err.error;
-                        reject(err);
                     }
-                }).catch((err)=>{
+
+                    reject(err);
+                } catch (e){
                     err.message = err.error;
                     reject(err);
-                });
+                }
+            }).catch((err)=>{
+                err.message = err.error;
+                reject(err);
             });
         });
     }
@@ -96,17 +81,19 @@ export class Api {
     }
 
     getWarehouseList() {
-        // TODO: add warehouse filter
         return this.get("Warehouse?$expand=Locations");
     }
 
-    getItemWarehouseLocations(itemId:string) {
-        // TODO: add warehouse filter
-        return this.get("InventoryLocations?$filter=InventoryID eq '" + itemId + "'");
+    getItemWarehouseLocations(itemId:string, warehouse:string) {
+        var warehouseFilter = warehouse ? " and WarehouseID eq '" + warehouse + "'" : "";
+
+        return this.get("InventoryLocations?$filter=InventoryID eq '" + itemId + "'" + warehouseFilter);
     }
 
-    getLocationContents(locationId:string) {
-        return this.get("InventoryLocations?$filter=LocationID eq '" + locationId + "'");
+    getLocationContents(locationId:string, warehouse:string) {
+        var warehouseFilter = warehouse ? " and WarehouseID eq '" + warehouse + "'" : "";
+
+        return this.get("InventoryLocations?$filter=LocationID eq '" + locationId + "'" + warehouseFilter);
     }
 
     getItemBatches(itemId:string, warehouseId:string, locationId:string){

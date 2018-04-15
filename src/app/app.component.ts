@@ -2,14 +2,14 @@ import { Component, ViewChild } from '@angular/core';
 import { Platform, Nav, LoadingController } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-import { AppPreferences } from '@ionic-native/app-preferences';
 
 import { HomePage } from '../pages/home/home';
 import { PickShipmentsPage } from '../pages/pick-shipments/pick-shipments';
 import { ItemLookupPage } from '../pages/item-lookup/item-lookup';
 import { BinLookupPage } from '../pages/bin-lookup/bin-lookup';
 import { SetupPage } from '../pages/setup/setup';
-import { Api, CacheProvider, PickProvider } from '../providers/providers';
+import { Api, CacheProvider, PreferencesProvider } from '../providers/providers';
+import { PreferencesPage } from "../pages/preferences/preferences";
 
 @Component({
     templateUrl: 'app.html'
@@ -18,7 +18,7 @@ export class MyApp {
     @ViewChild(Nav) navCtrl:Nav;
     rootPage:any = PickShipmentsPage;
 
-    constructor(platform:Platform, statusBar:StatusBar, splashScreen:SplashScreen, public appPreferences:AppPreferences, public api:Api, public cache:CacheProvider, public loadingCtrl: LoadingController) {
+    constructor(platform:Platform, statusBar:StatusBar, splashScreen:SplashScreen, public prefs: PreferencesProvider, public api:Api, public cache:CacheProvider, public loadingCtrl: LoadingController) {
         platform.ready().then((readySrc) => {
 
             console.log('Platform ready from', readySrc);
@@ -32,34 +32,30 @@ export class MyApp {
 
                 var context = this;
 
-                context.appPreferences.fetch('url').then(function (res) {
-                    if (!res) {
-                        context.rootPage = SetupPage;
-                    } else {
-                        let loader = context.loadingCtrl.create({content: "Logging in..."});
-                        loader.present();
+                if (this.prefs.getPreference('url') == "") {
+                    context.rootPage = SetupPage;
+                } else {
+                    let loader = context.loadingCtrl.create({content: "Logging in..."});
+                    loader.present();
 
-                        context.api.testConnection().then(() => {
+                    context.api.testConnection().then(() => {
 
-                            loader.dismiss();
+                        loader.dismiss();
 
-                            console.log("Login succeeded, loading initial data...");
-                            context.cache.initialLoad().then(() => {
-                                console.log("Initial data loaded.")
-                            }).catch((err) => {
-                                console.log("Initial data load failed: " + err)
-                            });
-
+                        console.log("Login succeeded, loading initial data...");
+                        context.cache.initialLoad().then(() => {
+                            console.log("Initial data loaded.")
                         }).catch((err) => {
-                            loader.dismiss();
-                            context.navCtrl.setRoot(SetupPage);
-                            console.log(JSON.stringify(err));
-                            alert("Login failed, please check connection. " +err.message);
+                            console.log("Initial data load failed: " + err)
                         });
-                    }
-                }).catch((err) => {
-                    alert("Failed to load the cordova platform. " + err.message);
-                });
+
+                    }).catch((err) => {
+                        loader.dismiss();
+                        context.navCtrl.setRoot(SetupPage);
+                        console.log(JSON.stringify(err));
+                        alert("Login failed, please check connection. " +err.message);
+                    });
+                }
 
             //}, 2000);
 
@@ -89,9 +85,10 @@ export class MyApp {
     }
 
     showPreferences() {
-        this.appPreferences.show().catch((err) => {
+        /*this.appPreferences.show().catch((err) => {
             //TODO: add setup check here. alert(err);
-        });
+        });*/
+        this.navCtrl.push(PreferencesPage);
     }
 
 }
