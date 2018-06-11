@@ -84,23 +84,11 @@ export class BinLookupPage {
         this.loader = this.loadingCtrl.create({content: "Loading..."});
         this.loader.present();
 
-        this.cache.getBinList().then((binList: any) => {
+        this.cache.getBinById(barcodeText).then((bin: any) => {
 
-            console.log(JSON.stringify(binList));
-
-            for (var i=0; i<binList.length; i++){
-                if (binList[i].LocationID.value == barcodeText){
-
-                    this.selectedLocation = binList[i];
-
-                    this.loadBinContents(binList[i]);
-
-                    return;
-                }
-            }
-
+            this.selectedLocation = bin;
+            this.loadBinContents(bin);
             this.dismissLoader();
-            alert("The warehouse location " + barcodeText + " was not found.");
 
         }).catch((err) => {
 
@@ -119,7 +107,7 @@ export class BinLookupPage {
         let loader = this.loadingCtrl.create({content: "Loading..."});
         loader.present();
 
-        this.api.getItemBatches(item.InventoryID.value, item.WarehouseID.value, item.LocationID.value).then((res) => {
+        this.api.getItemBatches(item.InventoryID.value, item.Warehouse.value, item.Location.value).then((res) => {
 
             item.LotSerialDetails = res;
 

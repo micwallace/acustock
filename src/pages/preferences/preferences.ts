@@ -16,9 +16,11 @@ import { PreferencesProvider, CacheProvider } from '../../providers/providers'
 })
 export class PreferencesPage {
 
+    preferences;
     currentWarehouse = "";
 
     constructor(public navCtrl:NavController, public navParams:NavParams, public prefs:PreferencesProvider, public events:Events, public cache: CacheProvider) {
+        this.preferences = prefs;
         this.currentWarehouse = prefs.getPreference('warehouse');
     }
 
@@ -42,13 +44,14 @@ export class PreferencesPage {
         var options = [];
 
         if (pref.key == "warehouse") {
-            for (let warehouse of this.cache.warehouseList) {
-                if (warehouse.Active.value)
-                    options.push({
-                        label: warehouse.Description.value,
-                        value: warehouse.WarehouseID.value
-                    });
-            }
+            if (this.cache.warehouseList)
+                for (let warehouse of this.cache.warehouseList) {
+                    if (warehouse.Active.value)
+                        options.push({
+                            label: warehouse.Description.value,
+                            value: warehouse.WarehouseID.value
+                        });
+                }
         } else if (pref.hasOwnProperty('options')) {
             options = pref.options;
         }

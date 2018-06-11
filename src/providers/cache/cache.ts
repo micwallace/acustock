@@ -13,6 +13,7 @@ export class CacheProvider {
 
     itemList = null;
     binList = null;
+    binIndex = null;
     warehouseList = null;
 
     constructor(public api:Api, public prefs: PreferencesProvider) {
@@ -61,7 +62,7 @@ export class CacheProvider {
                     }
                 }
 
-                reject({message: "No item found with ID "+id});
+                reject({message: "The item with ID " + id + " was not found."});
 
                 // TODO: Perform fresh lookup on cache expiry
 
@@ -92,14 +93,16 @@ export class CacheProvider {
     public getBinById(id){
         return new Promise((resolve, reject)=>{
 
+            if (this.binIndex && this.binIndex.hasOwnProperty(id)){
+                resolve(this.binIndex[id]);
+                return;
+            }
+
             this.getBinList().then((binList: any)=>{
 
-                for (var i=0; i<binList.length; i++){
-                    if (binList[i].LocationID.value == id){
-
-                        resolve(binList[i]);
-                        return;
-                    }
+                if (this.binIndex.hasOwnProperty(id)){
+                    resolve(this.binIndex[id]);
+                    return;
                 }
 
                 reject({message: "No location found with ID "+id});
@@ -112,16 +115,26 @@ export class CacheProvider {
     }
 
     public generateBinList(){
+        var found = false;
         for (var i = 0; i < this.warehouseList.length; i++) {
             if (this.warehouseList[i].WarehouseID.value == this.prefs.getPreference('warehouse')) {
                 this.binList = this.warehouseList[i].Locations;
-                return;
+                found = true;
+                break;
             }
         }
 
         // Warehouse not found, default to first loaded warehouse
-        this.binList = this.warehouseList[0].Locations;
-        this.prefs.setPreference('warehouse', this.warehouseList[0].WarehouseID.value, true);
+        if (!found) {
+            this.binList = this.warehouseList[0].Locations;
+            this.prefs.setPreference('warehouse', this.warehouseList[0].WarehouseID.value, true);
+        }
+
+        // Generate index for quick lookup
+        this.binIndex = {};
+        for (let bin of this.binList){
+            this.binIndex[bin.LocationID.value] = bin;
+        }
     }
 
     public initialLoad() {

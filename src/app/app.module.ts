@@ -25,12 +25,21 @@ import { PickTab} from "../pages/pick-shipments-pick/tabs/pick";
 import { PickListTab } from "../pages/pick-shipments-pick/tabs/pick-list";
 import { UnpickedListTab } from "../pages/pick-shipments-pick/tabs/unpicked-list";
 import { PreferencesPage } from "../pages/preferences/preferences";
+import { BinTransferPage } from "../pages/bin-transfer/bin-transfer";
+import { TransferProvider } from "../providers/transfer/transfer";
+import { EnterTab } from "../pages/bin-transfer/tabs/enter";
+import { TransferListTab } from "../pages/bin-transfer/tabs/transfer-list";
+import { TransferHistoryTab } from "../pages/bin-transfer/tabs/transfer-history";
 
 @NgModule({
     declarations: [
         MyApp,
         HomePage,
         LoginPage,
+        BinTransferPage,
+        EnterTab,
+        TransferListTab,
+        TransferHistoryTab,
         PickShipmentsPage,
         PickShipmentsListPage,
         PickShipmentsPickPage,
@@ -54,6 +63,10 @@ import { PreferencesPage } from "../pages/preferences/preferences";
         MyApp,
         HomePage,
         LoginPage,
+        BinTransferPage,
+        EnterTab,
+        TransferListTab,
+        TransferHistoryTab,
         PickShipmentsPage,
         PickShipmentsListPage,
         PickShipmentsPickPage,
@@ -78,6 +91,7 @@ import { PreferencesPage } from "../pages/preferences/preferences";
         ItemAutocompleteService,
         LocationAutocompleteService,
         PickProvider,
+        TransferProvider,
         PreferencesProvider
     ]
 })

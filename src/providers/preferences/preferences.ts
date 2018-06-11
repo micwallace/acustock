@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class PreferencesProvider {
 
-    schema = [
+    public schema = [
         {
             title: "Connection",
             preferences: [
@@ -92,6 +92,10 @@ export class PreferencesProvider {
 
         if (save)
             this.savePreferences();
+    }
+
+    hasPreference(key){
+        return this.preferences.hasOwnProperty(key);
     }
 
     getPreference(key) {

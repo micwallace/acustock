@@ -87,36 +87,11 @@ export class ItemLookupPage {
         this.loader = this.loadingCtrl.create({content: "Loading..."});
         this.loader.present();
 
-        this.cache.getItemList().then((itemList: any) => {
+        this.cache.getItemById(barcodeText).then((item: any) => {
 
-            for (var i=0; i<itemList.length; i++){
-
-                if (itemList[i].InventoryID.value == barcodeText){
-
-                    this.selectedItem = itemList[i];
-
-                    this.loadItemLocations(itemList[i]);
-
-                    return;
-                }
-
-
-                for (var x=0; x<itemList[i].CrossReferences.length; x++){
-
-                    if (itemList[i].CrossReferences[x].AlternateID.value == barcodeText){
-
-                        this.selectedItem = itemList[i];
-
-                        this.loadItemLocations(itemList[i]);
-
-                        return;
-                    }
-
-                }
-            }
-
+            this.selectedItem = item;
+            this.loadItemLocations(item);
             this.dismissLoader();
-            alert("The item with ID " + barcodeText + " was not found.");
 
         }).catch((err) => {
 
@@ -135,7 +110,7 @@ export class ItemLookupPage {
         let loader = this.loadingCtrl.create({content: "Loading..."});
         loader.present();
 
-        this.api.getItemBatches(item.InventoryID.value, item.WarehouseID.value, item.LocationID.value).then((res) => {
+        this.api.getItemBatches(item.InventoryID.value, item.Warehouse.value, item.Location.value).then((res) => {
 
             item.LotSerialDetails = res;
 
@@ -145,8 +120,9 @@ export class ItemLookupPage {
 
         }).catch((err) => {
 
-            loader.dismiss();
-            alert(err.message);
+            loader.dismiss().then(()=>{
+                alert(err.message);
+            });
         });
 
     }

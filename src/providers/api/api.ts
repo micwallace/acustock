@@ -85,15 +85,15 @@ export class Api {
     }
 
     getItemWarehouseLocations(itemId:string, warehouse:string) {
-        var warehouseFilter = warehouse ? " and WarehouseID eq '" + warehouse + "'" : "";
+        var warehouseFilter = warehouse ? " and Warehouse eq '" + warehouse + "'" : "";
 
         return this.get("InventoryLocations?$filter=InventoryID eq '" + itemId + "'" + warehouseFilter);
     }
 
     getLocationContents(locationId:string, warehouse:string) {
-        var warehouseFilter = warehouse ? " and WarehouseID eq '" + warehouse + "'" : "";
+        var warehouseFilter = warehouse ? " and Warehouse eq '" + warehouse + "'" : "";
 
-        return this.get("InventoryLocations?$filter=LocationID eq '" + locationId + "'" + warehouseFilter);
+        return this.get("InventoryLocations?$filter=Location eq '" + locationId + "'" + warehouseFilter);
     }
 
     getItemBatches(itemId:string, warehouseId:string, locationId:string){
@@ -104,10 +104,10 @@ export class Api {
             filter.push("InventoryID eq '"+itemId+"'");
 
         if (warehouseId)
-            filter.push("WarehouseID eq '"+warehouseId+"'");
+            filter.push("Warehouse eq '"+warehouseId+"'");
 
         if (locationId)
-            filter.push("LocationID eq '"+locationId+"'");
+            filter.push("Location eq '"+locationId+"'");
 
         return this.get("InventoryLotSerials" + (filter.length ? "?$filter=" + filter.join(" and ") : ""));
     }

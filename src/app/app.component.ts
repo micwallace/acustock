@@ -10,13 +10,14 @@ import { BinLookupPage } from '../pages/bin-lookup/bin-lookup';
 import { SetupPage } from '../pages/setup/setup';
 import { Api, CacheProvider, PreferencesProvider } from '../providers/providers';
 import { PreferencesPage } from "../pages/preferences/preferences";
+import { BinTransferPage } from "../pages/bin-transfer/bin-transfer";
 
 @Component({
     templateUrl: 'app.html'
 })
 export class MyApp {
     @ViewChild(Nav) navCtrl:Nav;
-    rootPage:any = PickShipmentsPage;
+    rootPage:any = BinTransferPage;
 
     constructor(platform:Platform, statusBar:StatusBar, splashScreen:SplashScreen, public prefs: PreferencesProvider, public api:Api, public cache:CacheProvider, public loadingCtrl: LoadingController) {
         platform.ready().then((readySrc) => {
@@ -32,7 +33,7 @@ export class MyApp {
 
                 var context = this;
 
-                if (this.prefs.getPreference('url') == "") {
+                if (!this.prefs.hasPreference('connection_url')) {
                     context.rootPage = SetupPage;
                 } else {
                     let loader = context.loadingCtrl.create({content: "Logging in..."});
@@ -62,6 +63,11 @@ export class MyApp {
         }).catch((err) => {
 
         });
+    }
+
+    goToTransfer(params) {
+        if (!params) params = {};
+        this.navCtrl.setRoot(BinTransferPage);
     }
 
     goToPickShipments(params) {

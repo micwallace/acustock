@@ -59,13 +59,13 @@ export class BarcodeListenerComponent implements OnInit {
       //If they are both less than 15, we know we are beyond the first characters, 
       //and we may start only adding the current character. Also, the current code cannot
       //be Enter, because that is when we need to emit the outputString
-      if(this.currentTimeDiff <= 25 && this.previousTimeDiff <= 25 && e.code != 'Enter'){
+      if(this.currentTimeDiff <= 25 && this.previousTimeDiff <= 25 && e.key != 'Enter'){
         this.outputString += this.currentKey;
       }
 
       //If we are in the middle of the scan and the code is 13, we can stop adding to the 
       //outputString and emit it instead. We must then set is back to empty for the next scan.
-      if(this.currentTimeDiff <= 25 && this.previousTimeDiff <= 25 && e.code == 'Enter'){
+      if(this.currentTimeDiff <= 25 && this.previousTimeDiff <= 25 && e.key == 'Enter'){
         this.scan.emit(this.outputString);
         this.outputString = '';
       }
