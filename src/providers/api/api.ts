@@ -18,8 +18,8 @@ export class Api {
     constructor(public http:HTTP, public prefs: PreferencesProvider) {
         this.updateSettings();
 
-        this.http.setHeader('Content-Type', 'application/json');
-        this.http.setHeader('Accept', 'application/json');
+        this.http.setHeader('*', 'Content-Type', 'application/json');
+        this.http.setHeader('*', 'Accept', 'application/json');
         this.http.setDataSerializer('json');
     }
 
@@ -120,23 +120,68 @@ export class Api {
         return this.get("ShipmentPriorityList");
     }
 
-    get(endpoint:string, params?:any, reqOpts?:any) {
-        return this.request('get', endpoint, null, reqOpts, params);
+    putTransfer(data){
+        return this.put("Transfer", data, {});
+    }
+
+    deleteTransfer(transferId:string){
+        return this.delete("Transfer/" + transferId);
+    }
+
+    releaseTransfer(transferId:string){
+        return this.postActionAndGetResult("Transfer/Release", {entity:{ReferenceNbr: {value: transferId}}});
+    }
+
+    postActionAndGetResult(endpoint:string, body:any){
+
+        return new Promise((resolve, reject) => {
+
+            this.request('post', endpoint, body, {}, {}, false, true).then((res:any)=> {
+
+                if (res.status == 204)
+                    return resolve(true);
+
+                var url = new URL(this.url);
+                url.pathname = res.headers.location;
+
+                setTimeout(()=>{ this.getLongRunningOpResult(url.toString(), resolve, reject, 1); }, 3000);
+            }).catch((err)=>{
+                reject(err);
+            });
+        });
+    }
+
+    getLongRunningOpResult(url, resolve, reject, count){
+        this.http.get(url, {}, null).then((res:any)=>{
+
+            if (res.status == 204)
+                return resolve(true);
+
+            setTimeout(()=>{ this.getLongRunningOpResult(url, resolve, reject, count); }, 4000);
+
+        }).catch((err)=>{
+            err.message = err.error;
+            reject(err);
+        });
+    }
+
+    get(endpoint:string, params?:any, headers?:any) {
+        return this.request('get', endpoint, null, headers, params);
     }
 
     post(endpoint:string, body:any) {
         return this.request('post', endpoint, body, {});
     }
 
-    put(endpoint:string, body:any, reqOpts?:any) {
-        return this.request('put', endpoint, body, reqOpts);
+    put(endpoint:string, body:any, headers?:any) {
+        return this.request('put', endpoint, body, headers);
     }
 
-    delete(endpoint:string, reqOpts?:any) {
-        return this.request('delete', endpoint, null, reqOpts);
+    delete(endpoint:string, headers?:any) {
+        return this.request('delete', endpoint, null, headers);
     }
 
-    request(method:string, endpoint:string, body?:any, reqOpts?:any, params?:any) {
+    request(method:string, endpoint:string, body?:any, headers?:any, params?:any, loginAttempt?:boolean, returnFullResponse?:any) {
         return new Promise((resolve, reject) => {
 
             let url = this.url + this.api_endpoint + '/' + endpoint;
@@ -144,25 +189,31 @@ export class Api {
 
             switch (method) {
                 case "get":
-                    promise = this.http.get(url, reqOpts, params);
+                    promise = this.http.get(url, headers, params);
                     break;
 
                 case "post":
-                    promise = this.http.post(url, body, reqOpts);
+                    promise = this.http.post(url, body, headers);
                     break;
 
                 case "put":
-                    promise = this.http.put(url, body, reqOpts);
+                    promise = this.http.put(url, body, headers);
                     break;
 
                 case "delete":
-                    promise = this.http.delete(url, params, reqOpts);
+                    promise = this.http.delete(url, params, headers);
                     break;
             }
 
             promise.then((res) => {
 
                 if (res.status > 199 && res.status < 300) {
+
+                    if (returnFullResponse)
+                        return resolve(res);
+
+                    if (res.status == 204)
+                        return resolve(true);
 
                     try {
                         var data = JSON.parse(res.data);
@@ -171,12 +222,55 @@ export class Api {
                         return;
                     }
 
-                    resolve(data);
+                    return resolve(data);
                 }
 
                 reject({message: "Unknown error:" + res.error});
 
             }, (err) => {
+
+                if (err.status == 401){
+                    if (this.prefs.getPreference("password") != "" && !loginAttempt){
+                        this.login().then((res) => {
+
+                            this.request(method, endpoint, body, headers, params, true).then((res) => {
+                                resolve(res);
+                            }, (err) => {
+                                reject(err);
+                            }).catch((err) => {
+                                reject(err);
+                            });
+
+                        }, (err) => {
+
+                            // TODO: Show login screen
+
+                            try {
+                                var error = JSON.parse(err.error);
+
+                                if (error.hasOwnProperty('exceptionMessage')){
+                                    err.errorData = error;
+                                    err.message = error.exceptionMessage;
+                                } else {
+                                    err.message = err.error;
+                                }
+
+                                reject(err);
+                            } catch (e){
+                                err.message = err.error;
+                                reject(err);
+                            }
+                        }).catch((err)=>{
+                            err.message = err.error;
+                            reject(err);
+                        });
+                    } else {
+                        //this.navCtrl.setRoot(LoginPage);
+                        err.message = err.error;
+                        reject(err);
+                    }
+                    return;
+                }
 
                 try {
                     var error = JSON.parse(err.error);

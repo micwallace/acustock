@@ -20,6 +20,23 @@ export class CacheProvider {
         console.log('Hello CacheProvider Provider');
     }
 
+    public getCurrentWarehouse(){
+
+        for (var i = 0; i < this.warehouseList.length; i++) {
+            if (this.warehouseList[i].WarehouseID.value == this.prefs.getPreference('warehouse')) {
+                return this.warehouseList[i];
+            }
+        }
+
+        // Warehouse not found, default to first loaded warehouse
+        if (this.warehouseList != null && this.warehouseList.length > 0) {
+            this.prefs.setPreference('warehouse', this.warehouseList[0].WarehouseID.value, true);
+            return this.warehouseList[0];
+        }
+
+        return null;
+    }
+
     public getItemList() {
         return new Promise((resolve, reject) => {
 
@@ -105,7 +122,10 @@ export class CacheProvider {
                     return;
                 }
 
-                reject({message: "No location found with ID "+id});
+                var warehouse = this.getCurrentWarehouse();
+                var warehouseName = warehouse ? (warehouse.Description.value ? warehouse.Description.value : warehouse.WarehouseID.value) : "Unknown";
+
+                reject({message: "No location found with ID "+id+" in warehouse "+warehouseName});
 
                 // TODO: Perform fresh lookup on cache expiry
             }).catch((err) => {
@@ -115,20 +135,12 @@ export class CacheProvider {
     }
 
     public generateBinList(){
-        var found = false;
-        for (var i = 0; i < this.warehouseList.length; i++) {
-            if (this.warehouseList[i].WarehouseID.value == this.prefs.getPreference('warehouse')) {
-                this.binList = this.warehouseList[i].Locations;
-                found = true;
-                break;
-            }
-        }
+        var warehouse = this.getCurrentWarehouse();
 
-        // Warehouse not found, default to first loaded warehouse
-        if (!found) {
-            this.binList = this.warehouseList[0].Locations;
-            this.prefs.setPreference('warehouse', this.warehouseList[0].WarehouseID.value, true);
-        }
+        if (!warehouse)
+            return;
+
+        this.binList = warehouse.Locations;
 
         // Generate index for quick lookup
         this.binIndex = {};

@@ -91,6 +91,7 @@ export class EnterTab {
 
             this.cache.api.getLocationContents(locId, this.cache.prefs.getPreference('warehouse')).then((itemList:any)=>{
 
+                console.log(JSON.stringify(itemList));
                 // Index current items for easier validation
                 this.currentLocationItems = {};
 
@@ -168,7 +169,7 @@ export class EnterTab {
         this.loader = this.loadingCtrl.create({content: "Loading..."});
         this.loader.present();
 
-        this.cache.getItemById(itemId).then((item)=>{
+        this.cache.getItemById(itemId).then((item:any)=>{
 
             this.dismissLoader();
 
@@ -176,6 +177,10 @@ export class EnterTab {
             if (!this.currentLocationItems.hasOwnProperty(item.InventoryID.value)){
                 alert("There is no quantity on-hand to transfer for the item and location combination.");
                 this.enteredData.item = "";
+                return;
+            }
+
+            if (!this.validateItemQty(1)){
                 return;
             }
 
@@ -194,6 +199,19 @@ export class EnterTab {
         });
     }
 
+    validateItemQty(qty:any){
+        var reqQty = qty ? qty : this.enteredData.qty;
+        var srcQty = this.currentLocationItems.hasOwnProperty(this.enteredData.item) ? this.currentLocationItems[this.enteredData.item].QtyOnHand.value : 0;
+        var curPendingQty = this.transferProvider.getItemLocPendingQty(this.enteredData.location, this.enteredData.item);
+        if (srcQty < curPendingQty + reqQty){
+            alert("There is only "+srcQty+" available for transfer from the current location. "+(curPendingQty ? curPendingQty+" are pending." : ""));
+            if (!qty)
+                this.enteredData.qty = srcQty - curPendingQty;
+            return false;
+        }
+        return true;
+    }
+
     nextFromBin(){
         if (this.enteredData.item != "" && this.enteredData.qty > 0){
             this.addTransferItem();
@@ -202,12 +220,43 @@ export class EnterTab {
         this.resetForm();
     }
 
+    nextItem(){
+        if (this.enteredData.item != "" && this.enteredData.qty > 0){
+            this.addTransferItem();
+        }
+
+        this.enteredData.item = "";
+        this.enteredData.qty = 0;
+        this.showItem = false;
+        this.showQty = false;
+    }
+
     addTransferItem(){
         // validate values
+        if (!this.validateItemQty(null))
+            return;
 
-        this.transferProvider.addPendingItem(this.enteredData.location, this.enteredData.toLocation, this.enteredData.item, this.enteredData.qty);
+        var srcQty = this.currentLocationItems.hasOwnProperty(this.enteredData.item) ? this.currentLocationItems[this.enteredData.item].QtyOnHand.value : 0;
 
+        this.transferProvider.addPendingItem(this.enteredData.location, this.enteredData.toLocation, this.enteredData.item, this.enteredData.qty, srcQty);
 
+    }
+
+    commitTransfers(){
+        this.nextFromBin();
+
+        if (this.transferProvider.pendingQty == 0)
+            return alert("Add some items to the transfer list first.");
+
+        this.loader = this.loadingCtrl.create({content: "Loading..."});
+        this.loader.present();
+
+        this.transferProvider.commitTransfer().then(()=>{
+            this.dismissLoader();
+        }).catch((err)=>{
+            this.dismissLoader();
+            alert(err.message);
+        });
     }
 
     onBarcodeScan(barcodeText){
@@ -233,7 +282,7 @@ export class EnterTab {
             this.setToLocation(barcodeText);
         }).catch((err) => {
 
-            this.cache.getItemById(barcodeText).then((item)=>{
+            this.cache.getItemById(barcodeText).then((item:any)=>{
 
                 if (this.enteredData.item == "" || this.enteredData.qty == 0){
                     this.setItem(item.InventoryID.value);
@@ -244,6 +293,7 @@ export class EnterTab {
                 if (item.InventoryID.value == this.enteredData.item){
                     this.zone.run(()=>{
                         this.enteredData.qty++;
+                        this.validateItemQty(null);
                     });
                 } else {
                     this.addTransferItem();

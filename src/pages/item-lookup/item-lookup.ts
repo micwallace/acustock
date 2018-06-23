@@ -101,8 +101,10 @@ export class ItemLookupPage {
     }
 
     private dismissLoader(){
-        this.loader.dismiss();
-        this.loader = null;
+        if (this.loader){
+            this.loader.dismiss();
+            this.loader = null;
+        }
     }
 
     openDetailsModal(event, item){

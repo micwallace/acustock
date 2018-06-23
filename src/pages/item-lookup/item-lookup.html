@@ -36,7 +36,7 @@
     <!--</ion-item>-->
     <ion-scroll style="height: calc(100% - 100px);" scrollY="true">
         <ion-list>
-            <ion-item tappable *ngFor="let location of itemLocations" (click)="openDetailsModal($event, location)">
+            <ion-item no-padding tappable *ngFor="let location of itemLocations" (click)="openDetailsModal($event, location)">
                 <ion-label>{{location.Location.value}}</ion-label>
                 <div class="item-note" item-end style="width: 120px;">
                     <ion-row>

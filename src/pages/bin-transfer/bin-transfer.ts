@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams, ViewController, Events } from 'ion
 import { EnterTab } from "./tabs/enter";
 import { TransferListTab } from "./tabs/transfer-list";
 import { TransferHistoryTab } from "./tabs/transfer-history";
+import { TransferProvider } from "../../providers/transfer/transfer";
 
 /**
  * Generated class for the PickShipmentsPickPage page.
@@ -22,7 +23,7 @@ export class BinTransferPage {
   tab2Root = TransferListTab;
   tab3Root = TransferHistoryTab;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController, public events: Events) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController, public events: Events, public transferProvider: TransferProvider) {
 
   }
 

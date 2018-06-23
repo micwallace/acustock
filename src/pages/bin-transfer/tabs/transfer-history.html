@@ -23,16 +23,16 @@
       <ion-col col-5>LotSerial</ion-col>
       <ion-col col-2>Qty</ion-col>
     </div>
-    <ion-item tappable no-margin no-padding *ngFor="let item of transferProvider.transferHistory; let i = index" (click)="openTransferDetails(item);">
-      <strong>{{item.InventoryID.value}}</strong>
-      <span style="float: right;">Picked {{pickProvider.getItemPickedQty(i)}} of {{item.ShippedQty.value}}</span>
+    <ion-item tappable no-margin no-padding *ngFor="let transfer of transferProvider.transferHistory; let i = index" (click)="openTransferDetails(transfer);">
+      <strong>{{transfer.ReferenceNbr.value}}</strong>
+      <!--<span style="float: right;">Picked {{pickProvider.getItemPickedQty(i)}} of {{item.ShippedQty.value}}</span>
       <div no-margin no-padding>
         <ion-row *ngFor="let allocation of item.Allocations">
           <ion-col col-5>{{allocation.LocationID.value}}</ion-col>
           <ion-col col-5>{{allocation.LotSerialNbr.value}}</ion-col>
           <ion-col col-2>{{allocation.Qty.value}}</ion-col>
         </ion-row>
-      </div>
+      </div>-->
     </ion-item>
   </ion-grid>
 </ion-content>

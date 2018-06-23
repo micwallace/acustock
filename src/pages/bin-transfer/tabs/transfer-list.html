@@ -19,16 +19,23 @@
 <ion-content padding>
     <ion-grid>
         <div class="row header">
-            <ion-col col-10>Locations / Item</ion-col>
+            <ion-col col-8>Locations / Item</ion-col>
             <ion-col col-2>Qty</ion-col>
         </div>
-        <ion-item tappable no-margin no-padding *ngFor="let key of objectKeys(transferProvider.pendingItems)" (click)="openEditDialog(item);">
+        <ion-item no-margin no-padding *ngFor="let key of objectKeys(transferProvider.pendingItems)">
             <strong>{{transferProvider.pendingItems[key].Location.value}} <ion-icon name="arrow-round-forward"></ion-icon> {{transferProvider.pendingItems[key].ToLocation.value}}</strong>
             <strong>Items</strong>
             <div no-margin no-padding>
-                <ion-row *ngFor="let skey of objectKeys(transferProvider.pendingItems[key].Items)">
-                    <ion-col col-5>{{transferProvider.pendingItems[key].Items[skey].InventoryID.value}}</ion-col>
-                    <ion-col col-2>{{transferProvider.pendingItems[key].Items[skey].Qty.value}}</ion-col>
+                <ion-row tappable *ngFor="let skey of objectKeys(transferProvider.pendingItems[key].Items)" (click)="openEditDialog(key, skey);">
+                    <ion-col col-8>{{transferProvider.pendingItems[key].Items[skey].InventoryID.value}}</ion-col>
+                    <ion-col col-2 text-right>
+                        {{transferProvider.pendingItems[key].Items[skey].Qty.value}}
+                    </ion-col>
+                    <ion-col col-2>
+                        <button ion-button icon-only small float-right (click)="deleteItem(key, skey); $event.stopPropagation();">
+                            <ion-icon name="trash"></ion-icon>
+                        </button>
+                    </ion-col>
                 </ion-row>
             </div>
         </ion-item>

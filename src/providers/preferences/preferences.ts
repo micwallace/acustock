@@ -40,7 +40,7 @@ export class PreferencesProvider {
                     type: "text",
                     placeholder: "",
                     def_value: "Company"
-                },
+                }
             ]
         },
         {
@@ -70,8 +70,6 @@ export class PreferencesProvider {
     defaults = {};
 
     preferences = {};
-
-    cache;
 
     constructor() {
         console.log('Hello PreferencesProvider Provider');
