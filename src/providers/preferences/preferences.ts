@@ -84,6 +84,10 @@ export class PreferencesProvider {
         }
     }
 
+    isSetupComplete(){
+        return (this.hasPreference("connection_url") && this.hasPreference("connection_username") && this.hasPreference("connection_company"));
+    }
+
     setPreference(key, value, save=false) {
         if (this.defaults.hasOwnProperty(key))
             this.preferences[key] = value;
@@ -93,7 +97,7 @@ export class PreferencesProvider {
     }
 
     hasPreference(key){
-        return this.preferences.hasOwnProperty(key);
+        return this.preferences.hasOwnProperty(key) && this.preferences[key] != "";
     }
 
     getPreference(key) {

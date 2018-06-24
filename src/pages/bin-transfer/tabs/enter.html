@@ -28,7 +28,7 @@
             <ion-col>
                 <ion-item no-padding>
                     <ion-label color="primary">From Bin:</ion-label>
-                    <ion-input id="location" #location type="text" [(ngModel)]="enteredData.location" (keyup.enter)="setLocation()" autofocus></ion-input>
+                    <ion-input id="location" #location type="text" [(ngModel)]="enteredData.location" (keyup.enter)="setLocation()" autofocus autocorrect="on"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -36,7 +36,7 @@
             <ion-col>
                 <ion-item no-padding>
                     <ion-label color="primary">To Bin:</ion-label>
-                    <ion-input id="to-location" #tolocation type="text" [(ngModel)]="enteredData.toLocation" (keyup.enter)="setToLocation()" autofocus></ion-input>
+                    <ion-input id="to-location" #tolocation type="text" [(ngModel)]="enteredData.toLocation" (keyup.enter)="setToLocation()"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -52,7 +52,7 @@
             <ion-col>
                 <ion-item no-padding>
                     <ion-label color="primary">Quantity:</ion-label>
-                    <ion-input id="qty" #qty [(ngModel)]="enteredData.qty" (keyup.enter)="setQuantity()"></ion-input>
+                    <ion-input id="qty" #qty type="number" min="0" [(ngModel)]="enteredData.qty" (keyup.enter)="setQuantity()"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>

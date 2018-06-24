@@ -248,10 +248,10 @@ export class EnterTab {
         if (this.transferProvider.pendingQty == 0)
             return alert("Add some items to the transfer list first.");
 
-        this.loader = this.loadingCtrl.create({content: "Loading..."});
+        this.loader = this.loadingCtrl.create({content: "Submitting Transfers..."});
         this.loader.present();
 
-        this.transferProvider.commitTransfer().then(()=>{
+        this.transferProvider.commitTransfer(this.loader).then(()=>{
             this.dismissLoader();
         }).catch((err)=>{
             this.dismissLoader();

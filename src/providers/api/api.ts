@@ -2,6 +2,7 @@ import { HTTP } from '@ionic-native/http';
 import { Injectable } from '@angular/core';
 
 import { PreferencesProvider } from "../preferences/preferences";
+import { LoginPage } from "../../pages/login/login";
 
 /**
  * Api is a generic REST Api handler. Set your API url first.
@@ -16,25 +17,25 @@ export class Api {
     private company:string = '';
 
     constructor(public http:HTTP, public prefs: PreferencesProvider) {
-        this.updateSettings();
+        this.updateSettings(null, null);
 
         this.http.setHeader('*', 'Content-Type', 'application/json');
         this.http.setHeader('*', 'Accept', 'application/json');
         this.http.setDataSerializer('json');
     }
 
-    updateSettings() {
+    updateSettings(username, password) {
         this.url = this.prefs.getPreference('connection_url');
-        this.username = this.prefs.getPreference('connection_username');
-        this.password = this.prefs.getPreference('connection_password');
         this.company = this.prefs.getPreference('connection_company');
+        this.username = username!=null ? username : this.prefs.getPreference('connection_username');
+        this.password = password!=null ? password : this.prefs.getPreference('connection_password');
     }
 
-    public testConnection() {
+    public testConnection(username, password) {
 
         return new Promise((resolve, reject) => {
 
-            this.updateSettings();
+            this.updateSettings(username, password);
 
             this.login().then((res) => {
 
@@ -157,6 +158,9 @@ export class Api {
             if (res.status == 204)
                 return resolve(true);
 
+            if (res.data)
+                return reject(JSON.stringify(res.data));
+
             setTimeout(()=>{ this.getLongRunningOpResult(url, resolve, reject, count); }, 4000);
 
         }).catch((err)=>{
@@ -230,7 +234,7 @@ export class Api {
             }, (err) => {
 
                 if (err.status == 401){
-                    if (this.prefs.getPreference("password") != "" && !loginAttempt){
+                    if (this.prefs.hasPreference("connection_password") && !loginAttempt){
                         this.login().then((res) => {
 
                             this.request(method, endpoint, body, headers, params, true).then((res) => {
@@ -243,8 +247,6 @@ export class Api {
 
                         }, (err) => {
 
-                            // TODO: Show login screen
-
                             try {
                                 var error = JSON.parse(err.error);
 
@@ -255,19 +257,20 @@ export class Api {
                                     err.message = err.error;
                                 }
 
-                                reject(err);
                             } catch (e){
                                 err.message = err.error;
-                                reject(err);
                             }
+
+                            reject(err);
+                            //this.navCtrl.setRoot(LoginPage, {message: "Login failed: " + err.message});
+
                         }).catch((err)=>{
                             err.message = err.error;
                             reject(err);
                         });
                     } else {
-                        //this.navCtrl.setRoot(LoginPage);
-                        err.message = err.error;
                         reject(err);
+                        //this.navCtrl.setRoot(LoginPage, {message: "Session expired, please login."});
                     }
                     return;
                 }

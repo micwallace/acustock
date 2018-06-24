@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { Platform, Nav, LoadingController } from 'ionic-angular';
+import { Platform, Nav, LoadingController, ToastController } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
@@ -11,6 +11,7 @@ import { SetupPage } from '../pages/setup/setup';
 import { Api, CacheProvider, PreferencesProvider } from '../providers/providers';
 import { PreferencesPage } from "../pages/preferences/preferences";
 import { BinTransferPage } from "../pages/bin-transfer/bin-transfer";
+import { LoginPage } from "../pages/login/login";
 
 @Component({
     templateUrl: 'app.html'
@@ -19,46 +20,48 @@ export class MyApp {
     @ViewChild(Nav) navCtrl:Nav;
     rootPage:any = BinTransferPage;
 
-    constructor(platform:Platform, statusBar:StatusBar, splashScreen:SplashScreen, public prefs: PreferencesProvider, public api:Api, public cache:CacheProvider, public loadingCtrl: LoadingController) {
+    constructor(platform:Platform, statusBar:StatusBar, splashScreen:SplashScreen, public prefs: PreferencesProvider, public api:Api,
+                public cache:CacheProvider, public loadingCtrl: LoadingController, public toastCtrl: ToastController) {
+
         platform.ready().then((readySrc) => {
 
             console.log('Platform ready from', readySrc);
-            // This is to fix ionic live install bug
-            // TODO: Remove for production
-            //setTimeout(() => {
-                // Okay, so the platform is ready and our plugins are available.
-                // Here you can do any higher level native things you might need.
-                statusBar.styleDefault();
-                splashScreen.hide();
 
-                var context = this;
+            // Okay, so the platform is ready and our plugins are available.
+            // Here you can do any higher level native things you might need.
+            statusBar.styleDefault();
+            splashScreen.hide();
 
-                if (!this.prefs.hasPreference('connection_url')) {
-                    context.rootPage = SetupPage;
-                } else {
-                    let loader = context.loadingCtrl.create({content: "Logging in..."});
-                    loader.present();
+            var context = this;
 
-                    context.api.testConnection().then(() => {
+            if (!this.prefs.isSetupComplete()) {
 
-                        loader.dismiss();
+                context.navCtrl.setRoot(SetupPage);
 
-                        console.log("Login succeeded, loading initial data...");
-                        context.cache.initialLoad().then(() => {
-                            console.log("Initial data loaded.")
-                        }).catch((err) => {
-                            console.log("Initial data load failed: " + err)
-                        });
+            } else if (!this.prefs.hasPreference("connection_password")) {
 
-                    }).catch((err) => {
-                        loader.dismiss();
-                        context.navCtrl.setRoot(SetupPage);
-                        console.log(JSON.stringify(err));
-                        alert("Login failed, please check connection. " +err.message);
-                    });
-                }
+                context.navCtrl.setRoot(LoginPage);
 
-            //}, 2000);
+            } else {
+
+                let loader = context.loadingCtrl.create({content: "Logging in..."});
+                loader.present();
+
+                context.api.testConnection(null, null).then(() => {
+
+                    loader.dismiss();
+
+                    console.log("Login succeeded, loading initial data...");
+                    context.cache.initialLoad();
+
+                }).catch((err) => {
+                    loader.dismiss();
+                    context.navCtrl.setRoot(SetupPage);
+                    console.log(JSON.stringify(err));
+                    alert("Login failed, please check connection. " +err.message);
+                });
+
+            }
 
         }).catch((err) => {
 

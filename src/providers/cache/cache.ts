@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Api } from "../api/api";
 import { PreferencesProvider } from "../preferences/preferences";
+import {ToastController} from "ionic-angular/index";
 
 /*
  Generated class for the CacheProvider provider.
@@ -16,7 +17,7 @@ export class CacheProvider {
     binIndex = null;
     warehouseList = null;
 
-    constructor(public api:Api, public prefs: PreferencesProvider) {
+    constructor(public api:Api, public prefs: PreferencesProvider, public toastCtrl: ToastController) {
         console.log('Hello CacheProvider Provider');
     }
 
@@ -57,6 +58,7 @@ export class CacheProvider {
 
         return new Promise((resolve, reject)=>{
 
+            // TODO: Optimise by only fetching the requested item.
             this.getItemList().then((itemList: any)=>{
 
                 for (var i=0; i<itemList.length; i++){
@@ -151,6 +153,13 @@ export class CacheProvider {
 
     public initialLoad() {
         return new Promise((resolve, reject) => {
+            var toast = this.toastCtrl.create({
+                message: 'Initial cache load in progress. Some operations will be slower until this completes.',
+                showCloseButton: true,
+                closeButtonText: "OK"
+            });
+            toast.present();
+
             this.api.getWarehouseList().then((warehouseList : any) => {
 
                 this.warehouseList = warehouseList;
@@ -162,15 +171,25 @@ export class CacheProvider {
                     this.itemList = itemList;
 
                     resolve();
-
+                    toast.setMessage('Initial load complete.');
+                    setTimeout(()=>{ toast.dismissAll(); }, 3000);
+                    console.log("Initial data loaded.")
                 }).catch((err) => {
                     reject(err);
+                    this.loadFailed(toast, err);
                 });
 
             }).catch((err) => {
                 reject(err);
+                this.loadFailed(toast, err);
             });
         });
+    }
+
+    private loadFailed(toast, err) {
+        toast.setMessage('Initial load failed: ' + err.message);
+        setTimeout(()=>{ toast.dismissAll(); }, 3000);
+        console.log("Initial data load failed: " + err.message);
     }
 
 }

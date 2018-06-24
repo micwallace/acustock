@@ -129,7 +129,7 @@ export class TransferProvider {
         return false;
     }
 
-    public commitTransfer(){
+    public commitTransfer(loadingCtrl:any){
 
         return new Promise((resolve, reject) => {
 
@@ -168,6 +168,8 @@ export class TransferProvider {
 
                 var transferId = res.ReferenceNbr.value;
 
+                loadingCtrl.data.content = "Releasing Transfers...";
+
                 this.api.releaseTransfer(transferId).then((releaseRes:any)=> {
 
                     // flush pending items
@@ -181,6 +183,8 @@ export class TransferProvider {
                     resolve();
 
                 }).catch((err)=> {
+
+                    loadingCtrl.data.content = "Failed to release, reverting changes...";
 
                     this.api.deleteTransfer(transferId).then((deleteRes:any)=>{
                         err.message = "Failed to release transfer. " + err.message;

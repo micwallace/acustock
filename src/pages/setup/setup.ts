@@ -90,7 +90,7 @@ export class SetupPage {
         let loader = this.loadingCtrl.create({content: "Loading..."});
         loader.present();
 
-        this.api.testConnection().then((res) => {
+        this.api.testConnection(null, null).then((res) => {
 
             loader.dismiss();
             this.navCtrl.setRoot(PickShipmentsPage);
