@@ -20,13 +20,14 @@
       <ion-col col-5>LotSerial</ion-col>
       <ion-col col-2>Qty</ion-col>
     </div>
-    <ion-item tappable no-margin no-padding *ngFor="let item of pickProvider.pickedItems" (click)="openPickItem(item);">
+    <ion-item tappable no-margin no-padding *ngFor="let item of pickProvider.currentShipment.Details" (click)="openPickItem(item);">
       <strong>{{item.InventoryID.value}}</strong>
+      <span item-end float-end>{{item.PickedQty.value}}/{{item.ShippedQty.value}}</span>
       <div no-margin no-padding>
         <ion-row *ngFor="let allocation of item.Allocations">
           <ion-col col-5>{{allocation.LocationID.value}}</ion-col>
           <ion-col col-5>{{allocation.LotSerialNbr.value}}</ion-col>
-          <ion-col col-2>{{allocation.Qty.value}}</ion-col>
+          <ion-col col-2>{{allocation.PickedQty.value}}/{{allocation.Qty.value}}</ion-col>
         </ion-row>
       </div>
     </ion-item>

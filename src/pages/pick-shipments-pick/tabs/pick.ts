@@ -22,8 +22,8 @@ export class PickTab {
     @ViewChild('lot') lotInput;
     @ViewChild('qty') qtyInput;
 
+    currentLocationIndex = 0;
     currentItemIndex = 0;
-    currentAllocationIndex = 0;
 
     serialTracked = false;
 
@@ -80,62 +80,60 @@ export class PickTab {
         }
     }
 
-    getCurrentItem() {
-        return this.pickProvider.getItemByIndex(this.currentItemIndex);
+    getSuggestedLocation(){
+        return this.pickProvider.getSuggestedLocation(this.currentLocationIndex);
     }
 
-    getCurrentItemAllocation() {
-        return this.pickProvider.getAllocationByIndex(this.currentItemIndex, this.currentAllocationIndex);
+    getSuggestedItem(){
+        return this.pickProvider.getSuggestedItem(this.currentLocationIndex, this.currentItemIndex)
     }
 
     getCurrentItemPickedQty() {
-        return this.pickProvider.getItemPickedQty(this.currentItemIndex);
+        return this.pickProvider.getTotalPickedQty(this.getSuggestedItem());
     }
 
     getSuggestedPickQty(){
-
-        var allocQty = this.getCurrentItemAllocation().Qty.value;
-        if (!allocQty)
-            return this.getCurrentItemLeftToPickQty();
-
-        return Math.min(this.getCurrentItemLeftToPickQty(), this.getCurrentItemAllocation().Qty.value);
+        return this.getSuggestedItem().RemainingQty;
     }
 
     getCurrentItemLeftToPickQty(){
-        return this.getCurrentItem().ShippedQty.value - this.getCurrentItemPickedQty();
+        //return this.getCurrentItem().ShippedQty.value - this.getCurrentItemPickedQty();
     }
 
     nextItem() {
-        if (this.currentAllocationIndex + 1 < this.getCurrentItem().Allocations.length) {
+        if (this.currentItemIndex + 1 < this.getSuggestedLocation().Items.length) {
 
-            this.currentAllocationIndex++;
-
-        } else if (this.currentItemIndex + 1 < this.pickProvider.unpickedItems.length) {
-
-            this.currentAllocationIndex = 0;
             this.currentItemIndex++;
+
+        } else if (this.currentLocationIndex + 1 < this.pickProvider.pickList.length) {
+
+            this.currentLocationIndex++;
+            this.currentItemIndex = 0;
 
         } else {
 
-            this.currentAllocationIndex = 0;
+            this.currentLocationIndex = 0;
             this.currentItemIndex = 0;
         }
+
+        console.log(this.currentLocationIndex+" / "+this.currentItemIndex);
+        console.log(this.getSuggestedItem());
     }
 
     previousItem() {
-        if (this.currentAllocationIndex - 1 > -1) {
-
-            this.currentAllocationIndex--;
-
-        } else if (this.currentItemIndex - 1 > -1) {
+        if (this.currentItemIndex - 1 > -1) {
 
             this.currentItemIndex--;
-            this.currentAllocationIndex = this.getCurrentItem().Allocations.length - 1;
+
+        } else if (this.currentLocationIndex - 1 > -1) {
+
+            this.currentLocationIndex--;
+            this.currentItemIndex = this.getSuggestedLocation().Items.length - 1;
 
         } else {
 
-            this.currentItemIndex = this.pickProvider.unpickedItems.length - 1;
-            this.currentAllocationIndex = this.getCurrentItem().Allocations.length - 1;
+            this.currentLocationIndex = this.pickProvider.pickList.length - 1;
+            this.currentItemIndex = this.getSuggestedLocation().Items.length - 1;
         }
     }
 
@@ -154,7 +152,7 @@ export class PickTab {
     }
 
     setLocation() {
-        var curBin = this.getCurrentItemAllocation().LocationID.value;
+        var curBin = this.getSuggestedItem().LocationID.value;
         var enteredBin = this.enteredData.location;
         if (curBin != enteredBin) {
             alert(enteredBin + " is not the recommended bin " + curBin);
@@ -167,7 +165,7 @@ export class PickTab {
     }
 
     setItem() {
-        var curItem = this.getCurrentItem();
+        var curItem = this.getSuggestedItem();
         var enteredItem = this.enteredData.item;
 
         this.cache.getItemById(enteredItem).then((item: any)=> {
@@ -195,10 +193,10 @@ export class PickTab {
 
     setQuantity() {
 
-        this.addPick();
+        //this.addPick();
     }
 
-    addPick() {
+    /*addPick() {
 
         for (var i in this.enteredData) {
             if (this.enteredData[i] == "") {
@@ -247,21 +245,21 @@ export class PickTab {
         console.log(JSON.stringify(currentAllocation));
         console.log(JSON.stringify(this.enteredData));
 
-        var itemComplete = this.pickProvider.addPick(this.currentItemIndex, this.currentAllocationIndex, data);
+        var itemComplete = this.pickProvider.addPick(this.currentLocationIndex, this.currentItemIndex, data);
 
         this.resetForm();
 
         if (itemComplete){
-            this.currentAllocationIndex = 0;
+            this.currentItemIndex = 0;
 
             // TODO: check if all items are complete and prompt to save
         }
 
-    }
+    }*/
 
     cancelPicks() {
 
-        if (this.pickProvider.pickedItems.length > 0) {
+        if (Object.keys(this.pickProvider.pendingPicks).length > 0) {
 
             let alert = this.alertCtrl.create({
                 title: "Cancel picks",

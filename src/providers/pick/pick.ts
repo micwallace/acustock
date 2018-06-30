@@ -15,11 +15,21 @@ export class PickProvider {
 
     public currentShipment;
 
-    public unpickedItems = [];
+    //public shipmentIndex = {}; // index current shipment by keys for easy modification of current object
 
-    public pickedItems = [];
+    public pickList = [];
+
+    public remainingItems = {};
+
+    public pendingPicks = {};
+
+    //public pickedItems = [];
 
     public savedPicks = null;
+
+    public totalQty = 0;
+
+    public unpickedQty = 0;
 
     constructor(public api:Api, public cache:CacheProvider, public loadingCtrl:LoadingController, public prefs: PreferencesProvider) {
         console.log('Hello PickProvider Provider');
@@ -40,6 +50,8 @@ export class PickProvider {
 
             this.api.getShipment(shipmentNbr).then((res:any) => {
 
+                //console.log(JSON.stringify(res));
+
                 loader.dismiss();
 
                 if (res.length == 0) {
@@ -50,7 +62,6 @@ export class PickProvider {
 
                 let shipment = res[0];
 
-                // TODO add warehouse check
                 var curWarehouse = this.prefs.getPreference('warehouse');
                 if (shipment.WarehouseID.value !== curWarehouse) {
                     alert("Shipment #" + shipmentNbr + " was found but belongs to warehouse " + shipment.WarehouseID.value + ", not the currently selected warehouse which is " + curWarehouse);
@@ -60,30 +71,7 @@ export class PickProvider {
 
                 this.currentShipment = shipment;
 
-                for (var i = 0; i < this.currentShipment.Details.length; i++) {
-
-                    var item = this.currentShipment.Details[i];
-
-                    if (item.LocationID.value == "SHIPPING")
-                        continue;
-
-                    var unpicked = Object.assign({}, item);
-                    unpicked.Allocations = [];
-                    unpicked.PickedQty = 0;
-
-                    for (var x = 0; x < item.Allocations.length; x++) {
-                        // TODO: get current warehouse shipping location
-                        if (item.Allocations[x].LocationID.value !== "SHIPPING") {
-                            unpicked.Allocations.push(item.Allocations[x]);
-                        } else {
-                            unpicked.PickedQty += item.ShippedQty.value;
-                        }
-                    }
-
-                    if (unpicked.Allocations.length > 0) {
-                        this.unpickedItems.push(unpicked);
-                    }
-                }
+                this.generatePickList();
 
                 // load saved picks
                 var picks = JSON.parse(localStorage.getItem("unconfirmed_picks"));
@@ -92,11 +80,13 @@ export class PickProvider {
 
                 if (picks && picks.hasOwnProperty(id)) {
                     this.savedPicks = picks[id];
-
+                    // TODO: Remove completed
                     console.log("Found saved picks");
                 } else {
                     this.savedPicks = null;
                 }
+
+                this.calculateQtys();
 
                 resolve(true);
 
@@ -109,6 +99,130 @@ export class PickProvider {
 
     }
 
+    generatePickList(){
+
+        var pickList = {};
+        this.remainingItems = {};
+
+        for (var i = 0; i < this.currentShipment.Details.length; i++) {
+
+            var item = this.currentShipment.Details[i];
+
+            if (item.PickedQty.value == item.ShippedQty.value)
+                continue;
+
+            /*var unpicked = Object.assign({}, item);
+             unpicked.Allocations = [];
+             unpicked.PickedQty = 0;*/
+            var inventoryId = item.InventoryID.value;
+
+            if (!this.remainingItems.hasOwnProperty(inventoryId))
+                this.remainingItems[inventoryId] = 0;
+
+            var totalQty = item.ShippedQty.value;
+            var allocatedQty = 0;
+
+            for (var x = 0; x < item.Allocations.length; x++) {
+
+                // TODO: get current warehouse shipping location
+                /*if (item.Allocations[x].LocationID.value !== "SHIPPING") {
+                 unpicked.Allocations.push(item.Allocations[x]);
+                 } else {
+                 unpicked.PickedQty += item.ShippedQty.value;
+                 }*/
+                var pickItem = item.Allocations[x];
+
+                allocatedQty += pickItem.Qty.value;
+
+                if (pickItem.PickedQty.value == pickItem.Qty.value)
+                    continue;
+
+                var location = pickItem.LocationID.value;
+
+                if (!pickList.hasOwnProperty(location))
+                    pickList[location] = {
+                        LocationID: {value: location},
+                        Items: []
+                    };
+
+                var remaining = pickItem.Qty.value - pickItem.PickedQty.value;
+
+                pickItem.RemainingQty = remaining;
+                pickItem.InventoryID = item.InventoryID;
+                pickItem.ShippedQty = item.ShippedQty;
+                pickItem.TotalPickedQty = item.PickedQty;
+
+                this.remainingItems[inventoryId] += remaining;
+
+                pickList[location].Items.push(pickItem);
+            }
+
+            // add unallocated total to remaining qty
+            var unallocated = totalQty - allocatedQty;
+            if (unallocated > 0) {
+
+                this.remainingItems[inventoryId] += unallocated;
+
+                if (!pickList.hasOwnProperty("UNALLOCATED"))
+                    pickList["UNALLOCATED"] = {
+                        LocationID: {value: ""},
+                        Items: []
+                    };
+
+                pickList["UNALLOCATED"].Items.push({
+                    InventoryID: item.InventoryID,
+                    Description: item.Description,
+                    SplitLineNbr: item.LineNbr,
+                    LocationID: {value: ""},
+                    LotSerialNbr: {value: ""},
+                    Qty: {value: unallocated},
+                    PickedQty: {value: 0},
+                    RemainingQty: unallocated,
+                    ShippedQty: item.ShippedQty,
+                    TotalPickedQty: item.PickedQty,
+                });
+            }
+
+        }
+
+        // convert picklist to array and sort by picking order
+
+        this.pickList = [];
+
+        for (i in pickList){
+            this.pickList.push(pickList[i]);
+        }
+
+        var binOrder = this.cache.binPickSequence;
+
+        this.pickList.sort((a, b)=>{
+            return (binOrder.indexOf(a[0]) < binOrder.indexOf(b[0])) ? 1 : -1;
+        });
+
+        console.log(JSON.stringify(this.pickList));
+
+    }
+
+    calculateQtys(){
+
+        this.totalQty = 0;
+        var pickedQty = 0;
+
+        for (var i=0; i<this.currentShipment.Details.length; i++){
+
+            var item = this.currentShipment.Details[i];
+            this.totalQty += item.ShippedQty.value;
+            pickedQty += item.PickedQty.value;
+        }
+
+        // add uncommitted picks
+        for (var x in this.pendingPicks) {
+            pickedQty += this.pendingPicks[x].PendingQty;
+        }
+
+        this.unpickedQty = this.totalQty - pickedQty;
+    }
+
     /*private getPickedItem(itemId){
      for (let item of this.pickedItems){
      if (itemId == item.InventoryID.value){
@@ -118,45 +232,39 @@ export class PickProvider {
      return null;
      }*/
 
-    getItemByIndex(index) {
+    getSuggestedLocation(index) {
 
-        if (this.unpickedItems.length == 0 || index >= this.unpickedItems.length)
+        if (this.pickList.length == 0 || index >= this.pickList.length)
             return null;
 
-        return this.unpickedItems[index];
+        return this.pickList[index];
     }
 
-    getAllocationByIndex(itemIndex, allocIndex) {
+    getSuggestedItem(locIndex, allocIndex) {
 
-        if (this.unpickedItems.length == 0 ||
-            itemIndex >= this.unpickedItems.length ||
-            allocIndex >= this.unpickedItems[itemIndex].Allocations.length)
+        if (this.pickList.length == 0 ||
+            locIndex >= this.pickList.length ||
+            allocIndex >= this.pickList[locIndex].Items.length)
             return null;
 
-        return this.unpickedItems[itemIndex].Allocations[allocIndex];
+        return this.pickList[locIndex].Items[allocIndex];
     }
 
-    getItemPickedQty(index) {
-        if (this.unpickedItems.length == 0 || index >= this.unpickedItems.length)
-            return 0;
+    getPendingPickedQty(item) {
 
-        var picked = this.unpickedItems[index].PickedQty;
-        var itemId = this.unpickedItems[index].InventoryID.value;
+        var key = item.SplitLineNbr.value + "/" + item.LineNbr.value;
 
-        // add uncommitted picks
-        for (let item of this.pickedItems) {
-            if (itemId == item.InventoryID.value) {
-                for (let allocation of item.Allocations) {
-                    picked += allocation.Qty.value;
-                }
-                break;
-            }
-        }
+        if (this.pendingPicks.hasOwnProperty(key))
+            return this.pendingPicks[key].PendingQty;
 
-        return picked;
+        return 0;
     }
 
-    public addPick(itemIndex, allocationIndex, data) {
+    getTotalPickedQty(item){
+        return item.TotalPickedQty.value + this.getPendingPickedQty(item);
+    }
+
+    /*public addPick(itemIndex, allocationIndex, data) {
         // check for existing item
         var found = false;
 
@@ -221,7 +329,7 @@ export class PickProvider {
             // indicate that the item has been fully picked
             return true;
         }
-    }
+    }*/
 
     public savePicks() {
         var picks = JSON.parse(localStorage.getItem("unconfirmed_picks"));
@@ -229,14 +337,12 @@ export class PickProvider {
         if (!picks)
             picks = {};
 
-        picks[this.currentShipment.ShipmentNbr.value] = {
-            unpickedItems: this.unpickedItems,
-            pickedItems: this.pickedItems
-        };
+        picks[this.currentShipment.ShipmentNbr.value] = this.pendingPicks;
 
         localStorage.setItem("unconfirmed_picks", JSON.stringify(picks));
 
         console.log("Picks saved");
+        this.calculateQtys();
     }
 
     public hasSavedPicks() {
@@ -244,8 +350,8 @@ export class PickProvider {
     }
 
     public loadSavedPicks() {
-        this.unpickedItems = this.savedPicks.unpickedItems;
-        this.pickedItems = this.savedPicks.pickedItems;
+        this.pendingPicks = this.savedPicks;
+        this.calculateQtys();
     }
 
     public clearSavedPicks() {

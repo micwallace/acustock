@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams, ViewController, Events } from 'ion
 import { PickTab } from "./tabs/pick";
 import { PickListTab } from "./tabs/pick-list";
 import { UnpickedListTab } from "./tabs/unpicked-list";
+import { PickProvider } from "../../providers/pick/pick";
 
 /**
  * Generated class for the PickShipmentsPickPage page.
@@ -22,7 +23,7 @@ export class PickShipmentsPickPage {
   tab2Root = UnpickedListTab;
   tab3Root = PickListTab;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController, public events: Events) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController, public events: Events, public pickProvider: PickProvider) {
     events.subscribe('closeModal', () => {
       this.dismiss();
     });

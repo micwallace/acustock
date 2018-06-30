@@ -15,6 +15,7 @@ export class CacheProvider {
     itemList = null;
     binList = null;
     binIndex = null;
+    binPickSequence = [];
     warehouseList = null;
 
     constructor(public api:Api, public prefs: PreferencesProvider, public toastCtrl: ToastController) {
@@ -117,6 +118,7 @@ export class CacheProvider {
                 return;
             }
 
+            // TODO: optimise so that two bin loads can't be happening at the same time.
             this.getBinList().then((binList: any)=>{
 
                 if (this.binIndex.hasOwnProperty(id)){
@@ -143,6 +145,13 @@ export class CacheProvider {
             return;
 
         this.binList = warehouse.Locations;
+
+        // Order for pick sequencing
+        this.binList.sort((a, b)=>{
+            return (a.Zone.value ? a.Zone.value.localeCompare(b.Zone.value) : 0) ||
+                    (a.PickingOrder.value > b.PickingOrder.value ? 1 : -1) ||
+                    (a.LocationID.value ? a.LocationID.value.localeCompare(b.LocationID.value) : 0);
+        });
 
         // Generate index for quick lookup
         this.binIndex = {};

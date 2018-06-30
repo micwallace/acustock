@@ -76,6 +76,10 @@ export class Api {
         return this.http.post(this.url + '/entity/auth/login', data, {});
     }
 
+    logout(){
+        return this.http.post(this.url + '/entity/auth/login', null, {});
+    }
+
     getItemList() {
 
         return this.get('StockItem?$expand=CrossReferences');
@@ -193,6 +197,7 @@ export class Api {
 
             switch (method) {
                 case "get":
+                    console.log(url);
                     promise = this.http.get(url, headers, params);
                     break;
 

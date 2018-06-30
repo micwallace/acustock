@@ -16,18 +16,17 @@
 <ion-content padding>
   <ion-grid>
     <div class="row header">
-      <ion-col col-5>Location</ion-col>
+      <ion-col col-5>Location/Item</ion-col>
       <ion-col col-5>LotSerial</ion-col>
       <ion-col col-2>Qty</ion-col>
     </div>
-    <ion-item tappable no-margin no-padding *ngFor="let item of pickProvider.unpickedItems; let i = index" (click)="openPickItem(item);">
-      <strong>{{item.InventoryID.value}}</strong>
-      <span style="float: right;">Picked {{pickProvider.getItemPickedQty(i)}} of {{item.ShippedQty.value}}</span>
+    <ion-item tappable no-margin no-padding *ngFor="let loc of pickProvider.pickList; let i = index" (click)="openPickItem(item);">
+      <strong>{{loc.LocationID.value}}</strong>
       <div no-margin no-padding>
-        <ion-row *ngFor="let allocation of item.Allocations">
-          <ion-col col-5>{{allocation.LocationID.value}}</ion-col>
-          <ion-col col-5>{{allocation.LotSerialNbr.value}}</ion-col>
-          <ion-col col-2>{{allocation.Qty.value}}</ion-col>
+        <ion-row *ngFor="let item of loc.Items">
+          <ion-col col-5>{{item.InventoryID.value}}</ion-col>
+          <ion-col col-5>{{item.LotSerialNbr.value}}</ion-col>
+          <ion-col col-2>{{pickProvider.getPendingPickedQty(item)}}/{{item.RemainingQty}}</ion-col>
         </ion-row>
       </div>
     </ion-item>

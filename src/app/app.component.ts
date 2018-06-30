@@ -18,7 +18,7 @@ import { LoginPage } from "../pages/login/login";
 })
 export class MyApp {
     @ViewChild(Nav) navCtrl:Nav;
-    rootPage:any = BinTransferPage;
+    rootPage:any = PickShipmentsPage;
 
     constructor(platform:Platform, statusBar:StatusBar, splashScreen:SplashScreen, public prefs: PreferencesProvider, public api:Api,
                 public cache:CacheProvider, public loadingCtrl: LoadingController, public toastCtrl: ToastController) {
