@@ -17,17 +17,17 @@
   <ion-grid>
     <div class="row header">
       <ion-col col-5>Location</ion-col>
-      <ion-col col-5>LotSerial</ion-col>
-      <ion-col col-2>Qty</ion-col>
+      <ion-col col-4>LotSerial</ion-col>
+      <ion-col col-3>Qty</ion-col>
     </div>
-    <ion-item tappable no-margin no-padding *ngFor="let item of pickProvider.currentShipment.Details" (click)="openPickItem(item);">
-      <strong>{{item.InventoryID.value}}</strong>
-      <span item-end float-end>{{item.PickedQty.value}}/{{item.ShippedQty.value}}</span>
+    <ion-item tappable no-margin no-padding *ngFor="let key of objectKeys(pickProvider.pendingPicks)" (click)="openPickItem(pickProvider.pendingPicks[key]);">
+      <strong>{{pickProvider.pendingPicks[key].InventoryID.value}}</strong>
+      <span item-end float-end>{{pickProvider.getPendingItemQty(key)}}/{{pickProvider.pendingPicks[key].RemainingQty}}</span>
       <div no-margin no-padding>
-        <ion-row *ngFor="let allocation of item.Allocations">
-          <ion-col col-5>{{allocation.LocationID.value}}</ion-col>
+        <ion-row *ngFor="let allocation of pickProvider.pendingPicks[key].Allocations">
+          <ion-col col-5><ion-icon name="close"></ion-icon>{{allocation.LocationID.value}}</ion-col>
           <ion-col col-5>{{allocation.LotSerialNbr.value}}</ion-col>
-          <ion-col col-2>{{allocation.PickedQty.value}}/{{allocation.Qty.value}}</ion-col>
+          <ion-col col-2>{{allocation.PendingQty}}/{{allocation.RemainingQty}}</ion-col>
         </ion-row>
       </div>
     </ion-item>

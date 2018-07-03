@@ -17,7 +17,7 @@
     <div *ngIf="getSuggestedItem() != null">
         <h5 style="text-align: center;">{{getSuggestedItem()?.InventoryID?.value}}</h5>
         <h6 style="text-align: center;">{{getSuggestedItem()?.Description?.value}}</h6>
-        <h6 style="text-align: center;">Picked {{getCurrentItemPickedQty()}} of {{getSuggestedItem()?.ShippedQty?.value}}</h6>
+        <h6 style="text-align: center;">Picked {{getCurrentItemPickedQty()}} of {{getSuggestedItem()?.RemainingQty}}</h6>
     </div>
 
     <ion-grid>
@@ -73,7 +73,7 @@
             <ion-col>
                 <ion-item>
                     <ion-label color="primary" stacked>&nbsp;</ion-label>
-                    <ion-input id="qty" #qty [(ngModel)]="enteredData.qty" (keyup.enter)="setQuantity()"></ion-input>
+                    <ion-input id="qty" type="number" #qty [(ngModel)]="enteredData.qty" (keyup.enter)="setQuantity()"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>

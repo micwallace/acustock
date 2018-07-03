@@ -15,15 +15,11 @@ export class PickProvider {
 
     public currentShipment;
 
-    //public shipmentIndex = {}; // index current shipment by keys for easy modification of current object
-
     public pickList = [];
 
     public remainingItems = {};
 
     public pendingPicks = {};
-
-    //public pickedItems = [];
 
     public savedPicks = null;
 
@@ -124,12 +120,6 @@ export class PickProvider {
 
             for (var x = 0; x < item.Allocations.length; x++) {
 
-                // TODO: get current warehouse shipping location
-                /*if (item.Allocations[x].LocationID.value !== "SHIPPING") {
-                 unpicked.Allocations.push(item.Allocations[x]);
-                 } else {
-                 unpicked.PickedQty += item.ShippedQty.value;
-                 }*/
                 var pickItem = item.Allocations[x];
 
                 allocatedQty += pickItem.Qty.value;
@@ -149,8 +139,9 @@ export class PickProvider {
 
                 pickItem.RemainingQty = remaining;
                 pickItem.InventoryID = item.InventoryID;
-                pickItem.ShippedQty = item.ShippedQty;
-                pickItem.TotalPickedQty = item.PickedQty;
+                pickItem.ShippedQty = item.ShippedQty.value;
+                pickItem.TotalPickedQty = item.PickedQty.value;
+                pickItem.TotalRemainingQty = item.ShippedQty.value - item.PickedQty.value;
 
                 this.remainingItems[inventoryId] += remaining;
 
@@ -172,7 +163,7 @@ export class PickProvider {
                 pickList["UNALLOCATED"].Items.push({
                     InventoryID: item.InventoryID,
                     Description: item.Description,
-                    SplitLineNbr: item.LineNbr,
+                    LineNbr: item.LineNbr,
                     LocationID: {value: ""},
                     LotSerialNbr: {value: ""},
                     Qty: {value: unallocated},
@@ -189,8 +180,8 @@ export class PickProvider {
 
         this.pickList = [];
 
-        for (i in pickList){
-            this.pickList.push(pickList[i]);
+        for (var y in pickList){
+            this.pickList.push(pickList[y]);
         }
 
         var binOrder = this.cache.binPickSequence;
@@ -250,86 +241,222 @@ export class PickProvider {
         return this.pickList[locIndex].Items[allocIndex];
     }
 
-    getPendingPickedQty(item) {
+    getPendingItemQty(shipLineNbr) {
 
-        var key = item.SplitLineNbr.value + "/" + item.LineNbr.value;
-
-        if (this.pendingPicks.hasOwnProperty(key))
-            return this.pendingPicks[key].PendingQty;
+        if (this.pendingPicks.hasOwnProperty(shipLineNbr))
+            return this.pendingPicks[shipLineNbr].PendingQty;
 
         return 0;
     }
 
-    getTotalPickedQty(item){
-        return item.TotalPickedQty.value + this.getPendingPickedQty(item);
+    getPendingAllocationQty(shipLineNbr, allocLineNbr) {
+
+        var alloc = this.getPendingAllocation(shipLineNbr, allocLineNbr);
+
+        if (alloc != null){
+            return alloc.PendingQty;
+        }
+
+        return 0;
     }
 
-    /*public addPick(itemIndex, allocationIndex, data) {
-        // check for existing item
-        var found = false;
+    getPendingAllocation(shipLineNbr, allocLineNbr){
 
-        for (let item of this.pickedItems) {
-            if (data.itemLineNbr == item.LineNbr.value) {
+        if (this.pendingPicks.hasOwnProperty(shipLineNbr)){
 
-                item.Allocations.push(data);
-                found = true;
-                break;
+            for (var i=0; i<this.pendingPicks[shipLineNbr].Allocations.length; i++){
+                if (this.pendingPicks[shipLineNbr].Allocations[i].SplitLineNbr.value == allocLineNbr)
+                    return this.pendingPicks[shipLineNbr].Allocations[i];
             }
         }
 
-        if (!found) {
-            for (let item of this.unpickedItems) {
-                if (data.itemLineNbr == item.LineNbr.value) {
+        return null;
+    }
 
-                    var pickedItem = Object.assign({}, item);
+    getTotalPickedQty(item){
+        return item.TotalPickedQty.value + this.getPendingItemQty(item);
+    }
 
-                    pickedItem.Allocations = [data];
-                    this.pickedItems.push(pickedItem);
-                    break;
-                }
-            }
+    public addPick(data, locationIndex, itemIndex) {
+
+        if (!this.remainingItems.hasOwnProperty(data.item)){
+            alert("The item "+data.item+" has no remaining quantity to pick.");
+            return;
         }
 
-        // If the whole qty is picked remove the item from the unpicked list, otherwise move to the next suggested allocation if one exists
-        if (this.getItemPickedQty(itemIndex) < this.getItemByIndex(itemIndex).ShippedQty.value) {
-            // TODO: check if suggested allocations have become exhausted.
+        if (this.remainingItems[data.item] < data.qty){
+            alert("There is only "+this.remainingItems[data.item]+" units of this item left to pick, the entered qty is "+data.qty);
+            return;
+        }
 
-            if (data.hasOwnProperty('lineNbr')) {
+        if (locationIndex > -1 && itemIndex > -1) {
 
-                console.log("Is suggesed allocation");
+            var suggested = this.getSuggestedItem(locationIndex, itemIndex);
+            var remainder, newAlloc;
 
-                var curAllocation = this.getAllocationByIndex(itemIndex, allocationIndex);
+            if (suggested && suggested.InventoryID.value == data.item){
 
-                if (data.Qty.value >= curAllocation.Qty.value) {
+                var reqQty = data.qty;
 
-                    this.unpickedItems[itemIndex].Allocations.splice(allocationIndex, 1);
+                suggested = Object.assign({}, suggested);
 
-                    console.log("Allocation fulfilled, moving to next.");
+                var curAlloc = this.getPendingAllocation(suggested.LineNbr.value, suggested.SplitLineNbr.value);
+                var pendingQty = curAlloc != null ? curAlloc.PendingQty : 0;
+
+                if (reqQty <= (suggested.RemainingQty - pendingQty)){
+
+                    if (curAlloc != null && curAlloc.LocationID.value != data.location){
+
+                        remainder = suggested.RemainingQty - reqQty;
+                        suggested.PendingQty = 0;
+                        suggested.RemainingQty = remainder;
+                        suggested.Qty.value = remainder;
+                        this.addPendingPick(suggested);
+
+                        newAlloc = Object.assign({}, suggested);
+                        delete newAlloc.SplitLineNbr;
+                        newAlloc.LocationID.value = data.location;
+                        newAlloc.RemainingQty = reqQty;
+                        newAlloc.PendingQty = reqQty;
+                        newAlloc.Qty.value = reqQty;
+                        this.addPendingPick(newAlloc);
+
+                    } else {
+                        suggested.PendingQty = reqQty;
+                        this.addPendingPick(suggested);
+                    }
+                    return;
 
                 } else {
-                    this.unpickedItems[itemIndex].Allocations[allocationIndex].Qty.value = parseInt(curAllocation.Qty.value) - data.Qty.value;
 
-                    console.log("Removing qty from allocation");
+                    suggested.LocationID.value = data.location;
+                    suggested.Qty.value = reqQty;
+                    suggested.PendingQty = reqQty;
+                    this.addPendingPick(suggested);
+
+                    reqQty -= suggested.RemainingQty;
+
+                    // loop through available allocations and add either delete or adjust Qty until the requested qty has been exhausted.
+                    for (let alloc of this.getPendingAllocations(data.item)){
+
+                        if (reqQty <= alloc.RemainingQty){
+
+                            if (reqQty < alloc.RemainingQty){
+                                // insert new allocation and adjust current allocation with remaining qty.
+                                remainder =  alloc.RemainingQty - reqQty;
+                                alloc.RemainingQty = remainder;
+                                alloc.PendingQty = 0;
+                                alloc.Qty.value = remainder;
+                                this.addPendingPick(alloc);
+
+                                newAlloc = Object.assign({}, alloc);
+                                delete newAlloc.LineNbr;
+                                newAlloc.RemainingQty = reqQty;
+                                newAlloc.PendingQty = reqQty;
+                                newAlloc.Qty.value = reqQty;
+                                this.addPendingPick(newAlloc);
+                            } else {
+                                alloc.deleted = true;
+                                this.addPendingPick(alloc);
+                            }
+                            return;
+                        }
+
+                        alloc.deleted = true;
+                        reqQty -= alloc.RemainingQty;
+                        this.addPendingPick(alloc);
+                    }
+
+                    return;
                 }
-
-            } else {
-
-                console.log("Not suggested allocations");
-                // TODO: perform server validation & remove qty from left over allocations
             }
+        }
 
-            this.savePicks();
+        alert("non suggested item entry not implemented");
+    }
 
-            return false;
+    private getPendingAllocations(shipLineNbr){
+
+        if (this.pickList.hasOwnProperty(shipLineNbr))
+            return this.pickList[shipLineNbr].Allocations;
+
+        return [];
+    }
+
+    private addPendingPick(pick){
+
+        var shipLineNum = pick.LineNbr.value;
+
+        if (!this.pendingPicks.hasOwnProperty(shipLineNum)) {
+
+            this.pendingPicks[shipLineNum] = {
+                LineNbr: pick.LineNbr,
+                InventoryID: pick.InventoryID,
+                Allocations: []
+            };
+
+            this.pendingPicks[shipLineNum].Qty = pick.Qty;
+            this.pendingPicks[shipLineNum].PendingQty = pick.PendingQty;
+            this.pendingPicks[shipLineNum].RemainingQty = pick.TotalRemainingQty;
+
+            this.pendingPicks[shipLineNum].Allocations.push(pick);
+
         } else {
 
-            this.unpickedItems.splice(itemIndex, 1);
+            // try to find current allocation and update quantity
+            var index=0;
+            if (pick.hasOwnProperty("SplitLineNbr"))
+                for (let alloc of this.pendingPicks[shipLineNum].Allocations){
 
-            this.savePicks();
-            // indicate that the item has been fully picked
-            return true;
+                    if (alloc.SplitLineNbr.value == pick.SplitLineNbr.value){
+                        this.pendingPicks[shipLineNum].Allocations[index].Qty = pick.Qty;
+                        this.pendingPicks[shipLineNum].Allocations[index].RemainingQty = pick.RemainingQty;
+                        this.pendingPicks[shipLineNum].Allocations[index].PendingQty += pick.PendingQty;
+                        this.pendingPicks[shipLineNum].PendingQty += pick.PendingQty;
+                        return;
+                    }
+
+                    index++;
+                }
+
+            this.pendingPicks[shipLineNum].Allocations.push(pick);
         }
-    }*/
+
+        this.savePicks();
+        this.trimPicklist();
+    }
+
+    private trimPicklist(){
+        // loop through picklist and remove completed or replaced allocations
+        var newPicklist = [];
+
+        console.log("Pending allocations: "+JSON.stringify(this.pendingPicks));
+
+        for (var i=0; i<this.pickList.length; i++){
+
+            var items = [];
+
+            for (var x=0; x<this.pickList[i].Items.length; x++){
+
+                var item = this.pickList[i].Items[x];
+
+                var alloc = this.getPendingAllocation(item.LineNbr.value, item.SplitLineNbr.value);
+
+                // Removed used allocations
+                if (alloc==null || (!alloc.deleted && alloc.PendingQty < item.RemainingQty)){
+                    items.push(item);
+                }
+            }
+
+            if (items.length > 0) {
+                var copy = Object.assign({}, this.pickList[i]);
+                copy.Items = items;
+                newPicklist.push(copy);
+            }
+        }
+
+        this.pickList = newPicklist;
+    }
 
     public savePicks() {
         var picks = JSON.parse(localStorage.getItem("unconfirmed_picks"));
@@ -352,6 +479,7 @@ export class PickProvider {
     public loadSavedPicks() {
         this.pendingPicks = this.savedPicks;
         this.calculateQtys();
+        this.trimPicklist();
     }
 
     public clearSavedPicks() {

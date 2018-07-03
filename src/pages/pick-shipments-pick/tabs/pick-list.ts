@@ -16,6 +16,8 @@ import { PickProvider } from '../../../providers/providers';
 })
 export class PickListTab {
 
+  objectKeys:any = Object.keys;
+
   constructor(public navCtrl: NavController, public navParams: NavParams, public pickProvider: PickProvider) {
   }
 

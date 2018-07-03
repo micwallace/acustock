@@ -89,7 +89,8 @@ export class PickTab {
     }
 
     getCurrentItemPickedQty() {
-        return this.pickProvider.getTotalPickedQty(this.getSuggestedItem());
+        var alloc = this.getSuggestedItem();
+        return this.pickProvider.getPendingAllocationQty(alloc.SplitLineNbr.value, alloc.LineNbr.value);
     }
 
     getSuggestedPickQty(){
@@ -97,7 +98,7 @@ export class PickTab {
     }
 
     getCurrentItemLeftToPickQty(){
-        //return this.getCurrentItem().ShippedQty.value - this.getCurrentItemPickedQty();
+        return this.getSuggestedItem().RemainingQty;
     }
 
     nextItem() {
@@ -196,7 +197,7 @@ export class PickTab {
         //this.addPick();
     }
 
-    /*addPick() {
+    addPick() {
 
         for (var i in this.enteredData) {
             if (this.enteredData[i] == "") {
@@ -210,42 +211,26 @@ export class PickTab {
         }
 
         // validate qty
-        if (parseInt(this.enteredData.qty) < 1){
+        if (this.enteredData.qty < 1){
             alert("Quantity must be greater than 0.");
             return;
         }
 
-        if (parseInt(this.enteredData.qty) > this.getCurrentItemLeftToPickQty()){
+        if (this.enteredData.qty > this.getCurrentItemLeftToPickQty()){
             alert("The entered quantity exceeds the quantity needed for this item.");
             return;
         }
 
-        var item = this.getCurrentItem();
-        var itemId = item.InventoryID.value;
-
-        var currentAllocation = this.getCurrentItemAllocation();
-
-        var data = {
-            LocationID: {value: this.enteredData.location},
-            InventoryID: {value: itemId},
-            LotSerialNbr: {value: this.enteredData.lot},
-            Qty: {value: parseInt(this.enteredData.qty)},
-            itemLineNbr: item.LineNbr.value,
-            lineNbr: null
-        };
-
-        if (currentAllocation &&
-            this.enteredData.location == currentAllocation.LocationID.value &&
-            this.enteredData.item == item.InventoryID.value &&
-            this.enteredData.lot == currentAllocation.LotSerialNbr.value) {
-
-            data.lineNbr = {value: currentAllocation.lineNumber};
-        }
-
-        console.log(JSON.stringify(currentAllocation));
         console.log(JSON.stringify(this.enteredData));
 
-        var itemComplete = this.pickProvider.addPick(this.currentLocationIndex, this.currentItemIndex, data);
+        var data = {
+            location: this.enteredData.location,
+            item: this.enteredData.item,
+            lot: this.enteredData.lot,
+            qty: parseInt(this.enteredData.qty)
+        };
+
+        var itemComplete = this.pickProvider.addPick(data, this.currentLocationIndex, this.currentItemIndex);
 
         this.resetForm();
 
@@ -255,7 +240,7 @@ export class PickTab {
             // TODO: check if all items are complete and prompt to save
         }
 
-    }*/
+    }
 
     cancelPicks() {
 
