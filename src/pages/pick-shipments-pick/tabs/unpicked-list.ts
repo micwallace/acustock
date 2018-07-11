@@ -11,21 +11,21 @@ import { PickProvider } from '../../../providers/pick/pick'
 
 @IonicPage()
 @Component({
-  selector: 'tabs-unpicked-list',
-  templateUrl: 'unpicked-list.html'
+    selector: 'tabs-unpicked-list',
+    templateUrl: 'unpicked-list.html'
 })
 export class UnpickedListTab {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public pickProvider: PickProvider) {
-    //console.log(JSON.stringify(pickProvider.unpickedItems));
-  }
+    constructor(public navCtrl:NavController, public navParams:NavParams, public pickProvider:PickProvider) {
+        //console.log(JSON.stringify(pickProvider.unpickedItems));
+    }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad PickShipmentPickPage Tab: Unpicked List');
-  }
+    ionViewDidLoad() {
+        console.log('ionViewDidLoad PickShipmentPickPage Tab: Unpicked List');
+    }
 
-  openPickItem(item){
+    openPickItem(item) {
 
-  }
+    }
 
 }

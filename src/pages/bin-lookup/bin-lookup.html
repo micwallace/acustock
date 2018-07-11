@@ -30,7 +30,7 @@
         <span [innerHTML]="attrs.data.LocationID.value | boldprefix:attrs.keyword"></span>
     </ng-template>
 
-    <ion-auto-complete  [(ngModel)]="selectedLocation" [dataProvider]="binAutocompleteService" [template]="listItem"
+    <ion-auto-complete [(ngModel)]="selectedLocation" [dataProvider]="binAutocompleteService" [template]="listItem"
                        (itemSelected)="loadBinContents($event)"></ion-auto-complete>
 
     <ion-scroll style="height: calc(100% - 100px);" scrollY="true" no-padding>
@@ -39,11 +39,11 @@
                 <ion-label>{{item.InventoryID.value}}</ion-label>
                 <div class="item-note" item-end style="width: 120px;">
                     <ion-row>
-                        <ion-col col-8>Available: </ion-col>
+                        <ion-col col-8>Available:</ion-col>
                         <ion-col col-4>{{item.QtyAvailable.value}}</ion-col>
                     </ion-row>
                     <ion-row>
-                        <ion-col col-8>On Hand: </ion-col>
+                        <ion-col col-8>On Hand:</ion-col>
                         <ion-col col-4>{{item.QtyOnHand.value}}</ion-col>
                     </ion-row>
                 </div>

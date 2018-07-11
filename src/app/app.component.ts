@@ -12,6 +12,7 @@ import { Api, CacheProvider, PreferencesProvider } from '../providers/providers'
 import { PreferencesPage } from "../pages/preferences/preferences";
 import { BinTransferPage } from "../pages/bin-transfer/bin-transfer";
 import { LoginPage } from "../pages/login/login";
+import {ReceivePage} from "../pages/receive/receive";
 
 @Component({
     templateUrl: 'app.html'
@@ -20,8 +21,8 @@ export class MyApp {
     @ViewChild(Nav) navCtrl:Nav;
     rootPage:any = PickShipmentsPage;
 
-    constructor(platform:Platform, statusBar:StatusBar, splashScreen:SplashScreen, public prefs: PreferencesProvider, public api:Api,
-                public cache:CacheProvider, public loadingCtrl: LoadingController, public toastCtrl: ToastController) {
+    constructor(platform:Platform, statusBar:StatusBar, splashScreen:SplashScreen, public prefs:PreferencesProvider, public api:Api,
+                public cache:CacheProvider, public loadingCtrl:LoadingController, public toastCtrl:ToastController) {
 
         platform.ready().then((readySrc) => {
 
@@ -58,7 +59,7 @@ export class MyApp {
                     loader.dismiss();
                     context.navCtrl.setRoot(SetupPage);
                     console.log(JSON.stringify(err));
-                    alert("Login failed, please check connection. " +err.message);
+                    alert("Login failed, please check connection. " + err.message);
                 });
 
             }
@@ -78,6 +79,11 @@ export class MyApp {
         this.navCtrl.setRoot(PickShipmentsPage);
     }
 
+    goToReceive(params){
+        if (!params) params = {};
+        this.navCtrl.setRoot(ReceivePage);
+    }
+
     goToHome(params) {
         if (!params) params = {};
         this.navCtrl.setRoot(HomePage);
@@ -95,8 +101,8 @@ export class MyApp {
 
     showPreferences() {
         /*this.appPreferences.show().catch((err) => {
-            //TODO: add setup check here. alert(err);
-        });*/
+         //TODO: add setup check here. alert(err);
+         });*/
         this.navCtrl.push(PreferencesPage);
     }
 

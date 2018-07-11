@@ -12,53 +12,55 @@
 
 </ion-header>
 
-
 <ion-content padding style="position: relative;">
     <div *ngIf="getSuggestedItem() != null">
         <h5 style="text-align: center;">{{getSuggestedItem()?.InventoryID?.value}}</h5>
         <h6 style="text-align: center;">{{getSuggestedItem()?.Description?.value}}</h6>
-        <h6 style="text-align: center;">Picked {{getCurrentItemPickedQty()}} of {{getSuggestedItem()?.RemainingQty}}</h6>
+        <h6 style="text-align: center;">Picked {{getCurrentItemPickedQty()}} of
+            {{getSuggestedItem()?.RemainingQty}}</h6>
     </div>
 
     <ion-grid>
         <ion-row>
             <ion-col>
                 <ion-item no-margin no-padding>
-                    <ion-label color="primary" stacked>Bin:</ion-label>
+                    <ion-label color="primary">Bin:</ion-label>
                     <ion-input [ngModel]="getSuggestedItem()?.LocationID?.value" readonly></ion-input>
                 </ion-item>
             </ion-col>
             <ion-col>
                 <ion-item>
-                    <ion-label color="primary" stacked>&nbsp;</ion-label>
-                    <ion-input id="location" #location type="text" [(ngModel)]="enteredData.location" (keyup.enter)="setLocation()" autofocus></ion-input>
+                    <ion-label color="primary">&nbsp;</ion-label>
+                    <ion-input id="location" #location type="text" [(ngModel)]="enteredData.location"
+                               (keyup.enter)="setLocation()" autofocus></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
         <ion-row>
             <ion-col>
                 <ion-item no-margin no-padding>
-                    <ion-label color="primary" stacked>SKU:</ion-label>
+                    <ion-label color="primary">SKU:</ion-label>
                     <ion-input [ngModel]="getSuggestedItem()?.InventoryID?.value" readonly></ion-input>
                 </ion-item>
             </ion-col>
             <ion-col>
                 <ion-item>
-                    <ion-label color="primary" stacked>&nbsp;</ion-label>
-                    <ion-input id="item" #item type="text" [(ngModel)]="enteredData.item" (keyup.enter)="setItem()"></ion-input>
+                    <ion-label color="primary">&nbsp;</ion-label>
+                    <ion-input id="item" #item type="text" [(ngModel)]="enteredData.item"
+                               (keyup.enter)="setItem()"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
         <ion-row *ngIf="showLot">
             <ion-col>
                 <ion-item>
-                    <ion-label color="primary" stacked>Lot/Serial:</ion-label>
+                    <ion-label color="primary">Lot/Serial:</ion-label>
                     <ion-input [ngModel]="getSuggestedItem()?.LotSerialNbr?.value" readonly></ion-input>
                 </ion-item>
             </ion-col>
             <ion-col>
                 <ion-item>
-                    <ion-label color="primary" stacked>&nbsp;</ion-label>
+                    <ion-label color="primary">&nbsp;</ion-label>
                     <ion-input id="lot" #lot [(ngModel)]="enteredData.lot" (keyup.enter)="setLotSerial()"></ion-input>
                 </ion-item>
             </ion-col>
@@ -66,28 +68,33 @@
         <ion-row *ngIf="showQty">
             <ion-col>
                 <ion-item>
-                    <ion-label color="primary" stacked>Qty:</ion-label>
+                    <ion-label color="primary">Qty:</ion-label>
                     <ion-input [ngModel]="getSuggestedPickQty()" readonly></ion-input>
                 </ion-item>
             </ion-col>
             <ion-col>
                 <ion-item>
-                    <ion-label color="primary" stacked>&nbsp;</ion-label>
-                    <ion-input id="qty" type="number" #qty [(ngModel)]="enteredData.qty" (keyup.enter)="setQuantity()"></ion-input>
+                    <ion-label color="primary">&nbsp;</ion-label>
+                    <ion-input id="qty" type="number" #qty [(ngModel)]="enteredData.qty"
+                               (keyup.enter)="addPick()"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
     </ion-grid>
-
+    <barcode-listener (scan)='onBarcodeScan($event);'></barcode-listener>
 </ion-content>
 <ion-footer no-shadow>
     <ion-toolbar position="bottom">
         <div class="row">
             <div class="col">
-                <button type="button" ion-button (click)="previousItem()"><ion-icon name="arrow-back"></ion-icon></button>
+                <button type="button" ion-button (click)="previousItem()">
+                    <ion-icon name="arrow-back"></ion-icon>
+                </button>
             </div>
             <div class="col">
-                <button type="button" ion-button (click)="nextItem()"><ion-icon name="arrow-forward"></ion-icon></button>
+                <button type="button" ion-button (click)="nextItem()">
+                    <ion-icon name="arrow-forward"></ion-icon>
+                </button>
             </div>
             <div class="col">
                 <button type="button" ion-button (click)="addPick()">Save</button>

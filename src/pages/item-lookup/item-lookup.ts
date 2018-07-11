@@ -31,10 +31,10 @@ export class ItemLookupPage {
                 public itemAutocompleteService:ItemAutocompleteService,
                 public api:Api,
                 public loadingCtrl:LoadingController,
-                public modalCtrl: ModalController,
-                public barcodeScanner: BarcodeScanner,
-                public cache: CacheProvider,
-                public prefs: PreferencesProvider) {
+                public modalCtrl:ModalController,
+                public barcodeScanner:BarcodeScanner,
+                public cache:CacheProvider,
+                public prefs:PreferencesProvider) {
     }
 
     ionViewDidLoad() {
@@ -59,7 +59,7 @@ export class ItemLookupPage {
         });
     }
 
-    public scanBarcode(){
+    public scanBarcode() {
         this.barcodeScanner.scan().then((barcodeData) => {
             if (barcodeData.cancelled)
                 return;
@@ -74,7 +74,7 @@ export class ItemLookupPage {
         });
     }
 
-    onBarcodeScan(barcodeText){
+    onBarcodeScan(barcodeText) {
         console.log(barcodeText);
 
         //this.searchbar.setValue(barcodeText);
@@ -82,12 +82,12 @@ export class ItemLookupPage {
         this.loadItemByBarcode(barcodeText);
     }
 
-    loadItemByBarcode(barcodeText){
+    loadItemByBarcode(barcodeText) {
 
         this.loader = this.loadingCtrl.create({content: "Loading..."});
         this.loader.present();
 
-        this.cache.getItemById(barcodeText).then((item: any) => {
+        this.cache.getItemById(barcodeText).then((item:any) => {
 
             this.selectedItem = item;
             this.loadItemLocations(item);
@@ -100,14 +100,14 @@ export class ItemLookupPage {
         });
     }
 
-    private dismissLoader(){
-        if (this.loader){
+    private dismissLoader() {
+        if (this.loader) {
             this.loader.dismiss();
             this.loader = null;
         }
     }
 
-    openDetailsModal(event, item){
+    openDetailsModal(event, item) {
 
         let loader = this.loadingCtrl.create({content: "Loading..."});
         loader.present();
@@ -122,7 +122,7 @@ export class ItemLookupPage {
 
         }).catch((err) => {
 
-            loader.dismiss().then(()=>{
+            loader.dismiss().then(()=> {
                 alert(err.message);
             });
         });

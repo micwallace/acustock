@@ -10,21 +10,21 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
 @IonicPage()
 @Component({
-  selector: 'page-item-lookup-details',
-  templateUrl: 'item-lookup-details.html',
+    selector: 'page-item-lookup-details',
+    templateUrl: 'item-lookup-details.html',
 })
 export class ItemLookupDetailsPage {
 
-  data = {};
+    data = {};
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
-      this.data = navParams.get("data");
+    constructor(public navCtrl:NavController, public navParams:NavParams) {
+        this.data = navParams.get("data");
 
-      console.log(JSON.stringify(this.data));
-  }
+        console.log(JSON.stringify(this.data));
+    }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad ItemLookupDetailsPage');
-  }
+    ionViewDidLoad() {
+        console.log('ionViewDidLoad ItemLookupDetailsPage');
+    }
 
 }

@@ -14,23 +14,23 @@ import { PickProvider } from "../../providers/pick/pick";
 
 @IonicPage()
 @Component({
-  selector: 'page-pick-shipments-pick',
-  templateUrl: 'pick-shipments-pick.html',
+    selector: 'page-pick-shipments-pick',
+    templateUrl: 'pick-shipments-pick.html',
 })
 export class PickShipmentsPickPage {
 
-  tab1Root = PickTab;
-  tab2Root = UnpickedListTab;
-  tab3Root = PickListTab;
+    tab1Root = PickTab;
+    tab2Root = UnpickedListTab;
+    tab3Root = PickListTab;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController, public events: Events, public pickProvider: PickProvider) {
-    events.subscribe('closeModal', () => {
-      this.dismiss();
-    });
-  }
+    constructor(public navCtrl:NavController, public navParams:NavParams, public viewCtrl:ViewController, public events:Events, public pickProvider:PickProvider) {
+        events.subscribe('closeModal', () => {
+            this.dismiss();
+        });
+    }
 
-  public dismiss(){
-    this.viewCtrl.dismiss();
-  }
+    public dismiss() {
+        //this.viewCtrl.dismiss();
+    }
 
 }

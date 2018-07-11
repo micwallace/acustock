@@ -6,33 +6,34 @@
 -->
 <ion-header>
 
-  <ion-navbar>
-    <button ion-button menuToggle>
-      <ion-icon name="menu"></ion-icon>
-    </button>
-    <ion-title>Transfer History</ion-title>
-  </ion-navbar>
+    <ion-navbar>
+        <button ion-button menuToggle>
+            <ion-icon name="menu"></ion-icon>
+        </button>
+        <ion-title>Transfer History</ion-title>
+    </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
-  <ion-grid>
-    <div class="row header">
-      <ion-col col-5>Location</ion-col>
-      <ion-col col-5>LotSerial</ion-col>
-      <ion-col col-2>Qty</ion-col>
-    </div>
-    <ion-item tappable no-margin no-padding *ngFor="let transfer of transferProvider.transferHistory; let i = index" (click)="openTransferDetails(transfer);">
-      <strong>{{transfer.ReferenceNbr.value}}</strong>
-      <!--<span style="float: right;">Picked {{pickProvider.getItemPickedQty(i)}} of {{item.ShippedQty.value}}</span>
-      <div no-margin no-padding>
-        <ion-row *ngFor="let allocation of item.Allocations">
-          <ion-col col-5>{{allocation.LocationID.value}}</ion-col>
-          <ion-col col-5>{{allocation.LotSerialNbr.value}}</ion-col>
-          <ion-col col-2>{{allocation.Qty.value}}</ion-col>
-        </ion-row>
-      </div>-->
-    </ion-item>
-  </ion-grid>
+    <ion-grid>
+        <div class="row header">
+            <ion-col col-5>Location</ion-col>
+            <ion-col col-5>LotSerial</ion-col>
+            <ion-col col-2>Qty</ion-col>
+        </div>
+        <ion-item tappable no-margin no-padding *ngFor="let transfer of transferProvider.transferHistory; let i = index"
+                  (click)="openTransferDetails(transfer);">
+            <strong>{{transfer.ReferenceNbr.value}}</strong>
+            <!--<span style="float: right;">Picked {{pickProvider.getItemPickedQty(i)}} of {{item.ShippedQty.value}}</span>
+            <div no-margin no-padding>
+              <ion-row *ngFor="let allocation of item.Allocations">
+                <ion-col col-5>{{allocation.LocationID.value}}</ion-col>
+                <ion-col col-5>{{allocation.LotSerialNbr.value}}</ion-col>
+                <ion-col col-2>{{allocation.Qty.value}}</ion-col>
+              </ion-row>
+            </div>-->
+        </ion-item>
+    </ion-grid>
 </ion-content>

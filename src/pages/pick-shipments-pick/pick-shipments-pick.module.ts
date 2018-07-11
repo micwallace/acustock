@@ -3,11 +3,12 @@ import { IonicPageModule } from 'ionic-angular';
 import { PickShipmentsPickPage } from './pick-shipments-pick';
 
 @NgModule({
-  declarations: [
-    PickShipmentsPickPage,
-  ],
-  imports: [
-    IonicPageModule.forChild(PickShipmentsPickPage),
-  ],
+    declarations: [
+        PickShipmentsPickPage,
+    ],
+    imports: [
+        IonicPageModule.forChild(PickShipmentsPickPage),
+    ],
 })
-export class PickShipmentsPickPageModule {}
+export class PickShipmentsPickPageModule {
+}

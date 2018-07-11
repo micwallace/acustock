@@ -18,11 +18,11 @@ export class CacheProvider {
     binPickSequence = [];
     warehouseList = null;
 
-    constructor(public api:Api, public prefs: PreferencesProvider, public toastCtrl: ToastController) {
+    constructor(public api:Api, public prefs:PreferencesProvider, public toastCtrl:ToastController) {
         console.log('Hello CacheProvider Provider');
     }
 
-    public getCurrentWarehouse(){
+    public getCurrentWarehouse() {
 
         for (var i = 0; i < this.warehouseList.length; i++) {
             if (this.warehouseList[i].WarehouseID.value == this.prefs.getPreference('warehouse')) {
@@ -55,25 +55,25 @@ export class CacheProvider {
         });
     }
 
-    public getItemById(id){
+    public getItemById(id) {
 
-        return new Promise((resolve, reject)=>{
+        return new Promise((resolve, reject)=> {
 
             // TODO: Optimise by only fetching the requested item.
-            this.getItemList().then((itemList: any)=>{
+            this.getItemList().then((itemList:any)=> {
 
-                for (var i=0; i<itemList.length; i++){
+                for (var i = 0; i < itemList.length; i++) {
 
-                    if (itemList[i].InventoryID.value == id){
+                    if (itemList[i].InventoryID.value == id) {
 
                         resolve(itemList[i]);
                         return;
                     }
 
 
-                    for (var x=0; x<itemList[i].CrossReferences.length; x++){
+                    for (var x = 0; x < itemList[i].CrossReferences.length; x++) {
 
-                        if (itemList[i].CrossReferences[x].AlternateID.value == id){
+                        if (itemList[i].CrossReferences[x].AlternateID.value == id) {
 
                             resolve(itemList[i]);
                             return;
@@ -86,7 +86,7 @@ export class CacheProvider {
 
                 // TODO: Perform fresh lookup on cache expiry
 
-            }).catch((err)=>{
+            }).catch((err)=> {
                 reject(err);
             })
         });
@@ -110,18 +110,18 @@ export class CacheProvider {
 
     }
 
-    public getBinById(id){
-        return new Promise((resolve, reject)=>{
+    public getBinById(id) {
+        return new Promise((resolve, reject)=> {
 
-            if (this.binIndex && this.binIndex.hasOwnProperty(id)){
+            if (this.binIndex && this.binIndex.hasOwnProperty(id)) {
                 resolve(this.binIndex[id]);
                 return;
             }
 
             // TODO: optimise so that two bin loads can't be happening at the same time.
-            this.getBinList().then((binList: any)=>{
+            this.getBinList().then((binList:any)=> {
 
-                if (this.binIndex.hasOwnProperty(id)){
+                if (this.binIndex.hasOwnProperty(id)) {
                     resolve(this.binIndex[id]);
                     return;
                 }
@@ -129,7 +129,7 @@ export class CacheProvider {
                 var warehouse = this.getCurrentWarehouse();
                 var warehouseName = warehouse ? (warehouse.Description.value ? warehouse.Description.value : warehouse.WarehouseID.value) : "Unknown";
 
-                reject({message: "No location found with ID "+id+" in warehouse "+warehouseName});
+                reject({message: "No location found with ID " + id + " in warehouse " + warehouseName});
 
                 // TODO: Perform fresh lookup on cache expiry
             }).catch((err) => {
@@ -138,7 +138,7 @@ export class CacheProvider {
         });
     }
 
-    public generateBinList(){
+    public generateBinList() {
         var warehouse = this.getCurrentWarehouse();
 
         if (!warehouse)
@@ -147,15 +147,15 @@ export class CacheProvider {
         this.binList = warehouse.Locations;
 
         // Order for pick sequencing
-        this.binList.sort((a, b)=>{
+        this.binList.sort((a, b)=> {
             return (a.Zone.value ? a.Zone.value.localeCompare(b.Zone.value) : 0) ||
-                    (a.PickingOrder.value > b.PickingOrder.value ? 1 : -1) ||
-                    (a.LocationID.value ? a.LocationID.value.localeCompare(b.LocationID.value) : 0);
+                (a.PickingOrder.value > b.PickingOrder.value ? 1 : -1) ||
+                (a.LocationID.value ? a.LocationID.value.localeCompare(b.LocationID.value) : 0);
         });
 
         // Generate index for quick lookup
         this.binIndex = {};
-        for (let bin of this.binList){
+        for (let bin of this.binList) {
             this.binIndex[bin.LocationID.value] = bin;
         }
     }
@@ -169,7 +169,7 @@ export class CacheProvider {
             });
             toast.present();
 
-            this.api.getWarehouseList().then((warehouseList : any) => {
+            this.api.getWarehouseList().then((warehouseList:any) => {
 
                 this.warehouseList = warehouseList;
 
@@ -181,7 +181,9 @@ export class CacheProvider {
 
                     resolve();
                     toast.setMessage('Initial load complete.');
-                    setTimeout(()=>{ toast.dismissAll(); }, 3000);
+                    setTimeout(()=> {
+                        toast.dismissAll();
+                    }, 3000);
                     console.log("Initial data loaded.")
                 }).catch((err) => {
                     reject(err);
@@ -197,7 +199,9 @@ export class CacheProvider {
 
     private loadFailed(toast, err) {
         toast.setMessage('Initial load failed: ' + err.message);
-        setTimeout(()=>{ toast.dismissAll(); }, 3000);
+        setTimeout(()=> {
+            toast.dismissAll();
+        }, 3000);
         console.log("Initial data load failed: " + err.message);
     }
 

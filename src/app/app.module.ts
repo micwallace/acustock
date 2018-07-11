@@ -30,6 +30,8 @@ import { TransferProvider } from "../providers/transfer/transfer";
 import { EnterTab } from "../pages/bin-transfer/tabs/enter";
 import { TransferListTab } from "../pages/bin-transfer/tabs/transfer-list";
 import { TransferHistoryTab } from "../pages/bin-transfer/tabs/transfer-history";
+import { ReceiveProvider } from '../providers/receive/receive';
+import { ReceivePage } from "../pages/receive/receive";
 
 @NgModule({
     declarations: [
@@ -49,6 +51,7 @@ import { TransferHistoryTab } from "../pages/bin-transfer/tabs/transfer-history"
         ItemLookupPage,
         ItemLookupDetailsPage,
         BinLookupPage,
+        ReceivePage,
         SetupPage,
         PreferencesPage,
         BarcodeListenerComponent,
@@ -76,6 +79,7 @@ import { TransferHistoryTab } from "../pages/bin-transfer/tabs/transfer-history"
         ItemLookupPage,
         ItemLookupDetailsPage,
         BinLookupPage,
+        ReceivePage,
         SetupPage,
         PreferencesPage
     ],
@@ -92,7 +96,8 @@ import { TransferHistoryTab } from "../pages/bin-transfer/tabs/transfer-history"
         LocationAutocompleteService,
         PickProvider,
         TransferProvider,
-        PreferencesProvider
+        PreferencesProvider,
+    ReceiveProvider
     ]
 })
 export class AppModule {

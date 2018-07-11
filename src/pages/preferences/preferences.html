@@ -20,12 +20,17 @@
             <ion-item *ngFor="let pref of group.preferences">
                 <ion-label color="primary">{{pref.title}}</ion-label>
 
-                <ion-input *ngIf="['text', 'password', 'url', 'number'].indexOf(pref.type) > -1" placeholder="{{pref.placeholder}}" type="{{pref.type}}" [value]="pref.def_value" [(ngModel)]="preferences.preferences[pref.key]"></ion-input>
+                <ion-input *ngIf="['text', 'password', 'url', 'number'].indexOf(pref.type) > -1"
+                           placeholder="{{pref.placeholder}}" type="{{pref.type}}" [value]="pref.def_value"
+                           [(ngModel)]="preferences.preferences[pref.key]"></ion-input>
 
-                <ion-toggle *ngIf="pref.type == 'toggle'" [checked]="pref.def_value" [(ngModel)]="preferences.preferences[pref.key]"></ion-toggle>
+                <ion-toggle *ngIf="pref.type == 'toggle'" [checked]="pref.def_value"
+                            [(ngModel)]="preferences.preferences[pref.key]"></ion-toggle>
 
                 <ion-select *ngIf="pref.type == 'select'" [(ngModel)]="preferences.preferences[pref.key]">
-                    <ion-option *ngFor="let option of getPreferenceOptions(pref)" [value]="option.value">{{option.label}}</ion-option>
+                    <ion-option *ngFor="let option of getPreferenceOptions(pref)" [value]="option.value">
+                        {{option.label}}
+                    </ion-option>
                 </ion-select>
             </ion-item>
         </ion-list>

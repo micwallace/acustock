@@ -30,7 +30,7 @@ export class SetupPage {
     }
 
     showPreferences() {
-        this.events.subscribe('preferencesSaved', ()=>{
+        this.events.subscribe('preferencesSaved', ()=> {
             if (this.prefs.getPreference('url') == "") {
                 alert("Please configure connection preferences to continue");
                 return;
@@ -56,11 +56,11 @@ export class SetupPage {
         });
     }
 
-    onBarcodeScan(barcodeText){
+    onBarcodeScan(barcodeText) {
         this.loadBarcodeConfiguration(barcodeText);
     }
 
-    loadBarcodeConfiguration(barcodeText){
+    loadBarcodeConfiguration(barcodeText) {
 
         try {
             var values = JSON.parse(barcodeText);
@@ -78,7 +78,7 @@ export class SetupPage {
 
             this.testConnection();
 
-        } catch (e){
+        } catch (e) {
             alert("Invalid configuration barcode.");
         }
     }

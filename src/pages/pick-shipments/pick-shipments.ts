@@ -11,8 +11,14 @@ import { PickShipmentsPickPage } from "../pick-shipments-pick/pick-shipments-pic
 })
 export class PickShipmentsPage {
 
-    constructor(public navCtrl:NavController, private barcodeScanner:BarcodeScanner, public pickProvider: PickProvider, public modalCtrl:ModalController) {
+    shipmentNbr = "";
 
+    constructor(public navCtrl:NavController, private barcodeScanner:BarcodeScanner, public pickProvider:PickProvider, public modalCtrl:ModalController) {
+
+    }
+
+    onBarcodeScan(barcodeData){
+        this.loadShipment(barcodeData);
     }
 
     scanShipment() {
@@ -20,7 +26,7 @@ export class PickShipmentsPage {
             if (barcodeData.cancelled)
                 return;
 
-            this.loadShipment(barcodeData.text);
+            this.onBarcodeScan(barcodeData.text);
 
         }, (err) => {
             // An error occurred
@@ -28,29 +34,31 @@ export class PickShipmentsPage {
         });
     }
 
-    loadShipment(shipmentNbr){
-        this.pickProvider.loadShipment(shipmentNbr).then((res)=>{
+    loadShipment(shipmentNbr) {
+        this.shipmentNbr = shipmentNbr;
 
-        }).catch((err)=>{
+        this.pickProvider.loadShipment(shipmentNbr).then((res)=> {
+            if (res === false)
+                this.shipmentNbr = "";
+        }).catch((err)=> {
 
         });
     }
 
-    openItemsDialog(){
+    openItemsDialog() {
         console.log(JSON.stringify(this.pickProvider.currentShipment.Details));
 
         let modal = this.modalCtrl.create(PickShipmentsListPage);
         modal.present();
     }
 
-    openPickDialog(){
-        if (this.pickProvider.unpickedQty == 0){
+    openPickDialog() {
+        if (this.pickProvider.unpickedQty == 0) {
             alert("There are no items left to pick.");
             return;
         }
 
-        let modal = this.modalCtrl.create(PickShipmentsPickPage);
-        modal.present();
+        this.navCtrl.push(PickShipmentsPickPage);
     }
 
 }

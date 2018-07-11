@@ -31,20 +31,22 @@
         <small *ngIf="attrs.data.AlternateID" [innerHTML]="attrs.data.AlternateID | boldprefix:attrs.keyword"></small>
     </ng-template>
     <!--<ion-item>-->
-    <ion-auto-complete id="item-select" [(ngModel)]="selectedItem" [dataProvider]="itemAutocompleteService" [template]="listItem"
+    <ion-auto-complete id="item-select" [(ngModel)]="selectedItem" [dataProvider]="itemAutocompleteService"
+                       [template]="listItem"
                        (itemSelected)="loadItemLocations($event)"></ion-auto-complete>
     <!--</ion-item>-->
     <ion-scroll style="height: calc(100% - 100px);" scrollY="true">
         <ion-list>
-            <ion-item no-padding tappable *ngFor="let location of itemLocations" (click)="openDetailsModal($event, location)">
+            <ion-item no-padding tappable *ngFor="let location of itemLocations"
+                      (click)="openDetailsModal($event, location)">
                 <ion-label>{{location.Location.value}}</ion-label>
                 <div class="item-note" item-end style="width: 120px;">
                     <ion-row>
-                        <ion-col col-8>Available: </ion-col>
+                        <ion-col col-8>Available:</ion-col>
                         <ion-col col-4>{{location.QtyAvailable.value}}</ion-col>
                     </ion-row>
                     <ion-row>
-                        <ion-col col-8>On Hand: </ion-col>
+                        <ion-col col-8>On Hand:</ion-col>
                         <ion-col col-4>{{location.QtyOnHand.value}}</ion-col>
                     </ion-row>
                 </div>

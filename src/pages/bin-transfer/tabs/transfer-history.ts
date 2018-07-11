@@ -11,21 +11,21 @@ import { TransferProvider } from '../../../providers/transfer/transfer'
 
 @IonicPage()
 @Component({
-  selector: 'page-bin-transfer',
-  templateUrl: 'transfer-history.html'
+    selector: 'page-bin-transfer',
+    templateUrl: 'transfer-history.html'
 })
 export class TransferHistoryTab {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public transferProvider: TransferProvider) {
+    constructor(public navCtrl:NavController, public navParams:NavParams, public transferProvider:TransferProvider) {
 
-  }
+    }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad PickShipmentPickPage Tab: Unpicked List');
-  }
+    ionViewDidLoad() {
+        console.log('ionViewDidLoad PickShipmentPickPage Tab: Unpicked List');
+    }
 
-  openPickItem(item){
+    openPickItem(item) {
 
-  }
+    }
 
 }

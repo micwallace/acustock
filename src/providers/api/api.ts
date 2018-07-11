@@ -16,7 +16,7 @@ export class Api {
     private password:string = '';
     private company:string = '';
 
-    constructor(public http:HTTP, public prefs: PreferencesProvider) {
+    constructor(public http:HTTP, public prefs:PreferencesProvider) {
         this.updateSettings(null, null);
 
         this.http.setHeader('*', 'Content-Type', 'application/json');
@@ -27,8 +27,8 @@ export class Api {
     updateSettings(username, password) {
         this.url = this.prefs.getPreference('connection_url');
         this.company = this.prefs.getPreference('connection_company');
-        this.username = username!=null ? username : this.prefs.getPreference('connection_username');
-        this.password = password!=null ? password : this.prefs.getPreference('connection_password');
+        this.username = username != null ? username : this.prefs.getPreference('connection_username');
+        this.password = password != null ? password : this.prefs.getPreference('connection_password');
     }
 
     public testConnection(username, password) {
@@ -46,7 +46,7 @@ export class Api {
                 try {
                     var error = JSON.parse(err.error);
 
-                    if (error.hasOwnProperty('exceptionMessage')){
+                    if (error.hasOwnProperty('exceptionMessage')) {
                         err.errorData = error;
                         err.message = error.exceptionMessage;
                     } else {
@@ -54,11 +54,11 @@ export class Api {
                     }
 
                     reject(err);
-                } catch (e){
+                } catch (e) {
                     err.message = err.error;
                     reject(err);
                 }
-            }).catch((err)=>{
+            }).catch((err)=> {
                 err.message = err.error;
                 reject(err);
             });
@@ -76,7 +76,7 @@ export class Api {
         return this.http.post(this.url + '/entity/auth/login', data, {});
     }
 
-    logout(){
+    logout() {
         return this.http.post(this.url + '/entity/auth/login', null, {});
     }
 
@@ -101,43 +101,47 @@ export class Api {
         return this.get("InventoryLocations?$filter=Location eq '" + locationId + "'" + warehouseFilter);
     }
 
-    getItemBatches(itemId:string, warehouseId:string, locationId:string){
+    getItemBatches(itemId:string, warehouseId:string, locationId:string) {
 
         let filter = [];
 
         if (itemId)
-            filter.push("InventoryID eq '"+itemId+"'");
+            filter.push("InventoryID eq '" + itemId + "'");
 
         if (warehouseId)
-            filter.push("Warehouse eq '"+warehouseId+"'");
+            filter.push("Warehouse eq '" + warehouseId + "'");
 
         if (locationId)
-            filter.push("Location eq '"+locationId+"'");
+            filter.push("Location eq '" + locationId + "'");
 
         return this.get("InventoryLotSerials" + (filter.length ? "?$filter=" + filter.join(" and ") : ""));
     }
 
-    getShipment(shipmentNbr){
+    getShipment(shipmentNbr) {
         return this.get("Shipment?$expand=Details,Details/Allocations&$filter=ShipmentNbr eq '" + shipmentNbr + "' and Operation eq 'Issue'");
     }
 
-    getShipmentList(){
+    getShipmentList() {
         return this.get("ShipmentPriorityList");
     }
 
-    putTransfer(data){
+    putShipment(data) {
+        return this.put("Shipment", data, {});
+    }
+
+    putTransfer(data) {
         return this.put("Transfer", data, {});
     }
 
-    deleteTransfer(transferId:string){
+    deleteTransfer(transferId:string) {
         return this.delete("Transfer/" + transferId);
     }
 
-    releaseTransfer(transferId:string){
-        return this.postActionAndGetResult("Transfer/Release", {entity:{ReferenceNbr: {value: transferId}}});
+    releaseTransfer(transferId:string) {
+        return this.postActionAndGetResult("Transfer/Release", {entity: {ReferenceNbr: {value: transferId}}});
     }
 
-    postActionAndGetResult(endpoint:string, body:any){
+    postActionAndGetResult(endpoint:string, body:any) {
 
         return new Promise((resolve, reject) => {
 
@@ -149,15 +153,17 @@ export class Api {
                 var url = new URL(this.url);
                 url.pathname = res.headers.location;
 
-                setTimeout(()=>{ this.getLongRunningOpResult(url.toString(), resolve, reject, 1); }, 3000);
-            }).catch((err)=>{
+                setTimeout(()=> {
+                    this.getLongRunningOpResult(url.toString(), resolve, reject, 1);
+                }, 3000);
+            }).catch((err)=> {
                 reject(err);
             });
         });
     }
 
-    getLongRunningOpResult(url, resolve, reject, count){
-        this.http.get(url, {}, null).then((res:any)=>{
+    getLongRunningOpResult(url, resolve, reject, count) {
+        this.http.get(url, {}, null).then((res:any)=> {
 
             if (res.status == 204)
                 return resolve(true);
@@ -165,9 +171,11 @@ export class Api {
             if (res.data)
                 return reject(JSON.stringify(res.data));
 
-            setTimeout(()=>{ this.getLongRunningOpResult(url, resolve, reject, count); }, 4000);
+            setTimeout(()=> {
+                this.getLongRunningOpResult(url, resolve, reject, count);
+            }, 4000);
 
-        }).catch((err)=>{
+        }).catch((err)=> {
             err.message = err.error;
             reject(err);
         });
@@ -195,9 +203,10 @@ export class Api {
             let url = this.url + this.api_endpoint + '/' + endpoint;
             var promise;
 
+            console.log(url);
+
             switch (method) {
                 case "get":
-                    console.log(url);
                     promise = this.http.get(url, headers, params);
                     break;
 
@@ -226,7 +235,7 @@ export class Api {
 
                     try {
                         var data = JSON.parse(res.data);
-                    } catch (e){
+                    } catch (e) {
                         reject({"message": "JSON parse error"});
                         return;
                     }
@@ -238,8 +247,8 @@ export class Api {
 
             }, (err) => {
 
-                if (err.status == 401){
-                    if (this.prefs.hasPreference("connection_password") && !loginAttempt){
+                if (err.status == 401) {
+                    if (this.prefs.hasPreference("connection_password") && !loginAttempt) {
                         this.login().then((res) => {
 
                             this.request(method, endpoint, body, headers, params, true).then((res) => {
@@ -255,21 +264,21 @@ export class Api {
                             try {
                                 var error = JSON.parse(err.error);
 
-                                if (error.hasOwnProperty('exceptionMessage')){
+                                if (error.hasOwnProperty('exceptionMessage')) {
                                     err.errorData = error;
                                     err.message = error.exceptionMessage;
                                 } else {
                                     err.message = err.error;
                                 }
 
-                            } catch (e){
+                            } catch (e) {
                                 err.message = err.error;
                             }
 
                             reject(err);
                             //this.navCtrl.setRoot(LoginPage, {message: "Login failed: " + err.message});
 
-                        }).catch((err)=>{
+                        }).catch((err)=> {
                             err.message = err.error;
                             reject(err);
                         });
@@ -286,7 +295,7 @@ export class Api {
                     err.errorData = error;
 
                     reject(err);
-                } catch (e){
+                } catch (e) {
                     err.message = err.error;
                     reject(err);
                 }

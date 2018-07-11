@@ -19,7 +19,7 @@ export class PreferencesPage {
     preferences;
     currentWarehouse = "";
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public prefs:PreferencesProvider, public events:Events, public cache: CacheProvider) {
+    constructor(public navCtrl:NavController, public navParams:NavParams, public prefs:PreferencesProvider, public events:Events, public cache:CacheProvider) {
         this.preferences = prefs;
         this.currentWarehouse = prefs.getPreference('warehouse');
     }

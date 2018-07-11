@@ -6,30 +6,30 @@
 -->
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>Shipment Items</ion-title>
-  </ion-navbar>
+    <ion-navbar>
+        <ion-title>Shipment Items</ion-title>
+    </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
-  <ion-grid>
-    <div class="row header">
-      <ion-col col-5>Location</ion-col>
-      <ion-col col-4>LotSerial</ion-col>
-      <ion-col col-3>Picked/Qty</ion-col>
-    </div>
-    <ion-item no-margin no-padding *ngFor="let item of pickProvider.currentShipment.Details">
-      <strong>{{item.InventoryID.value}}</strong>
-      <span item-end float-end>{{item.PickedQty.value}}/{{item.ShippedQty.value}}</span>
-      <div no-margin no-padding style="width:100%;">
-        <ion-row no-margin no-padding *ngFor="let allocation of item.Allocations">
-          <ion-col col-5>{{allocation.LocationID.value}}</ion-col>
-          <ion-col col-4>{{allocation.LotSerialNbr.value}}</ion-col>
-          <ion-col col-3 text-right>{{allocation.PickedQty.value}}/{{allocation.Qty.value}}</ion-col>
-        </ion-row>
-      </div>
-    </ion-item>
-  </ion-grid>
+    <ion-grid>
+        <div class="row header">
+            <ion-col col-5>Location</ion-col>
+            <ion-col col-4>LotSerial</ion-col>
+            <ion-col col-3>Picked/Qty</ion-col>
+        </div>
+        <ion-item no-margin no-padding *ngFor="let item of pickProvider.currentShipment.Details">
+            <strong>{{item.InventoryID.value}}</strong>
+            <span item-end float-end>{{item.PickedQty.value}}/{{item.ShippedQty.value}}</span>
+            <div no-margin no-padding style="width:100%;">
+                <ion-row no-margin no-padding *ngFor="let allocation of item.Allocations">
+                    <ion-col col-5>{{allocation.LocationID.value}}</ion-col>
+                    <ion-col col-4>{{allocation.LotSerialNbr.value}}</ion-col>
+                    <ion-col col-3 text-right>{{allocation.PickedQty.value}}/{{allocation.Qty.value}}</ion-col>
+                </ion-row>
+            </div>
+        </ion-item>
+    </ion-grid>
 </ion-content>

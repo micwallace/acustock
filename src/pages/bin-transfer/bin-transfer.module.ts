@@ -3,11 +3,12 @@ import { IonicPageModule } from 'ionic-angular';
 import { BinTransferPage } from './bin-transfer';
 
 @NgModule({
-  declarations: [
-    BinTransferPage,
-  ],
-  imports: [
-    IonicPageModule.forChild(BinTransferPage),
-  ],
+    declarations: [
+        BinTransferPage,
+    ],
+    imports: [
+        IonicPageModule.forChild(BinTransferPage),
+    ],
 })
-export class BinTransferPageModule {}
+export class BinTransferPageModule {
+}

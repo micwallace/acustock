@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController, Events, AlertController } from 'ionic-angular';
 import { PickProvider } from '../../../providers/providers';
 import { CacheProvider } from "../../../providers/cache/cache";
+import { LoadingController } from "ionic-angular/index";
 
 /**
  * Generated class for the PickShipmentsPickPage page.
@@ -31,7 +32,7 @@ export class PickTab {
         location: "",
         item: "",
         lot: "",
-        qty: ""
+        qty: 0
     };
 
     showLot = false;
@@ -43,7 +44,8 @@ export class PickTab {
                 public cache:CacheProvider,
                 public viewCtrl:ViewController,
                 public events:Events,
-                public alertCtrl:AlertController) {
+                public alertCtrl:AlertController,
+                public loadingCtrl: LoadingController) {
 
     }
 
@@ -80,24 +82,24 @@ export class PickTab {
         }
     }
 
-    getSuggestedLocation(){
+    getSuggestedLocation() {
         return this.pickProvider.getSuggestedLocation(this.currentLocationIndex);
     }
 
-    getSuggestedItem(){
+    getSuggestedItem() {
         return this.pickProvider.getSuggestedItem(this.currentLocationIndex, this.currentItemIndex)
     }
 
     getCurrentItemPickedQty() {
         var alloc = this.getSuggestedItem();
-        return this.pickProvider.getPendingAllocationQty(alloc.SplitLineNbr.value, alloc.LineNbr.value);
+        return this.pickProvider.getPendingAllocationQty(alloc.LineNbr.value, alloc.SplitLineNbr.value);
     }
 
-    getSuggestedPickQty(){
+    getSuggestedPickQty() {
         return this.getSuggestedItem().RemainingQty;
     }
 
-    getCurrentItemLeftToPickQty(){
+    getCurrentItemLeftToPickQty() {
         return this.getSuggestedItem().RemainingQty;
     }
 
@@ -117,7 +119,7 @@ export class PickTab {
             this.currentItemIndex = 0;
         }
 
-        console.log(this.currentLocationIndex+" / "+this.currentItemIndex);
+        console.log(this.currentLocationIndex + " / " + this.currentItemIndex);
         console.log(this.getSuggestedItem());
     }
 
@@ -144,7 +146,7 @@ export class PickTab {
             location: "",
             item: "",
             lot: "",
-            qty: ""
+            qty: 0
         };
 
         this.locationInput.setFocus();
@@ -152,9 +154,15 @@ export class PickTab {
         this.showQty = false;
     }
 
-    setLocation() {
+    setLocation(locId) {
+        if (locId) {
+            this.enteredData.location = locId;
+        } else {
+            locId = this.enteredData.location;
+        }
+
         var curBin = this.getSuggestedItem().LocationID.value;
-        var enteredBin = this.enteredData.location;
+        var enteredBin = locId;
         if (curBin != enteredBin) {
             alert(enteredBin + " is not the recommended bin " + curBin);
             return;
@@ -162,14 +170,22 @@ export class PickTab {
         }
 
         //document.getElementById("item").focus();
-        this.itemInput.setFocus();
+        setTimeout(()=> {
+            this.itemInput.setFocus();
+        });
     }
 
-    setItem() {
-        var curItem = this.getSuggestedItem();
-        var enteredItem = this.enteredData.item;
+    setItem(itemId) {
 
-        this.cache.getItemById(enteredItem).then((item: any)=> {
+        if (itemId) {
+            this.enteredData.item = itemId;
+        } else {
+            itemId = this.enteredData.item;
+        }
+
+        var curItem = this.getSuggestedItem();
+
+        this.cache.getItemById(itemId).then((item:any)=> {
 
             if (item.InventoryID.value != curItem.InventoryID.value) {
                 alert("The entered item does not match the requested item.");
@@ -177,6 +193,7 @@ export class PickTab {
             }
 
             this.showQty = true;
+            this.enteredData.qty = 1;
             this.enteredData.item = item.InventoryID.value;
             //document.getElementById("qty").focus();
             setTimeout(()=> {
@@ -184,17 +201,13 @@ export class PickTab {
             });
 
         }).catch((err)=> {
+            this.enteredData.item = "";
             alert(err.message);
         });
     }
 
     setLotSerial() {
 
-    }
-
-    setQuantity() {
-
-        //this.addPick();
     }
 
     addPick() {
@@ -211,12 +224,12 @@ export class PickTab {
         }
 
         // validate qty
-        if (this.enteredData.qty < 1){
+        if (this.enteredData.qty < 1) {
             alert("Quantity must be greater than 0.");
             return;
         }
 
-        if (this.enteredData.qty > this.getCurrentItemLeftToPickQty()){
+        if (this.enteredData.qty > this.getCurrentItemLeftToPickQty()) {
             alert("The entered quantity exceeds the quantity needed for this item.");
             return;
         }
@@ -227,14 +240,16 @@ export class PickTab {
             location: this.enteredData.location,
             item: this.enteredData.item,
             lot: this.enteredData.lot,
-            qty: parseInt(this.enteredData.qty)
+            qty: this.enteredData.qty
         };
 
-        var itemComplete = this.pickProvider.addPick(data, this.currentLocationIndex, this.currentItemIndex);
+        var curAlloc = this.getSuggestedItem();
+
+        var itemComplete = this.pickProvider.addPick(data, curAlloc);
 
         this.resetForm();
 
-        if (itemComplete){
+        if (itemComplete) {
             this.currentItemIndex = 0;
 
             // TODO: check if all items are complete and prompt to save
@@ -275,7 +290,43 @@ export class PickTab {
     }
 
     savePicks() {
+        let loader = this.loadingCtrl.create({content: "Confirming picks..."});
+        loader.present();
 
+        this.pickProvider.confirmPicks().then((res:any)=>{
+            loader.dismissAll();
+        }).catch((err)=> {
+            loader.dismissAll();
+            alert(err.message);
+        });
+    }
+
+    onBarcodeScan(barcodeText){
+        console.log(barcodeText);
+
+        if (this.enteredData.location == "") {
+            this.setLocation(barcodeText);
+            return;
+        }
+
+        this.cache.getItemById(barcodeText).then((item:any)=> {
+
+            if (this.enteredData.item == "" || this.enteredData.qty == 0) {
+                this.setItem(item.InventoryID.value);
+                return;
+            }
+
+            // If the item is the same as the last item, increment quantity.
+            if (item.InventoryID.value == this.enteredData.item) {
+                this.enteredData.qty++;
+            } else {
+                this.addPick();
+
+                this.setItem(item.InventoryID.value);
+            }
+        }).catch((err) => {
+            alert(err.message);
+        });
     }
 
 }

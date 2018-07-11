@@ -18,7 +18,7 @@ export class TransferListTab {
 
     objectKeys:any = Object.keys;
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public transferProvider:TransferProvider, public alertController: AlertController) {
+    constructor(public navCtrl:NavController, public navParams:NavParams, public transferProvider:TransferProvider, public alertController:AlertController) {
     }
 
     ionViewDidLoad() {
@@ -28,7 +28,7 @@ export class TransferListTab {
     openEditDialog(locationKey, itemKey) {
 
         var location = this.transferProvider.getPendingItem(locationKey);
-        var curItemQty =  location.Items[itemKey].Qty.value;
+        var curItemQty = location.Items[itemKey].Qty.value;
 
         var alertDialog = this.alertController.create({
             title: 'Update Qty',
@@ -55,10 +55,10 @@ export class TransferListTab {
 
                         var newPending = (qty - curItemQty) + curPending;
 
-                        if (newPending <= srcQty){
+                        if (newPending <= srcQty) {
                             this.transferProvider.updatePendingItemQty(locationKey, itemKey, qty);
                         } else {
-                            alert("There is only "+srcQty+" on hand to transfer from this location.");
+                            alert("There is only " + srcQty + " on hand to transfer from this location.");
                         }
                     }
                 }

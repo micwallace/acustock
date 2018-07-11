@@ -1,7 +1,7 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController, Events, AlertController } from 'ionic-angular';
-import { TransferProvider } from '../../../providers/transfer/transfer'
-import { CacheProvider } from "../../../providers/cache/cache";
+import { ReceiveProvider } from '../../../../providers/receive/receive'
+import { CacheProvider } from "../../../../providers/cache/cache";
 import { LoadingController } from "ionic-angular/index";
 
 /**
@@ -14,23 +14,19 @@ import { LoadingController } from "ionic-angular/index";
 @IonicPage()
 @Component({
     selector: 'page-bin-transfer',
-    templateUrl: 'enter.html'
+    templateUrl: 'shipment-enter.html'
 })
-export class EnterTab {
+export class ReceiveShipmentEnterTab {
 
     @ViewChild('location') locationInput;
-    @ViewChild('tolocation') toLocationInput;
     @ViewChild('item') itemInput;
     @ViewChild('qty') qtyInput;
 
     enteredData = {
         location: "",
-        toLocation: "",
         item: "",
         qty: 0
     };
-
-    currentLocationItems = {};
 
     showItem = false;
     showQty = false;
@@ -40,7 +36,7 @@ export class EnterTab {
     constructor(private zone:NgZone,
                 public navCtrl:NavController,
                 public navParams:NavParams,
-                public transferProvider:TransferProvider,
+                public receiveProvider:ReceiveProvider,
                 public cache:CacheProvider,
                 public viewCtrl:ViewController,
                 public events:Events,
@@ -57,12 +53,9 @@ export class EnterTab {
 
         this.enteredData = {
             location: "",
-            toLocation: "",
             item: "",
             qty: 0
         };
-
-        this.currentLocationItems = {};
 
         this.showItem = false;
         this.showQty = false;
@@ -89,31 +82,6 @@ export class EnterTab {
         // Validate bin and load current bin contents
         this.cache.getBinById(locId).then((bin)=> {
 
-            this.cache.api.getLocationContents(locId, this.cache.prefs.getPreference('warehouse')).then((itemList:any)=> {
-
-                console.log(JSON.stringify(itemList));
-                // Index current items for easier validation
-                this.currentLocationItems = {};
-
-                for (let item of itemList) {
-                    this.currentLocationItems[item.InventoryID.value] = item;
-                }
-
-                //document.getElementById("item").focus();
-                this.enteredData.toLocation = "";
-                this.showItem = false;
-                this.showQty = false;
-                this.toLocationInput.setFocus();
-
-                this.dismissLoader();
-
-            }).catch((err) => {
-                this.enteredData.location = "";
-                this.dismissLoader().then(()=> {
-                    alert(err.message);
-                });
-            });
-
         }).catch((err) => {
             this.enteredData.location = "";
             this.dismissLoader().then(()=> {
@@ -121,41 +89,6 @@ export class EnterTab {
             });
         });
 
-    }
-
-    setToLocation(locId) {
-
-        if (this.enteredData.location == locId) {
-            alert("From and to location must be different");
-            return;
-        }
-
-        if (locId) {
-            this.enteredData.toLocation = locId;
-        } else {
-            locId = this.enteredData.toLocation;
-        }
-
-        this.loader = this.loadingCtrl.create({content: "Loading..."});
-        this.loader.present();
-
-        this.cache.getBinById(locId).then((bin)=> {
-
-            this.enteredData.item = "";
-            this.showItem = true;
-            this.showQty = false;
-            setTimeout(()=> {
-                this.itemInput.setFocus();
-            });
-
-            this.dismissLoader();
-
-        }).catch((err) => {
-            this.enteredData.toLocation = "";
-            this.dismissLoader().then(()=> {
-                alert(err.message);
-            });
-        });
     }
 
     setItem(itemId) {
@@ -173,23 +106,6 @@ export class EnterTab {
 
             this.dismissLoader();
 
-            // Check that the item is available
-            if (!this.currentLocationItems.hasOwnProperty(item.InventoryID.value)) {
-                alert("There is no quantity on-hand to transfer for the item and location combination.");
-                this.enteredData.item = "";
-                return;
-            }
-
-            if (!this.validateItemQty(1)) {
-                return;
-            }
-
-            this.enteredData.item = item.InventoryID.value; // change alternate IDs like barcodes to primary ID
-            this.enteredData.qty = 1;
-            this.showQty = true;
-            setTimeout(()=> {
-                this.qtyInput.setFocus();
-            });
 
         }).catch((err) => {
             this.enteredData.item = "";
@@ -200,15 +116,6 @@ export class EnterTab {
     }
 
     validateItemQty(qty:any) {
-        var reqQty = qty ? qty : this.enteredData.qty;
-        var srcQty = this.currentLocationItems.hasOwnProperty(this.enteredData.item) ? this.currentLocationItems[this.enteredData.item].QtyOnHand.value : 0;
-        var curPendingQty = this.transferProvider.getItemLocPendingQty(this.enteredData.location, this.enteredData.item);
-        if (srcQty < curPendingQty + reqQty) {
-            alert("There is only " + srcQty + " available for transfer from the current location. " + (curPendingQty ? curPendingQty + " are pending." : ""));
-            if (!qty)
-                this.enteredData.qty = srcQty - curPendingQty;
-            return false;
-        }
         return true;
     }
 
@@ -236,27 +143,24 @@ export class EnterTab {
         if (!this.validateItemQty(null))
             return;
 
-        var srcQty = this.currentLocationItems.hasOwnProperty(this.enteredData.item) ? this.currentLocationItems[this.enteredData.item].QtyOnHand.value : 0;
-
-        this.transferProvider.addPendingItem(this.enteredData.location, this.enteredData.toLocation, this.enteredData.item, this.enteredData.qty, srcQty);
 
     }
 
     commitTransfers() {
         this.nextFromBin();
 
-        if (this.transferProvider.pendingQty == 0)
-            return alert("Add some items to the transfer list first.");
+        /*if (this.receiveProvider.pendingQty == 0)
+         return alert("Add some items to the transfer list first.");
 
-        this.loader = this.loadingCtrl.create({content: "Submitting Transfers..."});
-        this.loader.present();
+         this.loader = this.loadingCtrl.create({content: "Submitting Transfers..."});
+         this.loader.present();
 
-        this.transferProvider.commitTransfer(this.loader).then(()=> {
-            this.dismissLoader();
-        }).catch((err)=> {
-            this.dismissLoader();
-            alert(err.message);
-        });
+         this.receiveProvider.commitReceipt(this.loader).then(()=>{
+         this.dismissLoader();
+         }).catch((err)=>{
+         this.dismissLoader();
+         alert(err.message);
+         });*/
     }
 
     onBarcodeScan(barcodeText) {
@@ -267,11 +171,6 @@ export class EnterTab {
             return;
         }
 
-        if (this.enteredData.toLocation == "") {
-            this.setToLocation(barcodeText);
-            return;
-        }
-
         // If the location and to-location is already set, scanning a bin barcode updates the to-location
         this.cache.getBinById(barcodeText).then((bin)=> {
             // check if quantity is set. If it is then save the current entry
@@ -279,7 +178,7 @@ export class EnterTab {
                 this.addTransferItem();
             }
 
-            this.setToLocation(barcodeText);
+            this.setLocation(barcodeText);
         }).catch((err) => {
 
             this.cache.getItemById(barcodeText).then((item:any)=> {

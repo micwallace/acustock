@@ -6,29 +6,31 @@
 -->
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>Pending Items</ion-title>
-  </ion-navbar>
+    <ion-navbar>
+        <ion-title>Pending Items</ion-title>
+    </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
-  <ion-grid>
-    <div class="row header">
-      <ion-col col-5>Location/Item</ion-col>
-      <ion-col col-5>LotSerial</ion-col>
-      <ion-col col-2>Qty</ion-col>
-    </div>
-    <ion-item tappable no-margin no-padding *ngFor="let loc of pickProvider.pickList; let i = index" (click)="openPickItem(item);">
-      <strong>{{loc.LocationID.value}}</strong>
-      <div no-margin no-padding>
-        <ion-row *ngFor="let item of loc.Items">
-          <ion-col col-5>{{item.InventoryID.value}}</ion-col>
-          <ion-col col-5>{{item.LotSerialNbr.value}}</ion-col>
-          <ion-col col-2>{{pickProvider.getPendingAllocationQty(item.LineNbr.value, item.SplitLineNbr.value)}}/{{item.RemainingQty}}</ion-col>
-        </ion-row>
-      </div>
-    </ion-item>
-  </ion-grid>
+    <ion-grid>
+        <div class="row header">
+            <ion-col col-5>Location/Item</ion-col>
+            <ion-col col-5>LotSerial</ion-col>
+            <ion-col col-2>Qty</ion-col>
+        </div>
+        <ion-item tappable no-margin no-padding *ngFor="let loc of pickProvider.pickList; let i = index"
+                  (click)="openPickItem(item);">
+            <strong>{{loc.LocationID.value}}</strong>
+            <div no-margin no-padding>
+                <ion-row *ngFor="let item of loc.Items">
+                    <ion-col col-5>{{item.InventoryID.value}}</ion-col>
+                    <ion-col col-5>{{item.LotSerialNbr.value}}</ion-col>
+                    <ion-col col-2>{{pickProvider.getPendingAllocationQty(item.LineNbr.value, item.SplitLineNbr.value)}}/{{item.RemainingQty}}
+                    </ion-col>
+                </ion-row>
+            </div>
+        </ion-item>
+    </ion-grid>
 </ion-content>

@@ -77,18 +77,18 @@ export class PreferencesProvider {
         this.loadPreferences();
 
         // index defaults
-        for (let group of this.schema){
-            for (let pref of group.preferences){
+        for (let group of this.schema) {
+            for (let pref of group.preferences) {
                 this.defaults[pref.key] = pref.def_value;
             }
         }
     }
 
-    isSetupComplete(){
+    isSetupComplete() {
         return (this.hasPreference("connection_url") && this.hasPreference("connection_username") && this.hasPreference("connection_company"));
     }
 
-    setPreference(key, value, save=false) {
+    setPreference(key, value, save = false) {
         if (this.defaults.hasOwnProperty(key))
             this.preferences[key] = value;
 
@@ -96,7 +96,7 @@ export class PreferencesProvider {
             this.savePreferences();
     }
 
-    hasPreference(key){
+    hasPreference(key) {
         return this.preferences.hasOwnProperty(key) && this.preferences[key] != "";
     }
 

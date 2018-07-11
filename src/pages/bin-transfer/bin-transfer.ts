@@ -14,17 +14,17 @@ import { TransferProvider } from "../../providers/transfer/transfer";
 
 @IonicPage()
 @Component({
-  selector: 'page-bin-transfer',
-  templateUrl: 'bin-transfer.html',
+    selector: 'page-bin-transfer',
+    templateUrl: 'bin-transfer.html',
 })
 export class BinTransferPage {
 
-  tab1Root = EnterTab;
-  tab2Root = TransferListTab;
-  tab3Root = TransferHistoryTab;
+    tab1Root = EnterTab;
+    tab2Root = TransferListTab;
+    tab3Root = TransferHistoryTab;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController, public events: Events, public transferProvider: TransferProvider) {
+    constructor(public navCtrl:NavController, public navParams:NavParams, public viewCtrl:ViewController, public events:Events, public transferProvider:TransferProvider) {
 
-  }
+    }
 
 }

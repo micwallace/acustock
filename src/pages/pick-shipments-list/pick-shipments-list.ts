@@ -12,18 +12,18 @@ import { PickProvider } from '../../providers/providers';
 
 @IonicPage()
 @Component({
-  selector: 'page-pick-shipments-list',
-  templateUrl: 'pick-shipments-list.html'
+    selector: 'page-pick-shipments-list',
+    templateUrl: 'pick-shipments-list.html'
 })
 export class PickShipmentsListPage {
 
-  constructor(public pickProvider: PickProvider) {
-    console.log("Page opened");
-    console.log(JSON.stringify(this.pickProvider.currentShipment));
-  }
+    constructor(public pickProvider:PickProvider) {
+        console.log("Page opened");
+        console.log(JSON.stringify(this.pickProvider.currentShipment));
+    }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad PickShipmentsListPage');
-  }
+    ionViewDidLoad() {
+        console.log('ionViewDidLoad PickShipmentsListPage');
+    }
 
 }

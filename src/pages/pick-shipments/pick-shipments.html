@@ -8,6 +8,7 @@
         </ion-title>
     </ion-navbar>
 </ion-header>
+<barcode-listener (scan)='onBarcodeScan($event)'></barcode-listener>
 <ion-content padding id="page6">
     <form id="pick-shipments-form1">
         <ion-list id="login-list3">
@@ -15,7 +16,7 @@
                 <ion-label>
                     Shipment #
                 </ion-label>
-                <ion-input autofocus type="text" placeholder="" (keyup.enter)="loadShipment($event.target.value)"></ion-input>
+                <ion-input name="shipment-number" autofocus type="text" placeholder="" [ngModel]="shipmentNbr" (keyup.enter)="loadShipment($event.target.value)"></ion-input>
                 <button type="button" ion-button icon-only item-right (click)="scanShipment()">
                     <ion-icon name="barcode"></ion-icon>
                 </button>
@@ -24,7 +25,8 @@
                 <ion-label>
                     Shipment Type
                 </ion-label>
-                <ion-input name="shipment-type" type="text" placeholder="" [ngModel]="pickProvider.currentShipment?.Type?.value" readonly></ion-input>
+                <ion-input name="shipment-type" type="text" placeholder=""
+                           [ngModel]="pickProvider.currentShipment?.Type?.value" readonly></ion-input>
             </ion-item>
         </ion-list>
         <ion-grid *ngIf="pickProvider.currentShipment">

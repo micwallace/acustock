@@ -16,7 +16,7 @@ export class LoginPage {
     username = "";
     password = "";
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public loadingCtrl:LoadingController, public cache: CacheProvider, public api: Api) {
+    constructor(public navCtrl:NavController, public navParams:NavParams, public loadingCtrl:LoadingController, public cache:CacheProvider, public api:Api) {
 
         var message = navParams.get("message");
         if (message)
@@ -26,7 +26,7 @@ export class LoginPage {
         this.password = cache.prefs.getPreference("connection_password");
     }
 
-    login(){
+    login() {
         let loader = this.loadingCtrl.create({content: "Logging in..."});
         loader.present();
 
@@ -43,15 +43,15 @@ export class LoginPage {
             // TODO: Open settings page if the error is something other than 401
             loader.dismiss();
             console.log(JSON.stringify(err));
-            alert("Login failed, please check connection. " +err.message);
+            alert("Login failed, please check connection. " + err.message);
         });
     }
 
-    onScan(){
+    onScan() {
 
     }
 
-    onCameraScan(){
+    onCameraScan() {
 
     }
 

@@ -6,30 +6,37 @@
 -->
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>Picked Items</ion-title>
-  </ion-navbar>
+    <ion-navbar>
+        <ion-title>Picked Items</ion-title>
+    </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
-  <ion-grid>
-    <div class="row header">
-      <ion-col col-5>Location</ion-col>
-      <ion-col col-4>LotSerial</ion-col>
-      <ion-col col-3>Qty</ion-col>
-    </div>
-    <ion-item tappable no-margin no-padding *ngFor="let key of objectKeys(pickProvider.pendingPicks)" (click)="openPickItem(pickProvider.pendingPicks[key]);">
-      <strong>{{pickProvider.pendingPicks[key].InventoryID.value}}</strong>
-      <span item-end float-end>{{pickProvider.getPendingItemQty(key)}}/{{pickProvider.pendingPicks[key].RemainingQty}}</span>
-      <div no-margin no-padding>
-        <ion-row *ngFor="let allocation of pickProvider.pendingPicks[key].Allocations">
-          <ion-col col-5><ion-icon name="close"></ion-icon>{{allocation.LocationID.value}}</ion-col>
-          <ion-col col-5>{{allocation.LotSerialNbr.value}}</ion-col>
-          <ion-col col-2>{{allocation.PendingQty}}/{{allocation.RemainingQty}}</ion-col>
-        </ion-row>
-      </div>
-    </ion-item>
-  </ion-grid>
+    <ion-grid>
+        <div class="row header">
+            <ion-col col-5>Location</ion-col>
+            <ion-col col-4>LotSerial</ion-col>
+            <ion-col col-3>Qty</ion-col>
+        </div>
+        <ion-item tappable no-margin no-padding *ngFor="let key of objectKeys(pickProvider.pendingPicks)">
+            <strong>{{pickProvider.pendingPicks[key].InventoryID.value}}</strong>
+            <span item-end float-end>{{pickProvider.getPendingItemQty(key)}}/{{pickProvider.pendingPicks[key].RemainingQty}}</span>
+            <div no-margin no-padding>
+                <ion-row tappable *ngFor="let allocation of pickProvider.pendingPicks[key].Allocations" (click)="editPickItem(allocation);">
+                    <ion-col col-5>
+                        <ion-icon name="close"></ion-icon>
+                        {{allocation.LocationID.value}}
+                    </ion-col>
+                    <ion-col col-5>{{allocation.LotSerialNbr.value}}</ion-col>
+                    <ion-col col-2>{{allocation.PendingQty}}/{{allocation.RemainingQty}}
+                        <button ion-button icon-only small float-right (click)="removePickItem(allocation); $event.stopPropagation();">
+                            <ion-icon name="trash"></ion-icon>
+                        </button>
+                    </ion-col>
+                </ion-row>
+            </div>
+        </ion-item>
+    </ion-grid>
 </ion-content>

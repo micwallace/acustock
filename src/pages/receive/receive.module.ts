@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
-import { EnterTab } from './enter';
+import { ReceivePage } from './receive';
 
 @NgModule({
     declarations: [
-        EnterTab,
+        ReceivePage,
     ],
     imports: [
-        IonicPageModule.forChild(EnterTab),
+        IonicPageModule.forChild(ReceivePage),
     ],
 })
-export class EnterTabModule {
+export class ReceivePageModule {
 }

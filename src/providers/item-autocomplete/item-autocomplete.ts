@@ -29,13 +29,13 @@ export class ItemAutocompleteService implements AutoCompleteService {
 
     getResults(keyword:string) {
         return this.itemList.filter(
-            (item: any) => {
+            (item:any) => {
                 //noinspection TypeScriptUnresolvedVariable
                 if (item.InventoryID.value.toLowerCase().indexOf(keyword.toLowerCase()) !== -1)
                     return true;
 
-                for (var i in item.CrossReferences){
-                    if (item.CrossReferences[i].AlternateID.value.toLowerCase().indexOf(keyword.toLowerCase()) !== -1){
+                for (var i in item.CrossReferences) {
+                    if (item.CrossReferences[i].AlternateID.value.toLowerCase().indexOf(keyword.toLowerCase()) !== -1) {
                         item.AlternateID = item.CrossReferences[i].AlternateID.value;
                         return true;
                     }
