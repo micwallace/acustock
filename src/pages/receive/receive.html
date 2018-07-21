@@ -7,20 +7,22 @@
 <ion-header>
 
     <ion-navbar>
+        <button ion-button menuToggle>
+            <ion-icon name="menu"></ion-icon>
+        </button>
         <ion-title>Receive</ion-title>
     </ion-navbar>
 
 </ion-header>
-
-
-<ion-content padding>
+<barcode-listener *ngIf="navCtrl.getActive().name === 'ReceivePage'" (scan)='onBarcodeScan($event)'></barcode-listener>
+<ion-content padding barcode-listener (scan)='onBarcodeScan($event);'>
     <form id="pick-shipments-form1">
         <ion-list id="login-list3">
             <ion-item id="shipment-type">
                 <ion-select name="receipt-type" interface="popover" [(ngModel)]="receiptType">
-                    <ion-option value="shipment">Shipment (Customer Return)</ion-option>
-                    <ion-option value="purchase">Purchase Receipt</ion-option>
+                    <ion-option value="shipment">Receipt Shipment</ion-option>
                     <ion-option value="transfer">Transfer Receipt</ion-option>
+                    <ion-option value="purchase">Purchase Receipt</ion-option>
                 </ion-select>
             </ion-item>
             <ion-item id="receipt-number">
@@ -28,11 +30,50 @@
                     Receipt #
                 </ion-label>
                 <ion-input name="receipt-number" autofocus type="text" placeholder=""
-                           (keyup.enter)="loadShipment($event.target.value)"></ion-input>
-                <button type="button" ion-button icon-only item-right (click)="scanShipment()">
+                           (keyup.enter)="loadReceipt($event.target.value)"></ion-input>
+                <button type="button" ion-button icon-only item-right (click)="startCameraScanner()">
                     <ion-icon name="barcode"></ion-icon>
                 </button>
             </ion-item>
         </ion-list>
     </form>
+    <ion-grid *ngIf="receiveProvider.sourceDocument">
+        <ion-row>
+            <ion-col>
+                <label>Total Quantity:</label>
+            </ion-col>
+            <ion-col>
+                {{receiveProvider.totalQty}}
+            </ion-col>
+        </ion-row>
+        <ion-row *ngIf="receiveProvider.type != 'shipment' || receiveProvider.sourceDocument.Status.value == 'Open'">
+            <ion-col>
+                <label>Received Quantity:</label>
+            </ion-col>
+            <ion-col>
+                {{receiveProvider.receivedQty}}
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col>
+                <label>Quantity Left:</label>
+            </ion-col>
+            <ion-col>
+                {{receiveProvider.unreceivedQty}}
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col>
+                <label>Status:</label>
+            </ion-col>
+            <ion-col>
+                {{receiveProvider.sourceDocument.Status.value}}
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col>
+                <button type="button" ion-button (click)="addReceipt()">Add Receipt</button>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
 </ion-content>

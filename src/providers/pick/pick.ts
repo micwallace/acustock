@@ -36,32 +36,29 @@ export class PickProvider {
         return new Promise((resolve, reject)=> {
 
             if (!shipmentNbr) {
-                alert("Please enter a valid shipment number");
-                resolve(false);
+                reject({message:"Please enter a valid shipment number"});
                 return;
             }
-
-            let loader = this.loadingCtrl.create({content: "Loading..."});
-            loader.present();
 
             this.api.getShipment(shipmentNbr).then((res:any) => {
 
                 //console.log(JSON.stringify(res));
 
-                loader.dismiss();
-
                 if (res.length == 0) {
-                    alert("Shipment #" + shipmentNbr + " was not found in the system.");
-                    resolve(false);
+                    reject({message:"Shipment #" + shipmentNbr + " was not found in the system."});
                     return;
                 }
 
                 let shipment = res[0];
 
+                if (shipment.Operation.value == "Receipt"){
+                    reject({message:"Shipment #" + shipmentNbr + " was found but is a receipt shipment and cannot be picked."});
+                    return;
+                }
+
                 var curWarehouse = this.prefs.getPreference('warehouse');
                 if (shipment.WarehouseID.value !== curWarehouse) {
-                    alert("Shipment #" + shipmentNbr + " was found but belongs to warehouse " + shipment.WarehouseID.value + ", not the currently selected warehouse which is " + curWarehouse);
-                    resolve(false);
+                    reject({message:"Shipment #" + shipmentNbr + " was found but belongs to warehouse " + shipment.WarehouseID.value + ", not the currently selected warehouse which is " + curWarehouse});
                     return;
                 }
 
@@ -87,9 +84,7 @@ export class PickProvider {
                 resolve(true);
 
             }).catch((err) => {
-                loader.dismiss();
-                alert(err.message);
-                resolve(false);
+                reject(err);
             });
         });
 
@@ -122,6 +117,12 @@ export class PickProvider {
 
                 var pickItem = item.Allocations[x];
 
+                /*var pending = this.getPendingAllocation(pickItem.LineNbr.value, pickItem.SplitLineNbr.value);
+
+                // Removed used allocations
+                if (pending != null && (pending.deleted || pending.PendingQty >= pickItem.RemainingQty))
+                    continue;*/
+
                 allocatedQty += pickItem.Qty.value;
 
                 if (pickItem.PickedQty.value == pickItem.Qty.value)
@@ -148,7 +149,7 @@ export class PickProvider {
                 pickList[location].Items.push(pickItem);
             }
 
-            // add unallocated total to remaining qty
+            // add unallocated quantity to the picklist
             var unallocated = totalQty - allocatedQty;
             if (unallocated > 0) {
 
@@ -171,6 +172,7 @@ export class PickProvider {
                     RemainingQty: unallocated,
                     ShippedQty: item.ShippedQty,
                     TotalPickedQty: item.PickedQty,
+                    TotalRemainingQty: item.ShippedQty.value - item.PickedQty.value
                 });
             }
 
@@ -271,6 +273,29 @@ export class PickProvider {
             return null;
 
         return this.pickList[locIndex].Items[allocIndex];
+    }
+
+    getBestFitAllocation(inventoryId, locationId){
+
+        var bestAlloc = null;
+
+        for (var i = 0; i < this.pickList.length; i++){
+
+            for (var x = 0; x < this.pickList[i].Items.length; x++){
+
+                var alloc = this.pickList[i].Items[x];
+
+                if (alloc.InventoryID.value == inventoryId){
+
+                    if (this.pickList[i].LocationID.value == locationId)
+                        return [i, x];
+
+                    // Use the first allocation if it's only an inventory ID match
+                    if (bestAlloc == null)
+                        bestAlloc = [i, x];
+                }
+            }
+        }
     }
 
     getPendingItemQty(shipLineNbr) {
@@ -414,6 +439,7 @@ export class PickProvider {
 
         this.savePicks();
         this.trimPicklist();
+        //this.generatePickList();
 
     }
 
@@ -551,6 +577,7 @@ export class PickProvider {
         this.pendingPicks = this.savedPicks;
         this.calculateQtys();
         this.trimPicklist();
+        //this.generatePickList();
     }
 
     public clearSavedPicks() {

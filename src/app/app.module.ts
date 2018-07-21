@@ -32,6 +32,10 @@ import { TransferListTab } from "../pages/bin-transfer/tabs/transfer-list";
 import { TransferHistoryTab } from "../pages/bin-transfer/tabs/transfer-history";
 import { ReceiveProvider } from '../providers/receive/receive';
 import { ReceivePage } from "../pages/receive/receive";
+import {ReceiveShipmentPage} from "../pages/receive/shipment/receive-shipment";
+import {ReceiveShipmentListTab} from "../pages/receive/shipment/tabs/list";
+import {ReceiveShipmentPendingTab} from "../pages/receive/shipment/tabs/pending";
+import {ReceiveShipmentEnterTab} from "../pages/receive/shipment/tabs/shipment-enter";
 
 @NgModule({
     declarations: [
@@ -52,6 +56,10 @@ import { ReceivePage } from "../pages/receive/receive";
         ItemLookupDetailsPage,
         BinLookupPage,
         ReceivePage,
+        ReceiveShipmentPage,
+        ReceiveShipmentListTab,
+        ReceiveShipmentPendingTab,
+        ReceiveShipmentEnterTab,
         SetupPage,
         PreferencesPage,
         BarcodeListenerComponent,
@@ -80,6 +88,10 @@ import { ReceivePage } from "../pages/receive/receive";
         ItemLookupDetailsPage,
         BinLookupPage,
         ReceivePage,
+        ReceiveShipmentPage,
+        ReceiveShipmentListTab,
+        ReceiveShipmentPendingTab,
+        ReceiveShipmentEnterTab,
         SetupPage,
         PreferencesPage
     ],

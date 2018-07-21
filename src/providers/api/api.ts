@@ -117,8 +117,8 @@ export class Api {
         return this.get("InventoryLotSerials" + (filter.length ? "?$filter=" + filter.join(" and ") : ""));
     }
 
-    getShipment(shipmentNbr) {
-        return this.get("Shipment?$expand=Details,Details/Allocations&$filter=ShipmentNbr eq '" + shipmentNbr + "' and Operation eq 'Issue'");
+    getShipment(shipmentNbr, expand = "Details,Details/Allocations") {
+        return this.get("Shipment?$expand=" + expand + "&$filter=ShipmentNbr eq '" + shipmentNbr + "'");
     }
 
     getShipmentList() {
@@ -127,6 +127,30 @@ export class Api {
 
     putShipment(data) {
         return this.put("Shipment", data, {});
+    }
+
+    confirmShipment(shipmentNbr){
+        return this.postActionAndGetResult("Shipment/Confirm", {entity: {ShipmentNbr: {value: shipmentNbr}}});
+    }
+
+    correctShipment(shipmentNbr){
+        return this.postActionAndGetResult("Shipment/Correct", {entity: {ShipmentNbr: {value: shipmentNbr}}});
+    }
+
+    getTransferShipment(shipmentNbr) {
+        return this.get("Shipment?$expand=Orders&$filter=ShipmentNbr eq '" + shipmentNbr + "'");
+    }
+
+    getPurchaseOrder(orderNbr){
+        return this.get("PurchaseOrder?$expand=Details&$filter=OrderNbr eq '" + orderNbr + "'");
+    }
+
+    addReceipt(receiptData){
+
+    }
+
+    getTransfer(referenceNbr){
+        return this.get("Transfer?$expand=Details&$filter=ReferenceNbr eq '" + referenceNbr + "'");
     }
 
     putTransfer(data) {

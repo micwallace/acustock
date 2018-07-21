@@ -10,7 +10,7 @@
         <button ion-button menuToggle>
             <ion-icon name="menu"></ion-icon>
         </button>
-        <ion-title>Uncommitted transfers</ion-title>
+        <ion-title>Items</ion-title>
     </ion-navbar>
 
 </ion-header>
@@ -22,26 +22,18 @@
             <ion-col col-8>Locations / Item</ion-col>
             <ion-col col-2>Qty</ion-col>
         </div>
-        <ion-item no-margin no-padding *ngFor="let key of objectKeys(transferProvider.pendingItems)">
-            <strong>{{transferProvider.pendingItems[key].Location.value}}
-                <ion-icon name="arrow-round-forward"></ion-icon>
-                {{transferProvider.pendingItems[key].ToLocation.value}}</strong>
-            <strong>Items</strong>
-            <div no-margin no-padding>
-                <ion-row tappable *ngFor="let skey of objectKeys(transferProvider.pendingItems[key].Items)"
-                         (click)="openEditDialog(key, skey);">
-                    <ion-col col-8>{{transferProvider.pendingItems[key].Items[skey].InventoryID.value}}</ion-col>
-                    <ion-col col-2 text-right>
-                        {{transferProvider.pendingItems[key].Items[skey].Qty.value}}
-                    </ion-col>
-                    <ion-col col-2>
-                        <button ion-button icon-only small float-right
-                                (click)="deleteItem(key, skey); $event.stopPropagation();">
-                            <ion-icon name="trash"></ion-icon>
-                        </button>
+        <ion-item no-margin no-padding *ngFor="let key of objectKeys(receiveProvider.sourceIndex)">
+            <strong>{{receiveProvider.sourceIndex[key].InventoryID}}</strong>
+            <div item-end>{{receiveProvider.getReceivedAndPendingQty(key)}} / {{receiveProvider.getTotalQty(key)}}</div>
+            <ion-row *ngIf="receiveProvider.sourceIndex[key].Allocations != null" no-margin no-padding>
+                <strong>Locations</strong>
+                <ion-row tappable *ngFor="let alloc of receiveProvider.sourceIndex[key].Allocations">
+                    <ion-col col-8>{{alloc.LocationID?.value}}</ion-col>
+                    <ion-col col-4 text-right>
+                        {{alloc.Qty?.value}}
                     </ion-col>
                 </ion-row>
-            </div>
+            </ion-row>
         </ion-item>
     </ion-grid>
 </ion-content>

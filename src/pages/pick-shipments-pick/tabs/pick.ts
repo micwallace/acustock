@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, NgZone } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController, Events, AlertController } from 'ionic-angular';
 import { PickProvider } from '../../../providers/providers';
 import { CacheProvider } from "../../../providers/cache/cache";
@@ -45,7 +45,8 @@ export class PickTab {
                 public viewCtrl:ViewController,
                 public events:Events,
                 public alertCtrl:AlertController,
-                public loadingCtrl: LoadingController) {
+                public loadingCtrl: LoadingController,
+                private ngZone: NgZone) {
 
     }
 
@@ -83,24 +84,46 @@ export class PickTab {
     }
 
     getSuggestedLocation() {
-        return this.pickProvider.getSuggestedLocation(this.currentLocationIndex);
+        var location = this.pickProvider.getSuggestedLocation(this.currentLocationIndex);
+
+        if (!location){
+            this.currentLocationIndex = 0;
+            this.currentItemIndex = 0;
+            return this.pickProvider.getSuggestedLocation(this.currentLocationIndex);
+        }
+
+        return location;
     }
 
-    getSuggestedItem() {
-        return this.pickProvider.getSuggestedItem(this.currentLocationIndex, this.currentItemIndex)
+    getSuggestedAllocation() {
+        var item = this.pickProvider.getSuggestedItem(this.currentLocationIndex, this.currentItemIndex);
+
+        if (!item) {
+            this.currentLocationIndex = 0;
+            this.currentItemIndex = 0;
+            return this.pickProvider.getSuggestedItem(this.currentLocationIndex, this.currentItemIndex);
+        }
+
+        return item;
     }
 
-    getCurrentItemPickedQty() {
-        var alloc = this.getSuggestedItem();
+    getCurrentAllocPickedQty() {
+        var alloc = this.getSuggestedAllocation();
         return this.pickProvider.getPendingAllocationQty(alloc.LineNbr.value, alloc.SplitLineNbr.value);
     }
 
-    getSuggestedPickQty() {
-        return this.getSuggestedItem().RemainingQty;
+    getTotalPickedQty(){
+        var alloc = this.getSuggestedAllocation();
+
+        return this.pickProvider.getPendingItemQty(alloc.LineNbr.value);
     }
 
-    getCurrentItemLeftToPickQty() {
-        return this.getSuggestedItem().RemainingQty;
+    getSuggestedPickQty() {
+        return Math.min((this.getSuggestedAllocation().RemainingQty - this.getCurrentAllocPickedQty()), this.getTotalRemainingQty());
+    }
+
+    getTotalRemainingQty() {
+        return this.getSuggestedAllocation().TotalRemainingQty - this.getTotalPickedQty();
     }
 
     nextItem() {
@@ -120,7 +143,7 @@ export class PickTab {
         }
 
         console.log(this.currentLocationIndex + " / " + this.currentItemIndex);
-        console.log(this.getSuggestedItem());
+        console.log(this.getSuggestedAllocation());
     }
 
     previousItem() {
@@ -140,35 +163,38 @@ export class PickTab {
         }
     }
 
-    resetForm() {
+    resetForm(keepLocation, focus) {
 
-        this.enteredData = {
-            location: "",
-            item: "",
-            lot: "",
-            qty: 0
-        };
+        if (!keepLocation)
+            this.enteredData.location = "";
 
-        this.locationInput.setFocus();
+        this.enteredData.item = "";
+        this.enteredData.lot = "";
+        this.enteredData.qty = 0;
+
+        if (focus)
+            this.locationInput.setFocus();
 
         this.showQty = false;
     }
 
     setLocation(locId) {
+
         if (locId) {
             this.enteredData.location = locId;
-        } else {
-            locId = this.enteredData.location;
         }
 
-        var curBin = this.getSuggestedItem().LocationID.value;
-        var enteredBin = locId;
+        var curBin = this.getSuggestedAllocation().LocationID.value;
+        var enteredBin = this.enteredData.location;
         if (curBin != enteredBin) {
             alert(enteredBin + " is not the recommended bin " + curBin);
+            this.enteredData.location = "";
             return;
             // TODO: allow location overide
         }
 
+        if (locId)
+            return;
         //document.getElementById("item").focus();
         setTimeout(()=> {
             this.itemInput.setFocus();
@@ -179,26 +205,37 @@ export class PickTab {
 
         if (itemId) {
             this.enteredData.item = itemId;
-        } else {
-            itemId = this.enteredData.item;
         }
 
-        var curItem = this.getSuggestedItem();
+        var curItem = this.getSuggestedAllocation();
 
-        this.cache.getItemById(itemId).then((item:any)=> {
+        this.cache.getItemById(this.enteredData.item).then((item:any)=> {
 
             if (item.InventoryID.value != curItem.InventoryID.value) {
-                alert("The entered item does not match the requested item.");
-                return;
+                // Search the picklist for the item & load the best match
+                var allocIndexes = this.pickProvider.getBestFitAllocation(item.InventoryID.value, this.enteredData.location);
+
+                if (allocIndexes == null){
+                    this.enteredData.item = "";
+                    this.enteredData.qty = 0;
+                    alert("The item does not exist on the picklist or has already been picked.");
+                    return;
+                }
+
+                this.currentLocationIndex = allocIndexes[0];
+                this.currentItemIndex = allocIndexes[1];
             }
 
             this.showQty = true;
             this.enteredData.qty = 1;
             this.enteredData.item = item.InventoryID.value;
-            //document.getElementById("qty").focus();
+
+            if (itemId)
+                return;
+
             setTimeout(()=> {
                 this.qtyInput.setFocus();
-            });
+            }, 500);
 
         }).catch((err)=> {
             this.enteredData.item = "";
@@ -210,7 +247,7 @@ export class PickTab {
 
     }
 
-    addPick() {
+    addPick(isScan=false) {
 
         for (var i in this.enteredData) {
             if (this.enteredData[i] == "") {
@@ -229,7 +266,7 @@ export class PickTab {
             return;
         }
 
-        if (this.enteredData.qty > this.getCurrentItemLeftToPickQty()) {
+        if (this.enteredData.qty > this.getTotalRemainingQty()) {
             alert("The entered quantity exceeds the quantity needed for this item.");
             return;
         }
@@ -243,16 +280,33 @@ export class PickTab {
             qty: this.enteredData.qty
         };
 
-        var curAlloc = this.getSuggestedItem();
+        var curAlloc = this.getSuggestedAllocation();
 
-        var itemComplete = this.pickProvider.addPick(data, curAlloc);
+        this.pickProvider.addPick(data, curAlloc);
 
-        this.resetForm();
+        var newAlloc = this.getSuggestedAllocation();
 
-        if (itemComplete) {
-            this.currentItemIndex = 0;
+        this.resetForm((newAlloc != null && curAlloc.LocationID.value == newAlloc.LocationID.value), isScan);
 
-            // TODO: check if all items are complete and prompt to save
+        if (!newAlloc) {
+            let alert = this.alertCtrl.create({
+                title: "Picking Complete",
+                message: "All items have been picked, would you like to confirm them?",
+                buttons: [
+                    {
+                        text: "Cancel",
+                        role: "cancel"
+                    },
+                    {
+                        text: "OK",
+                        handler: ()=> {
+                            alert.dismiss();
+                            this.confirmPicks();
+                        }
+                    }
+                ]
+            });
+            alert.present();
         }
 
     }
@@ -263,7 +317,7 @@ export class PickTab {
 
             let alert = this.alertCtrl.create({
                 title: "Cancel picks",
-                message: "Yo mah dude, are you sure you want to abort these picks ya been doing?",
+                message: "Yo mah dude, are you sure you want to can all pending picks?",
                 buttons: [
                     {
                         text: "Cancel",
@@ -289,12 +343,13 @@ export class PickTab {
 
     }
 
-    savePicks() {
+    confirmPicks() {
         let loader = this.loadingCtrl.create({content: "Confirming picks..."});
         loader.present();
 
         this.pickProvider.confirmPicks().then((res:any)=>{
             loader.dismissAll();
+            this.events.publish('closeModal');
         }).catch((err)=> {
             loader.dismissAll();
             alert(err.message);
@@ -305,27 +360,60 @@ export class PickTab {
         console.log(barcodeText);
 
         if (this.enteredData.location == "") {
-            this.setLocation(barcodeText);
-            return;
+            this.ngZone.run(()=> {
+                this.setLocation(barcodeText);
+                return;
+            });
         }
 
-        this.cache.getItemById(barcodeText).then((item:any)=> {
+        this.cache.getBinById(barcodeText).then((bin:any)=> {
 
-            if (this.enteredData.item == "" || this.enteredData.qty == 0) {
-                this.setItem(item.InventoryID.value);
-                return;
-            }
+            this.ngZone.run(()=> {
+                // check if quantity is set. If it is then save the current entry
+                if (this.enteredData.item != "" && this.enteredData.qty > 0) {
+                    this.addPick();
+                    return;
+                }
 
-            // If the item is the same as the last item, increment quantity.
-            if (item.InventoryID.value == this.enteredData.item) {
-                this.enteredData.qty++;
-            } else {
-                this.addPick();
+                this.setLocation(barcodeText);
+            });
 
-                this.setItem(item.InventoryID.value);
-            }
         }).catch((err) => {
-            alert(err.message);
+
+            this.cache.getItemById(barcodeText).then((item:any)=> {
+
+                this.ngZone.run(()=> {
+
+                    if (this.enteredData.item == "" || this.enteredData.qty == 0) {
+                        this.setItem(item.InventoryID.value);
+                        return;
+                    }
+
+                    // If the item is the same as the last item, validate & increment quantity.
+                    if (item.InventoryID.value == this.enteredData.item) {
+
+                        if (this.getTotalRemainingQty() - (this.enteredData.qty + 1) < 0){
+                            alert("You've already picked the quantity required for this item.");
+                            return;
+                        }
+                        this.enteredData.qty++;
+
+                        // If the completed quantity is reached let's automatically move to the next suggested pick
+                        if (this.getTotalRemainingQty() - this.enteredData.qty == 0){
+                            this.addPick(true);
+                        }
+                    } else {
+                        this.addPick(true);
+
+                        this.setItem(item.InventoryID.value);
+                    }
+
+                });
+
+            }).catch((err) => {
+                alert(err.message);
+            });
+
         });
     }
 

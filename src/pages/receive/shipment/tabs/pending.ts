@@ -12,9 +12,9 @@ import { ReceiveProvider } from '../../../../providers/receive/receive'
 @IonicPage()
 @Component({
     selector: 'page-receive',
-    templateUrl: 'list.html'
+    templateUrl: 'pending.html'
 })
-export class ReceiveShipmentListTab {
+export class ReceiveShipmentPendingTab {
 
     objectKeys:any = Object.keys;
 

@@ -15,6 +15,7 @@ export class CacheProvider {
     itemList = null;
     binList = null;
     binIndex = null;
+    itemIndex = {};
     binPickSequence = [];
     warehouseList = null;
 
@@ -161,7 +162,7 @@ export class CacheProvider {
     }
 
     public initialLoad() {
-        return new Promise((resolve, reject) => {
+        //return new Promise((resolve, reject) => {
             var toast = this.toastCtrl.create({
                 message: 'Initial cache load in progress. Some operations will be slower until this completes.',
                 showCloseButton: true,
@@ -179,22 +180,22 @@ export class CacheProvider {
 
                     this.itemList = itemList;
 
-                    resolve();
+                    //resolve();
                     toast.setMessage('Initial load complete.');
                     setTimeout(()=> {
                         toast.dismissAll();
                     }, 3000);
                     console.log("Initial data loaded.")
                 }).catch((err) => {
-                    reject(err);
+                    //reject(err);
                     this.loadFailed(toast, err);
                 });
 
             }).catch((err) => {
-                reject(err);
+                //reject(err);
                 this.loadFailed(toast, err);
             });
-        });
+        //});
     }
 
     private loadFailed(toast, err) {

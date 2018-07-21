@@ -4,6 +4,7 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { PickProvider } from '../../providers/providers';
 import { PickShipmentsListPage } from "../pick-shipments-list/pick-shipments-list";
 import { PickShipmentsPickPage } from "../pick-shipments-pick/pick-shipments-pick";
+import {LoadingController} from "ionic-angular/index";
 
 @Component({
     selector: 'page-pick-shipments',
@@ -13,7 +14,7 @@ export class PickShipmentsPage {
 
     shipmentNbr = "";
 
-    constructor(public navCtrl:NavController, private barcodeScanner:BarcodeScanner, public pickProvider:PickProvider, public modalCtrl:ModalController) {
+    constructor(public navCtrl:NavController, private barcodeScanner:BarcodeScanner, public pickProvider:PickProvider, public modalCtrl:ModalController, public loadingCtrl:LoadingController) {
 
     }
 
@@ -21,7 +22,7 @@ export class PickShipmentsPage {
         this.loadShipment(barcodeData);
     }
 
-    scanShipment() {
+    startCameraScanner() {
         this.barcodeScanner.scan().then((barcodeData) => {
             if (barcodeData.cancelled)
                 return;
@@ -37,11 +38,15 @@ export class PickShipmentsPage {
     loadShipment(shipmentNbr) {
         this.shipmentNbr = shipmentNbr;
 
-        this.pickProvider.loadShipment(shipmentNbr).then((res)=> {
-            if (res === false)
-                this.shipmentNbr = "";
-        }).catch((err)=> {
+        let loader = this.loadingCtrl.create({content: "Loading..."});
+        loader.present();
 
+        this.pickProvider.loadShipment(shipmentNbr).then((res)=> {
+            loader.dismiss();
+        }).catch((err)=> {
+            loader.dismiss();
+            this.shipmentNbr = "";
+            alert(err.message);
         });
     }
 
@@ -58,6 +63,7 @@ export class PickShipmentsPage {
             return;
         }
 
+        //noinspection TypeScriptValidateTypes
         this.navCtrl.push(PickShipmentsPickPage);
     }
 
