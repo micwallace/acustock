@@ -18,22 +18,23 @@
 
 <ion-content padding>
     <ion-grid>
-        <div class="row header">
-            <ion-col col-8>Locations / Item</ion-col>
-            <ion-col col-2>Qty</ion-col>
-        </div>
-        <ion-item no-margin no-padding *ngFor="let key of objectKeys(receiveProvider.sourceIndex)">
-            <strong>{{receiveProvider.sourceIndex[key].InventoryID}}</strong>
-            <div item-end>{{receiveProvider.getReceivedAndPendingQty(key)}} / {{receiveProvider.getTotalQty(key)}}</div>
-            <ion-row *ngIf="receiveProvider.sourceIndex[key].Allocations != null" no-margin no-padding>
-                <strong>Locations</strong>
+        <ion-row style="border-bottom: 1px solid #888;">
+            <ion-col col-8><strong>Locations / Item</strong></ion-col>
+            <ion-col col-4 text-right style="padding-right: 15px;"><strong>Qty</strong></ion-col>
+        </ion-row>
+        <ion-list no-margin no-padding>
+            <ion-item no-margin no-padding *ngFor="let key of objectKeys(receiveProvider.sourceIndex)">
+                <ion-row no-padding>
+                    <ion-col col-8><strong>{{receiveProvider.sourceIndex[key].InventoryID}}</strong></ion-col>
+                    <ion-col col-4 text-right style="padding-right:0;">{{receiveProvider.getReceivedAndPendingQty(key)}} / {{receiveProvider.getTotalQty(key)}}</ion-col>
+                </ion-row>
                 <ion-row tappable *ngFor="let alloc of receiveProvider.sourceIndex[key].Allocations">
                     <ion-col col-8>{{alloc.LocationID?.value}}</ion-col>
-                    <ion-col col-4 text-right>
+                    <ion-col col-4 text-right style="padding-right:0;">
                         {{alloc.Qty?.value}}
                     </ion-col>
                 </ion-row>
-            </ion-row>
-        </ion-item>
+            </ion-item>
+        </ion-list>
     </ion-grid>
 </ion-content>

@@ -9,10 +9,10 @@ export class BarcodeListenerComponent implements OnInit {
     // our output will be the event emitter
     @Output() scan:EventEmitter<string> = new EventEmitter<string>();
     // Add the listener for the keypress
-    @HostListener('document:keypress', ['$event'])
+    /*@HostListener('document:keypress', ['$event'])
     keypress(e:KeyboardEvent) {
         this.keypressHandler(e);
-    }
+    }*/
 
     currentTime = 0;
     currentTimeDiff = 0;
@@ -26,13 +26,22 @@ export class BarcodeListenerComponent implements OnInit {
     }
 
     ngOnInit() {
+        document.addEventListener('keypress', (e)=>{
+            this.keypressHandler(e);
+        });
 
+        document.addEventListener('keydown', (e)=>{
+            if (this.outputString != "" && e.key == "Enter")
+                this.keypressHandler(e);
+        });
     }
 
     keypressHandler(e) {
         let timestamp = new Date().getTime();
         this.previousKey = this.currentKey;
         this.currentKey = e.key;
+
+        //console.log(e.key);
 
         if (this.currentTime) {
             this.previousTimeDiff = this.currentTimeDiff;

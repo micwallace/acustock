@@ -18,28 +18,29 @@
 
 <ion-content padding>
     <ion-grid>
-        <div class="row header">
-            <ion-col col-8>Locations / Item</ion-col>
-            <ion-col col-2>Qty</ion-col>
-        </div>
-        <ion-item no-margin no-padding *ngFor="let key of objectKeys(receiveProvider.pendingItems)">
-            <strong>{{receiveProvider.pendingItems[key].InventoryID}}</strong>
-            <strong>Allocations</strong>
-            <div no-margin no-padding>
-                <ion-row tappable *ngFor="let skey of objectKeys(receiveProvider.pendingItems[key].Allocations)"
-                         (click)="openEditDialog(key, skey);">
+        <ion-row style="border-bottom: 1px solid #888;">
+            <ion-col col-8><strong>Locations / Item</strong></ion-col>
+            <ion-col col-2 text-right style="padding-right: 15px;"><strong>Qty</strong></ion-col>
+        </ion-row>
+        <ion-list no-margin no-padding>
+            <ion-item no-margin no-padding *ngFor="let key of objectKeys(receiveProvider.pendingItems)">
+                <ion-row no-padding>
+                    <ion-col col-12><strong style="display: block;">{{receiveProvider.pendingItems[key].InventoryID}}</strong></ion-col>
+                </ion-row>
+                <ion-row no-padding tappable *ngFor="let skey of objectKeys(receiveProvider.pendingItems[key].Allocations)"
+                         (click)="editReceiptItem(key, skey, receiveProvider.pendingItems[key].Allocations[skey]);">
                     <ion-col col-8>{{receiveProvider.pendingItems[key].Allocations[skey].LocationID}}</ion-col>
                     <ion-col col-2 text-right>
                         {{receiveProvider.pendingItems[key].Allocations[skey].Qty}}
                     </ion-col>
-                    <ion-col col-2>
-                        <button ion-button icon-only small float-right
-                                (click)="deleteItem(key, skey); $event.stopPropagation();">
+                    <ion-col col-2 text-right>
+                        <button ion-button icon-only small no-margin
+                                (click)="removeReceiptItem(key, skey); $event.stopPropagation();">
                             <ion-icon name="trash"></ion-icon>
                         </button>
                     </ion-col>
                 </ion-row>
-            </div>
-        </ion-item>
+            </ion-item>
+        </ion-list>
     </ion-grid>
 </ion-content>

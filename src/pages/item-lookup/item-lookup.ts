@@ -101,8 +101,8 @@ export class ItemLookupPage {
     }
 
     private dismissLoader() {
-        if (this.loader) {
-            this.loader.dismiss();
+        if (this.loader != null) {
+            this.loader.dismissAll();
             this.loader = null;
         }
     }

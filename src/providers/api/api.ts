@@ -125,16 +125,16 @@ export class Api {
         return this.get("ShipmentPriorityList");
     }
 
-    putShipment(data) {
-        return this.put("Shipment", data, {});
+    putShipment(data, expand = "Details,Details/Allocations") {
+        return this.put("Shipment?$expand=" + expand, data, {});
     }
 
     confirmShipment(shipmentNbr){
-        return this.postActionAndGetResult("Shipment/Confirm", {entity: {ShipmentNbr: {value: shipmentNbr}}});
+        return this.postActionAndGetResult("Shipment/ConfirmShipment", {entity: {ShipmentNbr: {value: shipmentNbr}}});
     }
 
     correctShipment(shipmentNbr){
-        return this.postActionAndGetResult("Shipment/Correct", {entity: {ShipmentNbr: {value: shipmentNbr}}});
+        return this.postActionAndGetResult("Shipment/CorrectShipment", {entity: {ShipmentNbr: {value: shipmentNbr}}});
     }
 
     getTransferShipment(shipmentNbr) {
@@ -145,8 +145,20 @@ export class Api {
         return this.get("PurchaseOrder?$expand=Details&$filter=OrderNbr eq '" + orderNbr + "'");
     }
 
-    addReceipt(receiptData){
+    putReceipt(data){
+        return this.put("Receipt", data, {});
+    }
 
+    releaseReceipt(referenceNbr){
+        return this.postActionAndGetResult("Receipt/ReleaseReceipt", {entity: {ReferenceNbr: {value: referenceNbr}}});
+    }
+
+    putPurchaseReceipt(data){
+        return this.put("PurchaseReceipt", data, {});
+    }
+
+    releasePurchaseReceipt(referenceNbr){
+        return this.postActionAndGetResult("PurchaseReceipt/ReleasePurchaseReceipt", {entity: {ReferenceNbr: {value: referenceNbr}}});
     }
 
     getTransfer(referenceNbr){
@@ -168,6 +180,10 @@ export class Api {
     postActionAndGetResult(endpoint:string, body:any) {
 
         return new Promise((resolve, reject) => {
+
+            this.http.setHeader('*', 'Content-Type', 'application/json');
+            this.http.setHeader('*', 'Accept', 'application/json');
+            this.http.setDataSerializer('json');
 
             this.request('post', endpoint, body, {}, {}, false, true).then((res:any)=> {
 
@@ -210,10 +226,20 @@ export class Api {
     }
 
     post(endpoint:string, body:any) {
+        this.http.setHeader('*', 'Content-Type', 'application/json');
+        this.http.setHeader('*', 'Accept', 'application/json');
+        this.http.setDataSerializer('json');
+
         return this.request('post', endpoint, body, {});
     }
 
     put(endpoint:string, body:any, headers?:any) {
+        // sometimes cordova plugin isn't initialized when the contructor runs resulting in these values not being set
+        // this is a cheap workaround
+        this.http.setHeader('*', 'Content-Type', 'application/json');
+        this.http.setHeader('*', 'Accept', 'application/json');
+        this.http.setDataSerializer('json');
+
         return this.request('put', endpoint, body, headers);
     }
 

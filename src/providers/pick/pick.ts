@@ -73,8 +73,6 @@ export class PickProvider {
 
                 if (picks && picks.hasOwnProperty(id)) {
                     this.savedPicks = picks[id];
-                    // TODO: Remove completed
-                    console.log("Found saved picks");
                 } else {
                     this.savedPicks = null;
                 }

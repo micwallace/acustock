@@ -4,6 +4,7 @@ import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-an
 import { ReceiveProvider } from "../../providers/receive/receive";
 import { ReceiveShipmentPage } from "./shipment/receive-shipment";
 import {AlertController} from "ionic-angular/index";
+import {Events} from "ionic-angular/index";
 
 /**
  * Generated class for the ReceivePage page.
@@ -89,11 +90,19 @@ export class ReceivePage {
                                 text: 'OK',
                                 handler: () => {
 
+                                    let loader = this.loadingCtrl.create({content: "Re-opening shipment..."});
+                                    loader.present();
+
                                     this.receiveProvider.correctShipment().then(()=>{
+                                        this.receiveProvider.sourceDocument.Status.value = "Open";
+
+                                        loader.dismiss();
                                         //noinspection TypeScriptValidateTypes
                                         this.navCtrl.push(ReceiveShipmentPage);
                                     }).catch((err)=>{
-                                        alert(err);
+                                        loader.dismiss().then(()=>{
+                                            alert(err.message);
+                                        });
                                     });
                                 }
                             }

@@ -19,7 +19,7 @@
     <form id="pick-shipments-form1">
         <ion-list id="login-list3">
             <ion-item id="shipment-type">
-                <ion-select name="receipt-type" interface="popover" [(ngModel)]="receiptType">
+                <ion-select name="receipt-type" interface="popover" [(ngModel)]="receiptType" style="padding-left:0;">
                     <ion-option value="shipment">Receipt Shipment</ion-option>
                     <ion-option value="transfer">Transfer Receipt</ion-option>
                     <ion-option value="purchase">Purchase Receipt</ion-option>
@@ -30,7 +30,7 @@
                     Receipt #
                 </ion-label>
                 <ion-input name="receipt-number" autofocus type="text" placeholder=""
-                           (keyup.enter)="loadReceipt($event.target.value)"></ion-input>
+                           (keypress)="$event.stopPropagation();" (keydown.enter)="loadReceipt($event.target.value); $event.stopPropagation();"></ion-input>
                 <button type="button" ion-button icon-only item-right (click)="startCameraScanner()">
                     <ion-icon name="barcode"></ion-icon>
                 </button>

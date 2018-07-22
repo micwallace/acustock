@@ -32,7 +32,7 @@
                 <ion-item>
                     <ion-label color="primary">&nbsp;</ion-label>
                     <ion-input id="location" #location type="text" [(ngModel)]="enteredData.location"
-                               (focus)="$event.target.select();" (keypress)="$event.stopPropagation();" (keyup.enter)="setLocation()"></ion-input>
+                               (focus)="$event.target.select();" (keypress)="$event.stopPropagation();" (keyup.enter)="setLocation(); $event.stopPropogation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -47,7 +47,7 @@
                 <ion-item>
                     <ion-label color="primary">&nbsp;</ion-label>
                     <ion-input id="item" #item type="text" [(ngModel)]="enteredData.item"
-                               (focus)="$event.target.select();" (keypress)="$event.stopPropagation();" (keyup.enter)="setItem()"></ion-input>
+                               (focus)="$event.target.select();" (keypress)="$event.stopPropagation();" (keydown.enter)="setItem(); $event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -61,7 +61,7 @@
             <ion-col>
                 <ion-item>
                     <ion-label color="primary">&nbsp;</ion-label>
-                    <ion-input id="lot" #lot [(ngModel)]="enteredData.lot" (keyup.enter)="setLotSerial()"></ion-input>
+                    <ion-input id="lot" #lot [(ngModel)]="enteredData.lot" (keypress)="$event.stopPropagation();" (keyup.enter)="setLotSerial(); $event.stopPropogation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -76,7 +76,7 @@
                 <ion-item>
                     <ion-label color="primary">&nbsp;</ion-label>
                     <ion-input id="qty" type="number" #qty [(ngModel)]="enteredData.qty"
-                               (focus)="$event.target.select();" (keyup.enter)="addPick()"></ion-input>
+                               (focus)="$event.target.select();" (keypress)="$event.stopPropagation();" (keyup.enter)="addPick(); $event.stopPropogation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>

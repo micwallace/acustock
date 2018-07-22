@@ -12,14 +12,14 @@ import { Api, CacheProvider, PreferencesProvider } from '../providers/providers'
 import { PreferencesPage } from "../pages/preferences/preferences";
 import { BinTransferPage } from "../pages/bin-transfer/bin-transfer";
 import { LoginPage } from "../pages/login/login";
-import {ReceivePage} from "../pages/receive/receive";
+import { ReceivePage } from "../pages/receive/receive";
 
 @Component({
     templateUrl: 'app.html'
 })
 export class MyApp {
     @ViewChild(Nav) navCtrl:Nav;
-    rootPage:any = PickShipmentsPage;
+    rootPage:any = ReceivePage;
 
     constructor(platform:Platform, statusBar:StatusBar, splashScreen:SplashScreen, public prefs:PreferencesProvider, public api:Api,
                 public cache:CacheProvider, public loadingCtrl:LoadingController, public toastCtrl:ToastController) {

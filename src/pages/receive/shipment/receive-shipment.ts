@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController, Events } from 'ionic-angular';
+import { Component, ViewChild } from '@angular/core';
+import { IonicPage, NavController, NavParams, ViewController, Events, Tabs } from 'ionic-angular';
 import { ReceiveShipmentEnterTab } from "./tabs/shipment-enter";
 import { ReceiveShipmentListTab } from "./tabs/list";
 import { ReceiveShipmentPendingTab } from "./tabs/pending";
@@ -19,12 +19,25 @@ import { ReceiveProvider } from "../../../providers/receive/receive";
 })
 export class ReceiveShipmentPage {
 
+    @ViewChild("tabs") tabs: Tabs;
+
     tab1Root = ReceiveShipmentEnterTab;
     tab2Root = ReceiveShipmentPendingTab;
     tab3Root = ReceiveShipmentListTab;
 
     constructor(public navCtrl:NavController, public navParams:NavParams, public viewCtrl:ViewController, public events:Events, public receiveProvider:ReceiveProvider) {
+        events.subscribe('closeReceiveScreen', () => {
+            this.navCtrl.pop();
+        });
+    }
 
+    onBarcodeScan(barcodeText){
+        if (this.tabs.selectedIndex !== 0) {
+            this.tabs.select(0, {});
+            //this.tabs.selectedIndex = 0;
+        }
+
+        this.events.publish('barcode:scan', barcodeText);
     }
 
 }
