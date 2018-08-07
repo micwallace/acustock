@@ -129,14 +129,7 @@ export class ReceiveProvider {
                         }
                     }
 
-                    this.api.getTransfer(referenceNbr).then((res:Array<any>)=> {
-
-                        if (res.length == 0) {
-                            reject({message: "A transfer or receipt shipment document with #" + referenceNbr + " could not be found."});
-                            return;
-                        }
-
-                        let transfer = res[0];
+                    this.api.getTransfer(referenceNbr).then((transfer:any)=> {
 
                         if (shipment != null) {
                             if (transfer.ToWarehouseID.value !== curWarehouse) {
@@ -152,6 +145,12 @@ export class ReceiveProvider {
                         resolve(true);
 
                     }).catch((err)=> {
+
+                        if (err.hasOwnProperty('errorData') && err.errorData.exceptionType == "PX.Api.ContractBased.NoEntitySatisfiesTheConditionException"){
+                            reject({message: "A transfer or receipt shipment document with #" + referenceNbr + " could not be found."});
+                            return;
+                        }
+
                         reject(err);
                     });
 
@@ -206,7 +205,6 @@ export class ReceiveProvider {
                     itemInfo.QtyReceived = 0;
                     itemInfo.QtyRemaining = item.ShippedQty.value;
                     itemInfo.Allocations = item.Allocations;
-                    console.log(JSON.stringify(item.Allocations));
                     break;
 
                 case "transfer":
@@ -387,13 +385,13 @@ export class ReceiveProvider {
 
         return new Promise((resolve, reject)=> {
 
-            var data;
+            var data:any;
 
             if (this.type == "shipment") {
 
                 data = this.getShipmentUpdateObject();
 
-                this.api.putShipment(data).then((res)=> {
+                this.api.putShipment(data).then((res:any)=> {
 
                     loader.data.content = "Confirming Shipment...";
 
@@ -423,7 +421,7 @@ export class ReceiveProvider {
                 // Add purchase receipt document
                 data = this.getPurchaseReceiptObject();
 
-                this.api.putPurchaseReceipt(data).then((res)=>{
+                this.api.putPurchaseReceipt(data).then((res:any)=>{
 
                     loader.data.content = "Releasing receipt...";
 
@@ -452,32 +450,33 @@ export class ReceiveProvider {
                 });
 
             } else {
-                // Add receipt document which does not require a reference to a transfer order & shipment
+                // Add IN receipt document, which does not require a reference to a transfer order & shipment
+
                 data = this.getReceiptObject();
 
-                this.api.putReceipt(data).then((res)=>{
+                this.api.putReceipt(data).then((res:any)=> {
 
-                    loader.data.content = "Releasing receipt...";
+                        loader.data.content = "Releasing receipt...";
 
-                    console.log("Receipt #"+res.ReferenceNbr.value);
+                        console.log("Receipt #" + res.ReferenceNbr.value);
 
-                    this.api.releaseReceipt(res.ReferenceNbr.value).then((releaseRes)=> {
+                        this.api.releaseReceipt(res.ReferenceNbr.value).then((releaseRes)=> {
 
-                        this.postConfirmSuccess();
+                            this.postConfirmSuccess();
 
-                        loader.data.content = "Reloading document...";
+                            loader.data.content = "Reloading document...";
 
-                        this.loadReceipt(this.sourceDocument.ReferenceNbr.value, "transfer").then((res)=>{
-                            resolve(res);
+                            this.loadReceipt(this.sourceDocument.ReferenceNbr.value, "transfer").then((res)=> {
+                                resolve(res);
+                            }).catch((err)=> {
+                                reject(err);
+                            });
+
                         }).catch((err)=> {
                             reject(err);
                         });
 
-                    }).catch((err)=> {
-                        reject(err);
-                    });
-
-                }).catch((err)=>{
+                }).catch((err)=> {
                     reject(err);
                 });
             }
@@ -486,8 +485,8 @@ export class ReceiveProvider {
     }
 
     private postConfirmSuccess(){
-        this.clearSavedReceipts();
-        this.pendingItems = {};
+        //this.clearSavedReceipts();
+        //this.pendingItems = {};
         this.calculatePendingQty();
     }
 
@@ -500,15 +499,15 @@ export class ReceiveProvider {
 
         var item:any;
 
-        for (var i in this.sourceDocument.Details) {
+        for (var i in this.sourceIndex) {
 
-            var source = this.sourceDocument.Details[i];
+            var source = this.sourceIndex[i];
 
-            if (!this.pendingItems.hasOwnProperty(source.LineNbr.value)) {
+            if (!this.pendingItems.hasOwnProperty(source.LineNbr)) {
                 item = {
                     "delete": true,
-                    LineNbr: source.LineNbr,
-                    InventoryID: source.InventoryID,
+                    LineNbr: {value: source.LineNbr},
+                    InventoryID: {value: source.InventoryID},
                 };
 
                 data.Details.push(item);
@@ -516,11 +515,11 @@ export class ReceiveProvider {
                 continue;
             }
 
-            var pending = this.pendingItems[source.LineNbr.value];
+            var pending = this.pendingItems[source.LineNbr];
 
             item = {
-                LineNbr: source.LineNbr,
-                InventoryID: source.InventoryID,
+                LineNbr: {value: source.LineNbr},
+                InventoryID: {value: source.InventoryID},
                 ShippedQty: {value: pending.Qty},
                 Allocations: []
             };
@@ -534,11 +533,6 @@ export class ReceiveProvider {
                     SplitLineNbr: oldAlloc.SplitLineNbr,
                 });
             }
-
-            // If there is only one allocation, update item level location ID
-            /*if (Object.keys(pending.Allocations).length === 1) {
-                item.LocationID = {value: pending.Allocations[Object.keys(pending.Allocations)].LocationID};
-            }*/
 
             // Add new allocations
             for (var y in pending.Allocations) {
@@ -562,40 +556,38 @@ export class ReceiveProvider {
     private getReceiptObject() {
 
         var data:any = {
-            TransferNbr: this.sourceDocument.TransferNbr,
-            Description: "AcuStock Transfer Receipt",
+            TransferNbr: this.sourceDocument.ReferenceNbr,
+            Description: {value: "AcuStock Transfer Receipt"},
+            Hold: {value: false},
             Details: []
         };
 
         var warehouse = this.prefs.getPreference('warehouse');
+
 
         for (var i in this.pendingItems){
 
             var pending = this.pendingItems[i];
 
             var item:any = {
-                LineNumber: {value: i},
-                Warehouse: {value: warehouse},
+                OrigRefNbr: this.sourceDocument.ReferenceNbr,
+                OrigLineNbr: {value: i},
                 InventoryID: {value: pending.InventoryID},
+                Warehouse: {value: warehouse},
+                //Location: {value: newAlloc.LocationID},
                 Quantity: {value: pending.Qty},
                 Allocations: []
             };
 
-            // If there is only one allocation, update item level location ID
-            /*if (Object.keys(pending.Allocations).length === 1) {
-                item.Location = {value: pending.Allocations[Object.keys(pending.Allocations)].LocationID};
-            }*/
-
             // Add new allocations
             for (var y in pending.Allocations) {
-                var newAlloc = pending.Allocations[y];
 
-                item.Allocations.push({
-                    LineNumber: {value: i},
-                    InventoryID: {value: pending.InventoryID},
-                    Location: {value: newAlloc.LocationID},
-                    Quantity: {value: newAlloc.Qty},
-                });
+                 var newAlloc = pending.Allocations[y];
+
+                 item.Allocations.push({
+                     Location: {value: newAlloc.LocationID},
+                     Quantity: {value: newAlloc.Qty},
+                 });
             }
 
             data.Details.push(item);
@@ -613,9 +605,7 @@ export class ReceiveProvider {
 
         var warehouse = this.prefs.getPreference('warehouse');
 
-        var data:any = {
-            Details: []
-        };
+        var data:any = {};
 
         if (this.type == "purchase"){
             data.Type = {value: "Receipt"};
@@ -629,13 +619,16 @@ export class ReceiveProvider {
             console.log("Transfer purchase receipt object");
         }
 
+        data.Details = [];
+
         for (var i in this.pendingItems){
 
             var pending = this.pendingItems[i];
 
             var item:any = {
-                Warehouse: {value: warehouse},
                 InventoryID: {value: pending.InventoryID},
+                Warehouse: {value: warehouse},
+                //Location: {value: newAlloc.LocationID},
                 ReceiptQty: {value: pending.Qty},
                 Allocations: []
             };
@@ -645,30 +638,24 @@ export class ReceiveProvider {
                 item.POOrderNbr = this.sourceDocument.OrderNbr;
                 item.POOrderType = this.sourceDocument.Type;
             } else {
-                item.TransferLineNbr = {value: i};
+                item.OrigRefNbr = this.sourceDocument.ReferenceNbr;
+                item.OrigLineNbr = {value: i};
                 item.TransferOrderNbr = {value: this.transferShipmentRef.OrderNbr};
                 item.TransferOrderType = {value: this.transferShipmentRef.OrderType};
                 item.TransferShipmentNbr = {value: this.transferShipmentRef.ShipmentNbr};
             }
 
-            // If there is only one allocation, update item level location ID
-            /*if (Object.keys(pending.Allocations).length === 1) {
-                item.Location = {value: pending.Allocations[Object.keys(pending.Allocations)].LocationID};
-            }*/
-
-            // Add new allocations
             for (var y in pending.Allocations) {
+
                 var newAlloc = pending.Allocations[y];
 
                 item.Allocations.push({
-                    InventoryID: {value: pending.InventoryID},
                     Location: {value: newAlloc.LocationID},
                     Quantity: {value: newAlloc.Qty},
                 });
             }
 
             data.Details.push(item);
-
         }
 
         console.log(JSON.stringify(data));

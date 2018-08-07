@@ -29,7 +29,7 @@
                 <ion-label>
                     Receipt #
                 </ion-label>
-                <ion-input name="receipt-number" autofocus type="text" placeholder=""
+                <ion-input [(ngModel)]="referenceNbr" name="receipt-number" autofocus type="text" placeholder=""
                            (keypress)="$event.stopPropagation();" (keydown.enter)="loadReceipt($event.target.value); $event.stopPropagation();"></ion-input>
                 <button type="button" ion-button icon-only item-right (click)="startCameraScanner()">
                     <ion-icon name="barcode"></ion-icon>
@@ -38,6 +38,38 @@
         </ion-list>
     </form>
     <ion-grid *ngIf="receiveProvider.sourceDocument">
+        <ion-row *ngIf="receiveProvider.type == 'shipment'">
+            <ion-col>
+                <label>Shipment #:</label>
+            </ion-col>
+            <ion-col>
+                {{receiveProvider.sourceDocument.ShipmentNbr.value}}
+            </ion-col>
+        </ion-row>
+        <ion-row *ngIf="receiveProvider.type == 'transfer'">
+            <ion-col>
+                <label>Transfer #:</label>
+            </ion-col>
+            <ion-col>
+                {{receiveProvider.sourceDocument.ReferenceNbr.value}}
+            </ion-col>
+        </ion-row>
+        <ion-row *ngIf="receiveProvider.type == 'purchase'">
+            <ion-col>
+                <label>Order #:</label>
+            </ion-col>
+            <ion-col>
+                {{receiveProvider.sourceDocument.OrderNbr.value}}
+            </ion-col>
+        </ion-row>
+        <ion-row *ngIf="receiveProvider.transferShipmentRef">
+            <ion-col>
+                <label>Transfer Shipment #:</label>
+            </ion-col>
+            <ion-col>
+                {{receiveProvider.transferShipmentRef.ShipmentNbr}}
+            </ion-col>
+        </ion-row>
         <ion-row>
             <ion-col>
                 <label>Total Quantity:</label>

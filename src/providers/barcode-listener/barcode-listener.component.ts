@@ -21,19 +21,25 @@ export class BarcodeListenerComponent implements OnInit {
     previousKey:string;
     outputString:string = '';
 
+    listenersAdded = false;
+
     constructor() {
 
     }
 
     ngOnInit() {
-        document.addEventListener('keypress', (e)=>{
-            this.keypressHandler(e);
-        });
+        if (!this.listenersAdded) {
+            this.listenersAdded = true;
 
-        document.addEventListener('keydown', (e)=>{
-            if (this.outputString != "" && e.key == "Enter")
+            document.addEventListener('keypress', (e)=> {
                 this.keypressHandler(e);
-        });
+            });
+
+            document.addEventListener('keydown', (e)=> {
+                if (this.outputString != "" && e.key == "Enter")
+                    this.keypressHandler(e);
+            });
+        }
     }
 
     keypressHandler(e) {
@@ -74,7 +80,7 @@ export class BarcodeListenerComponent implements OnInit {
 
             //If we are in the middle of the scan and the code is 13, we can stop adding to the
             //outputString and emit it instead. We must then set is back to empty for the next scan.
-            if (this.currentTimeDiff <= 25 && this.previousTimeDiff <= 25 && e.key == 'Enter') {
+            if (this.currentTimeDiff <= 25 && this.previousTimeDiff <= 25 && e.key == 'Enter' && this.outputString !== '') {
                 this.scan.emit(this.outputString);
                 this.outputString = '';
             }

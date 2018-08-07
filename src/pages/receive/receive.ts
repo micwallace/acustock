@@ -121,6 +121,16 @@ export class ReceivePage {
 
         } else {
 
+            if (this.receiveProvider.type == "transfer" && this.receiveProvider.sourceDocument.Status.value !== "Released"){
+                alert("Unable to add receipt: the transfer document has not been released.");
+                return;
+            }
+
+            if (this.receiveProvider.type == "purchase" && this.receiveProvider.sourceDocument.Status.value !== "Open"){
+                alert("Unable to add receipt: the purchase order status is not open.");
+                return;
+            }
+
             if (this.receiveProvider.unreceivedQty == 0) {
                 alert("There are no items left to receive.");
                 return;

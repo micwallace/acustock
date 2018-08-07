@@ -146,7 +146,7 @@ export class Api {
     }
 
     putReceipt(data){
-        return this.put("Receipt", data, {});
+        return this.put("Receipt?$expand=Details,Details/Allocations", data, {});
     }
 
     releaseReceipt(referenceNbr){
@@ -158,11 +158,11 @@ export class Api {
     }
 
     releasePurchaseReceipt(referenceNbr){
-        return this.postActionAndGetResult("PurchaseReceipt/ReleasePurchaseReceipt", {entity: {ReferenceNbr: {value: referenceNbr}}});
+        return this.postActionAndGetResult("PurchaseReceipt/ReleasePurchaseReceipt", {entity: {ReceiptNbr: {value: referenceNbr}}});
     }
 
     getTransfer(referenceNbr){
-        return this.get("Transfer?$expand=Details&$filter=ReferenceNbr eq '" + referenceNbr + "'");
+        return this.get("Transfer/" + referenceNbr + "?$expand=Details");
     }
 
     putTransfer(data) {
