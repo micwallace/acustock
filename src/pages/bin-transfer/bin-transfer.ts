@@ -23,7 +23,11 @@ export class BinTransferPage {
     tab2Root = TransferListTab;
     tab3Root = TransferHistoryTab;
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public viewCtrl:ViewController, public events:Events, public transferProvider:TransferProvider) {
+    constructor(public navCtrl:NavController,
+                public navParams:NavParams,
+                public viewCtrl:ViewController,
+                public events:Events,
+                public transferProvider:TransferProvider) {
 
     }
 

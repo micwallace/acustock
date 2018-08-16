@@ -55,6 +55,38 @@ export class PreferencesProvider {
             ]
         },
         {
+            title: "Sounds & Alerts",
+            preferences: [
+                {
+                    key: "success_sound",
+                    title: "Scanner Success Sound",
+                    type: "select",
+                    def_value: "success-1",
+                    options: PreferencesProvider.successSounds
+                },
+                {
+                    key: "prompt_sound",
+                    title: "Prompt Sound",
+                    type: "select",
+                    def_value: "success-1",
+                    options: PreferencesProvider.successSounds
+                },
+                {
+                    key: "alert_sound",
+                    title: "Scanner Alert Sound",
+                    type: "select",
+                    def_value: "alert-1",
+                    options: PreferencesProvider.failureSounds
+                },
+                {
+                    key: "alert_vibrate",
+                    title: "Alert & Prompt Vibrate",
+                    type: "toggle",
+                    def_value: true
+                }
+            ]
+        },
+        {
             title: "Debug",
             preferences: [
                 {
@@ -65,6 +97,28 @@ export class PreferencesProvider {
                 }
             ]
         }
+    ];
+
+    public static successSounds = [
+        { label: "Off", value: "" },
+        { label: "Success 1", value: "success-1" },
+        { label: "Success 2", value: "success-2" },
+        { label: "Success 3", value: "success-3" },
+        { label: "Success 4", value: "success-4" },
+        { label: "Success 5", value: "success-5" },
+        { label: "Success 6", value: "success-6" },
+        { label: "Success 7", value: "success-7" }
+    ];
+
+    public static failureSounds = [
+        { label: "Off", value: "" },
+        { label: "Alert 1", value: "alert-1" },
+        { label: "Alert 2", value: "alert-2" },
+        { label: "Alert 3", value: "alert-3" },
+        { label: "Alert 4", value: "alert-4" },
+        { label: "Alert 5", value: "alert-5" },
+        { label: "Alert 6", value: "alert-6" },
+        { label: "Alert 7", value: "alert-7" }
     ];
 
     defaults = {};

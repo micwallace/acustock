@@ -4,7 +4,8 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { PickProvider } from '../../providers/providers';
 import { PickShipmentsListPage } from "../pick-shipments-list/pick-shipments-list";
 import { PickShipmentsPickPage } from "../pick-shipments-pick/pick-shipments-pick";
-import {LoadingController} from "ionic-angular/index";
+import { LoadingController } from "ionic-angular/index";
+import { UtilsProvider } from "../../providers/utils";
 
 @Component({
     selector: 'page-pick-shipments',
@@ -14,12 +15,17 @@ export class PickShipmentsPage {
 
     shipmentNbr = "";
 
-    constructor(public navCtrl:NavController, private barcodeScanner:BarcodeScanner, public pickProvider:PickProvider, public modalCtrl:ModalController, public loadingCtrl:LoadingController) {
+    constructor(public navCtrl:NavController,
+                private barcodeScanner:BarcodeScanner,
+                public pickProvider:PickProvider,
+                public modalCtrl:ModalController,
+                public loadingCtrl:LoadingController,
+                public utils:UtilsProvider) {
 
     }
 
     onBarcodeScan(barcodeData){
-        this.loadShipment(barcodeData);
+        this.loadShipment(barcodeData, true);
     }
 
     startCameraScanner() {
@@ -31,11 +37,11 @@ export class PickShipmentsPage {
 
         }, (err) => {
             // An error occurred
-            alert("Error accessing barcode device: " + err);
+            this.utils.showAlert("Error", "Error accessing barcode device: " + err);
         });
     }
 
-    loadShipment(shipmentNbr) {
+    loadShipment(shipmentNbr, isScan=false) {
         this.shipmentNbr = shipmentNbr;
 
         let loader = this.loadingCtrl.create({content: "Loading..."});
@@ -46,7 +52,8 @@ export class PickShipmentsPage {
         }).catch((err)=> {
             loader.dismiss();
             this.shipmentNbr = "";
-            alert(err.message);
+            this.utils.playFailedSound(isScan);
+            this.utils.showAlert("Error", err.message);
         });
     }
 
@@ -59,7 +66,7 @@ export class PickShipmentsPage {
 
     openPickDialog() {
         if (this.pickProvider.unpickedQty == 0) {
-            alert("There are no items left to pick.");
+            this.utils.showAlert("Error", "There are no items left to pick.");
             return;
         }
 

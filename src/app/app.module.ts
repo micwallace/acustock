@@ -3,7 +3,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 
-import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
 import { PickShipmentsPage } from '../pages/pick-shipments/pick-shipments';
 import { ItemLookupPage } from '../pages/item-lookup/item-lookup';
@@ -12,6 +11,7 @@ import { SetupPage } from '../pages/setup/setup';
 
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { AppPreferences } from '@ionic-native/app-preferences';
+import { Vibration } from '@ionic-native/vibration';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { AutoCompleteModule } from 'ionic2-auto-complete';
@@ -37,10 +37,17 @@ import {ReceiveShipmentListTab} from "../pages/receive/shipment/tabs/list";
 import {ReceiveShipmentPendingTab} from "../pages/receive/shipment/tabs/pending";
 import {ReceiveShipmentEnterTab} from "../pages/receive/shipment/tabs/shipment-enter";
 
+import { CountPage } from '../pages/count/count';
+import { CountEntryPage } from '../pages/count/entry/count-entry';
+import { CountEntryEnterTab } from '../pages/count/entry/tabs/count-enter';
+import { CountEntryListTab } from '../pages/count/entry/tabs/count-list';
+import { CountEntryPendingTab } from '../pages/count/entry/tabs/pending-list';
+import {CountProvider} from "../providers/count/count";
+import {UtilsProvider} from "../providers/utils";
+
 @NgModule({
     declarations: [
         MyApp,
-        HomePage,
         LoginPage,
         BinTransferPage,
         EnterTab,
@@ -60,6 +67,11 @@ import {ReceiveShipmentEnterTab} from "../pages/receive/shipment/tabs/shipment-e
         ReceiveShipmentListTab,
         ReceiveShipmentPendingTab,
         ReceiveShipmentEnterTab,
+        CountPage,
+        CountEntryPage,
+        CountEntryEnterTab,
+        CountEntryListTab,
+        CountEntryPendingTab,
         SetupPage,
         PreferencesPage,
         BarcodeListenerComponent,
@@ -72,7 +84,6 @@ import {ReceiveShipmentEnterTab} from "../pages/receive/shipment/tabs/shipment-e
     bootstrap: [IonicApp],
     entryComponents: [
         MyApp,
-        HomePage,
         LoginPage,
         BinTransferPage,
         EnterTab,
@@ -92,6 +103,11 @@ import {ReceiveShipmentEnterTab} from "../pages/receive/shipment/tabs/shipment-e
         ReceiveShipmentListTab,
         ReceiveShipmentPendingTab,
         ReceiveShipmentEnterTab,
+        CountPage,
+        CountEntryPage,
+        CountEntryEnterTab,
+        CountEntryListTab,
+        CountEntryPendingTab,
         SetupPage,
         PreferencesPage
     ],
@@ -108,8 +124,11 @@ import {ReceiveShipmentEnterTab} from "../pages/receive/shipment/tabs/shipment-e
         LocationAutocompleteService,
         PickProvider,
         TransferProvider,
+        CountProvider,
         PreferencesProvider,
-    ReceiveProvider
+        UtilsProvider,
+        ReceiveProvider,
+        Vibration
     ]
 })
 export class AppModule {

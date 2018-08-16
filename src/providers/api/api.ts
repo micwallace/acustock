@@ -137,10 +137,6 @@ export class Api {
         return this.postActionAndGetResult("Shipment/CorrectShipment", {entity: {ShipmentNbr: {value: shipmentNbr}}});
     }
 
-    getTransferShipment(shipmentNbr) {
-        return this.get("Shipment?$expand=Orders&$filter=ShipmentNbr eq '" + shipmentNbr + "'");
-    }
-
     getPurchaseOrder(orderNbr){
         return this.get("PurchaseOrder?$expand=Details&$filter=OrderNbr eq '" + orderNbr + "'");
     }
@@ -175,6 +171,14 @@ export class Api {
 
     releaseTransfer(transferId:string) {
         return this.postActionAndGetResult("Transfer/Release", {entity: {ReferenceNbr: {value: transferId}}});
+    }
+
+    getCount(referenceNbr) {
+        return this.get("PhysicalInventoryReview/" + referenceNbr + "?$expand=Details");
+    }
+
+    putCount(data) {
+        return this.put("PhysicalInventoryReview?$expand=Details", data, {});
     }
 
     postActionAndGetResult(endpoint:string, body:any) {

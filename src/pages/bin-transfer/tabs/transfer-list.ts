@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { TransferProvider } from '../../../providers/transfer/transfer'
+import { UtilsProvider } from "../../../providers/utils";
 
 /**
  * Generated class for the PickShipmentsListPage page.
@@ -18,7 +19,11 @@ export class TransferListTab {
 
     objectKeys:any = Object.keys;
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public transferProvider:TransferProvider, public alertController:AlertController) {
+    constructor(public navCtrl:NavController,
+                public navParams:NavParams,
+                public transferProvider:TransferProvider,
+                public alertController:AlertController,
+                public utils:UtilsProvider) {
     }
 
     ionViewDidLoad() {
@@ -58,7 +63,7 @@ export class TransferListTab {
                         if (newPending <= srcQty) {
                             this.transferProvider.updatePendingItemQty(locationKey, itemKey, qty);
                         } else {
-                            alert("There is only " + srcQty + " on hand to transfer from this location.");
+                            this.utils.showAlert("Error", "There is only " + srcQty + " on hand to transfer from this location.");
                         }
                     }
                 }

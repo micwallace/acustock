@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams, ViewController, Events, AlertContr
 import { ReceiveProvider } from '../../../../providers/receive/receive'
 import { CacheProvider } from "../../../../providers/cache/cache";
 import { LoadingController } from "ionic-angular/index";
+import { UtilsProvider } from "../../../../providers/utils";
 
 /**
  * Generated class for the PickShipmentsPickPage page.
@@ -44,7 +45,8 @@ export class ReceiveShipmentEnterTab {
                 public events:Events,
                 public alertCtrl:AlertController,
                 public loadingCtrl:LoadingController,
-                public renderer:Renderer) {
+                public renderer:Renderer,
+                public utils:UtilsProvider) {
 
         events.subscribe('barcode:scan', (barcodeText)=>{
             this.onBarcodeScan(barcodeText)
@@ -53,6 +55,8 @@ export class ReceiveShipmentEnterTab {
 
     ionViewDidLoad() {
         if (this.receiveProvider.hasSavedReceipts()) {
+
+            this.utils.playPromptSound();
 
             let alert = this.alertCtrl.create({
                 title: "Load saved receipts",
@@ -80,11 +84,8 @@ export class ReceiveShipmentEnterTab {
 
     resetForm() {
 
-        this.enteredData = {
-            location: "",
-            item: "",
-            qty: 0
-        };
+        this.enteredData.item = "";
+        this.enteredData.qty = 0;
 
         this.currentSourceLine = null;
 
@@ -99,7 +100,7 @@ export class ReceiveShipmentEnterTab {
         //this.loader = null;
     }
 
-    setItem(itemId) {
+    setItem(itemId, isScan=false) {
 
         if (itemId) {
             this.enteredData.item = itemId;
@@ -119,8 +120,9 @@ export class ReceiveShipmentEnterTab {
                 this.currentSourceLine = null;
                 this.enteredData.item = "";
                 this.enteredData.qty = 0;
+                this.utils.playFailedSound(isScan);
                 this.dismissLoader().then(()=>{
-                    alert("The item does not exist on the picklist or has already been picked.");
+                    this.utils.showAlert("Error", "The item does not exist on this transfer/shipment or has already been received on another receipt.");
                 });
                 return;
             }
@@ -133,19 +135,22 @@ export class ReceiveShipmentEnterTab {
                 this.enteredData.qty = 1;
             }
 
+            if (isScan) this.utils.playScanSuccessSound();
+
             //TODO: load item warehouse details for default receipt location
 
             this.dismissLoader();
 
         }).catch((err) => {
             this.enteredData.item = "";
+            this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
-                alert(err.message);
+                this.utils.showAlert("Error", err.message);
             });
         });
     }
 
-    setLocation(locId) {
+    setLocation(locId, isScan=false) {
 
         if (locId) {
             this.enteredData.location = locId;
@@ -163,12 +168,15 @@ export class ReceiveShipmentEnterTab {
                 this.enteredData.qty = 1;
             }
 
+            if (isScan) this.utils.playScanSuccessSound();
+
             this.dismissLoader();
 
         }).catch((err) => {
             this.enteredData.location = "";
+            this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
-                alert(err.message);
+                this.utils.showAlert("Error", err.message);
             });
         });
 
@@ -201,16 +209,40 @@ export class ReceiveShipmentEnterTab {
         }
     }*/
 
-    addReceiptItem() {
+    addReceiptItem(isScan=false) {
         // validate values
         if (!this.validateItemQty(null)) {
-            alert("You've entered a qty of "+this.enteredData.qty+" but there is only "+this.getRemainingQty()+" left to receive.");
+            this.utils.playFailedSound(isScan);
+            this.utils.showAlert("Error", "You've entered a qty of "+this.enteredData.qty+" but there is only "+this.getRemainingQty()+" left to receive.");
             return false;
         }
 
         this.receiveProvider.addReceiptItem(this.enteredData, this.currentSourceLine);
 
         this.resetForm();
+
+        if (this.receiveProvider.unreceivedQty - this.receiveProvider.pendingItems) {
+
+            let alert = this.alertCtrl.create({
+                title: "Receipt Complete",
+                message: "All items for the current transfer or shipment have been received, would you like to confirm?",
+                buttons: [
+                    {
+                        text: "Cancel",
+                        role: "cancel"
+                    },
+                    {
+                        text: "OK",
+                        handler: ()=> {
+                            alert.dismiss();
+                            this.confirmReceipts();
+                        }
+                    }
+                ]
+            });
+
+            alert.present();
+        }
 
         return true;
     }
@@ -222,7 +254,7 @@ export class ReceiveShipmentEnterTab {
         }
 
         if (this.receiveProvider.pendingQty == 0)
-            return alert("Add some items to the receipt list first.");
+            return this.utils.showAlert("Error", "Add some items to the receipt list first.");
 
         this.loader = this.loadingCtrl.create({content: "Submitting Receipts..."});
         this.loader.present();
@@ -232,7 +264,8 @@ export class ReceiveShipmentEnterTab {
             this.events.publish("closeReceiveScreen");
         }).catch((err)=>{
             this.dismissLoader();
-            alert(err.message);
+            this.utils.playFailedSound(false);
+            this.utils.showAlert("Error", err.message);
         });
     }
 
@@ -242,14 +275,14 @@ export class ReceiveShipmentEnterTab {
         // If the location and to-location is already set, scanning a bin barcode updates the to-location
         this.cache.getBinById(barcodeText).then((bin)=> {
 
-            this.setLocation(barcodeText);
+            this.setLocation(barcodeText, true);
 
         }).catch((err) => {
 
             this.cache.getItemById(barcodeText).then((item:any)=> {
 
                 if (this.enteredData.item == "" || this.enteredData.qty == 0) {
-                    this.setItem(item.InventoryID.value);
+                    this.setItem(item.InventoryID.value, true);
                     return;
                 }
 
@@ -258,23 +291,26 @@ export class ReceiveShipmentEnterTab {
                     this.zone.run(()=> {
 
                         if (!this.validateItemQty(this.enteredData.qty + 1)){
-                            alert("You've already picked the quantity required for this item.");
+                            this.utils.playFailedSound(true);
+                            this.utils.showAlert("Error", "You've already picked the quantity required for this item.");
                             return;
                         }
                         this.enteredData.qty++;
 
+                        this.utils.playScanSuccessSound();
+
                         // If the completed quantity is reached let's automatically add the receipt item
-                        /*if ((this.getRemainingQty() - this.enteredData.qty) <= 0){
-                            this.addReceiptItem();
-                        }*/
+                        if ((this.getRemainingQty() - this.enteredData.qty) <= 0){
+                            this.addReceiptItem(true);
+                        }
                     });
                 } else {
-                    this.addReceiptItem();
+                    if (this.addReceiptItem(true))
+                        this.setItem(item.InventoryID.value, true);
 
-                    this.setItem(item.InventoryID.value);
                 }
             }).catch((err) => {
-                alert(err.message);
+                this.utils.showAlert("Error", err.message);
             });
         });
     }

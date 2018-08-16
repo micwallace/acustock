@@ -28,7 +28,7 @@
                             [(ngModel)]="preferences.preferences[pref.key]"></ion-toggle>
 
                 <ion-select *ngIf="pref.type == 'select'" [(ngModel)]="preferences.preferences[pref.key]">
-                    <ion-option *ngFor="let option of getPreferenceOptions(pref)" [value]="option.value">
+                    <ion-option *ngFor="let option of getPreferenceOptions(pref)" [value]="option.value" (ionSelect)="onSelectOptionClick(pref.key, option.value);">
                         {{option.label}}
                     </ion-option>
                 </ion-select>

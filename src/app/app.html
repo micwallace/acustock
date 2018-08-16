@@ -2,15 +2,17 @@
     <ion-header>
         <ion-toolbar>
             <ion-title>
-                Menu
+                AcuStock
             </ion-title>
         </ion-toolbar>
+        <div>
+            <strong>{{prefs.getPreference('connection_username')}}</strong>
+            <strong>{{prefs.getPreference('connection_company')}}</strong>
+            <strong>{{prefs.getPreference('warehouse')}}</strong>
+        </div>
     </ion-header>
     <ion-content id="side-menu21">
         <ion-list id="menu-list1">
-            <ion-item color="none" menuClose="" on-click="goToHome()" id="menu-list-item1">
-                Home
-            </ion-item>
             <ion-item color="none" menuClose="" on-click="goToPickShipments()" id="menu-list-item2">
                 Pick Shipments
             </ion-item>
@@ -26,7 +28,7 @@
             <ion-item color="none" menuClose="" on-click="goToBinLookup()" id="menu-list-item6">
                 Bin Lookup
             </ion-item>
-            <ion-item color="none" menuClose="" id="menu-list-item7">
+            <ion-item color="none" menuClose="" on-click="goToCount()" id="menu-list-item7">
                 Physical Count
             </ion-item>
             <ion-item color="none" menuClose="" on-click="showPreferences()" id="menu-list-item8">

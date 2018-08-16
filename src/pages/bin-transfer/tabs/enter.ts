@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams, ViewController, Events, AlertContr
 import { TransferProvider } from '../../../providers/transfer/transfer'
 import { CacheProvider } from "../../../providers/cache/cache";
 import { LoadingController } from "ionic-angular/index";
+import { UtilsProvider } from "../../../providers/utils";
 
 /**
  * Generated class for the PickShipmentsPickPage page.
@@ -45,7 +46,8 @@ export class EnterTab {
                 public viewCtrl:ViewController,
                 public events:Events,
                 public alertCtrl:AlertController,
-                public loadingCtrl:LoadingController) {
+                public loadingCtrl:LoadingController,
+                public utils:UtilsProvider) {
 
     }
 
@@ -75,7 +77,7 @@ export class EnterTab {
         //this.loader = null;
     }
 
-    setLocation(locId) {
+    setLocation(locId, isScan) {
 
         if (locId) {
             this.enteredData.location = locId;
@@ -107,26 +109,31 @@ export class EnterTab {
 
                 this.dismissLoader();
 
+                if (isScan)
+                    this.utils.playScanSuccessSound();
+
             }).catch((err) => {
                 this.enteredData.location = "";
+                this.utils.playFailedSound(isScan);
                 this.dismissLoader().then(()=> {
-                    alert(err.message);
+                    this.utils.showAlert("Error", err.message);
                 });
             });
 
         }).catch((err) => {
             this.enteredData.location = "";
+            this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
-                alert(err.message);
+                this.utils.showAlert("Error", err.message);
             });
         });
 
     }
 
-    setToLocation(locId) {
+    setToLocation(locId, isScan) {
 
         if (this.enteredData.location == locId) {
-            alert("From and to location must be different");
+            this.utils.showAlert("Error", "From and to location must be different");
             return;
         }
 
@@ -150,15 +157,19 @@ export class EnterTab {
 
             this.dismissLoader();
 
+            if (isScan)
+                this.utils.playScanSuccessSound();
+
         }).catch((err) => {
             this.enteredData.toLocation = "";
+            this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
-                alert(err.message);
+                this.utils.showAlert("Error", err.message);
             });
         });
     }
 
-    setItem(itemId) {
+    setItem(itemId, isScan=false) {
 
         if (itemId) {
             this.enteredData.item = itemId;
@@ -175,12 +186,14 @@ export class EnterTab {
 
             // Check that the item is available
             if (!this.currentLocationItems.hasOwnProperty(item.InventoryID.value)) {
-                alert("There is no quantity on-hand to transfer for the item and location combination.");
+                this.utils.playFailedSound(isScan);
+                this.utils.showAlert("Error", "There is no quantity on-hand to transfer for the item and location combination.");
                 this.enteredData.item = "";
                 return;
             }
 
             if (!this.validateItemQty(1)) {
+                this.utils.playFailedSound(isScan);
                 return;
             }
 
@@ -191,10 +204,14 @@ export class EnterTab {
                 this.qtyInput.setFocus();
             });
 
+            if (isScan)
+                this.utils.playScanSuccessSound();
+
         }).catch((err) => {
             this.enteredData.item = "";
+            this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
-                alert(err.message);
+                this.utils.showAlert("Error", err.message);
             });
         });
     }
@@ -204,7 +221,7 @@ export class EnterTab {
         var srcQty = this.currentLocationItems.hasOwnProperty(this.enteredData.item) ? this.currentLocationItems[this.enteredData.item].QtyOnHand.value : 0;
         var curPendingQty = this.transferProvider.getItemLocPendingQty(this.enteredData.location, this.enteredData.item);
         if (srcQty < curPendingQty + reqQty) {
-            alert("There is only " + srcQty + " available for transfer from the current location. " + (curPendingQty ? curPendingQty + " are pending." : ""));
+            this.utils.showAlert("Error", "There is only " + srcQty + " available for transfer from the current location. " + (curPendingQty ? curPendingQty + " are pending." : ""));
             if (!qty)
                 this.enteredData.qty = srcQty - curPendingQty;
             return false;
@@ -246,7 +263,7 @@ export class EnterTab {
         this.nextFromBin();
 
         if (this.transferProvider.pendingQty == 0)
-            return alert("Add some items to the transfer list first.");
+            return this.utils.showAlert("Error", "Add some items to the transfer list first.");
 
         this.loader = this.loadingCtrl.create({content: "Submitting Transfers..."});
         this.loader.present();
@@ -255,7 +272,8 @@ export class EnterTab {
             this.dismissLoader();
         }).catch((err)=> {
             this.dismissLoader();
-            alert(err.message);
+            this.utils.playFailedSound();
+            this.utils.showAlert("Error", err.message);
         });
     }
 
@@ -263,12 +281,12 @@ export class EnterTab {
         console.log(barcodeText);
 
         if (this.enteredData.location == "") {
-            this.setLocation(barcodeText);
+            this.setLocation(barcodeText, true);
             return;
         }
 
         if (this.enteredData.toLocation == "") {
-            this.setToLocation(barcodeText);
+            this.setToLocation(barcodeText, true);
             return;
         }
 
@@ -279,13 +297,13 @@ export class EnterTab {
                 this.addTransferItem();
             }
 
-            this.setToLocation(barcodeText);
+            this.setToLocation(barcodeText, true);
         }).catch((err) => {
 
             this.cache.getItemById(barcodeText).then((item:any)=> {
 
                 if (this.enteredData.item == "" || this.enteredData.qty == 0) {
-                    this.setItem(item.InventoryID.value);
+                    this.setItem(item.InventoryID.value, true);
                     return;
                 }
 
@@ -293,15 +311,20 @@ export class EnterTab {
                 if (item.InventoryID.value == this.enteredData.item) {
                     this.zone.run(()=> {
                         this.enteredData.qty++;
-                        this.validateItemQty(null);
+                        if (this.validateItemQty(null)){
+                            this.utils.playScanSuccessSound();
+                        } else {
+                            this.utils.playFailedSound(true);
+                        }
                     });
                 } else {
                     this.addTransferItem();
 
-                    this.setItem(item.InventoryID.value);
+                    this.setItem(item.InventoryID.value, true);
                 }
             }).catch((err) => {
-                alert(err.message);
+                this.utils.showAlert("Error", err.message);
+                this.utils.playFailedSound(true);
             });
         });
     }

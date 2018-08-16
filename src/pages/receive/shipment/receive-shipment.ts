@@ -25,7 +25,11 @@ export class ReceiveShipmentPage {
     tab2Root = ReceiveShipmentPendingTab;
     tab3Root = ReceiveShipmentListTab;
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public viewCtrl:ViewController, public events:Events, public receiveProvider:ReceiveProvider) {
+    constructor(public navCtrl:NavController,
+                public navParams:NavParams,
+                public viewCtrl:ViewController,
+                public events:Events, public receiveProvider:ReceiveProvider) {
+
         events.subscribe('closeReceiveScreen', () => {
             this.navCtrl.pop();
         });

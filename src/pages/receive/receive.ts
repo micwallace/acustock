@@ -3,8 +3,9 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
 import { ReceiveProvider } from "../../providers/receive/receive";
 import { ReceiveShipmentPage } from "./shipment/receive-shipment";
-import {AlertController} from "ionic-angular/index";
-import {Events} from "ionic-angular/index";
+import { AlertController } from "ionic-angular/index";
+import { Events } from "ionic-angular/index";
+import { UtilsProvider } from "../../providers/utils";
 
 /**
  * Generated class for the ReceivePage page.
@@ -23,15 +24,20 @@ export class ReceivePage {
     public receiptType = "shipment";
     public referenceNbr = "";
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public barcodeScanner:BarcodeScanner,
-                public loadingCtrl:LoadingController, public receiveProvider:ReceiveProvider, public alertCtrl: AlertController) {
+    constructor(public navCtrl:NavController,
+                public navParams:NavParams,
+                public barcodeScanner:BarcodeScanner,
+                public loadingCtrl:LoadingController,
+                public receiveProvider:ReceiveProvider,
+                public alertCtrl: AlertController,
+                public utils:UtilsProvider) {
     }
 
     ionViewDidLoad() {
         console.log('ionViewDidLoad ReceivePage');
     }
 
-    loadReceipt(referenceNbr){
+    loadReceipt(referenceNbr, isScan=false){
 
         this.referenceNbr = referenceNbr;
 
@@ -47,7 +53,8 @@ export class ReceivePage {
 
             loader.dismiss();
             this.referenceNbr = "";
-            alert(err.message);
+            this.utils.playFailedSound(isScan);
+            this.utils.showAlert("Error", err.message);
 
         });
     }
@@ -61,12 +68,12 @@ export class ReceivePage {
 
         }, (err) => {
             // An error occurred
-            alert("Error accessing barcode device: " + err);
+            this.utils.showAlert("Error", "Error accessing barcode device: " + err);
         });
     }
 
     onBarcodeScan(barcodeText){
-        this.loadReceipt(barcodeText);
+        this.loadReceipt(barcodeText, true);
     }
 
     addReceipt() {
@@ -101,7 +108,7 @@ export class ReceivePage {
                                         this.navCtrl.push(ReceiveShipmentPage);
                                     }).catch((err)=>{
                                         loader.dismiss().then(()=>{
-                                            alert(err.message);
+                                            this.utils.showAlert("Error", err.message);
                                         });
                                     });
                                 }
@@ -113,7 +120,7 @@ export class ReceivePage {
 
                 } else {
 
-                    alert("This receipt shipment is completed and cannot be edited.");
+                    this.utils.showAlert("Error", "This receipt shipment is completed and cannot be edited.");
                     return;
                 }
                 return;
@@ -122,17 +129,17 @@ export class ReceivePage {
         } else {
 
             if (this.receiveProvider.type == "transfer" && this.receiveProvider.sourceDocument.Status.value !== "Released"){
-                alert("Unable to add receipt: the transfer document has not been released.");
+                this.utils.showAlert("Error", "Unable to add receipt: the transfer document has not been released.");
                 return;
             }
 
             if (this.receiveProvider.type == "purchase" && this.receiveProvider.sourceDocument.Status.value !== "Open"){
-                alert("Unable to add receipt: the purchase order status is not open.");
+                this.utils.showAlert("Error", "Unable to add receipt: the purchase order status is not open.");
                 return;
             }
 
             if (this.receiveProvider.unreceivedQty == 0) {
-                alert("There are no items left to receive.");
+                this.utils.showAlert("Error", "There are no items left to receive.");
                 return;
             }
         }

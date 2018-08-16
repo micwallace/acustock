@@ -4,6 +4,7 @@ import { IonicPage, NavController, NavParams, LoadingController, ModalController
 import { Api, CacheProvider, LocationAutocompleteService, PreferencesProvider } from '../../providers/providers';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { ItemLookupDetailsPage } from '../item-lookup-details/item-lookup-details'
+import {UtilsProvider} from "../../providers/utils";
 
 /**
  * Generated class for the BinLookupPage page.
@@ -34,29 +35,30 @@ export class BinLookupPage {
                 public barcodeScanner:BarcodeScanner,
                 public cache:CacheProvider,
                 public modalCtrl:ModalController,
-                public prefs:PreferencesProvider) {
+                public prefs:PreferencesProvider,
+                public utils:UtilsProvider) {
     }
 
     ionViewDidLoad() {
         console.log('ionViewDidLoad BinLookupPage');
     }
 
-    loadBinContents(item) {
-        //console.log(JSON.stringify(selected));
-        //console.log(JSON.stringify(item));
+    loadBinContents(item, isScan=false) {
+
         if (this.loader == null) {
             this.loader = this.loadingCtrl.create({content: "Loading..."});
             this.loader.present();
         }
 
         this.api.getLocationContents(item.LocationID.value, this.prefs.getPreference('warehouse')).then((res:any) => {
+
             this.binContents = res;
-            console.log(JSON.stringify(res));
             this.dismissLoader();
 
         }).catch((err) => {
-            console.log(JSON.stringify(err));
             this.dismissLoader();
+            this.utils.playFailedSound(isScan);
+            this.utils.showAlert("Error", err.message);
         });
     }
 
@@ -69,14 +71,8 @@ export class BinLookupPage {
 
         }, (err) => {
             // An error occurred
-            alert("Error accessing barcode device: " + err);
+            this.utils.showAlert("Error", "Error accessing barcode device: " + err);
         });
-    }
-
-    onBarcodeScan(barcodeText) {
-        console.log(barcodeText);
-
-        this.loadItemByBarcode(barcodeText);
     }
 
     loadItemByBarcode(barcodeText) {
@@ -87,13 +83,13 @@ export class BinLookupPage {
         this.cache.getBinById(barcodeText).then((bin:any) => {
 
             this.selectedLocation = bin;
-            this.loadBinContents(bin);
+            this.loadBinContents(bin, true);
             this.dismissLoader();
 
         }).catch((err) => {
 
             this.dismissLoader();
-            alert(err.message);
+            this.utils.showAlert("Error", err.message);
         });
     }
 
@@ -120,7 +116,7 @@ export class BinLookupPage {
         }).catch((err) => {
 
             loader.dismiss();
-            alert(err.message);
+            this.utils.showAlert("Error", err.message);
         });
 
     }

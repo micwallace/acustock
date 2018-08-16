@@ -16,8 +16,10 @@ import { PickProvider } from '../../../providers/pick/pick'
 })
 export class UnpickedListTab {
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public pickProvider:PickProvider) {
-        //console.log(JSON.stringify(pickProvider.unpickedItems));
+    constructor(public navCtrl:NavController,
+                public navParams:NavParams,
+                public pickProvider:PickProvider) {
+
     }
 
     ionViewDidLoad() {

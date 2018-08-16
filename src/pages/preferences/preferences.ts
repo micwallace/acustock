@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, Events } from 'ionic-angular';
 import { PreferencesProvider, CacheProvider } from '../../providers/providers'
+import { UtilsProvider } from "../../providers/utils";
 
 /**
  * Generated class for the PreferencesPage page.
@@ -19,7 +20,7 @@ export class PreferencesPage {
     preferences;
     currentWarehouse = "";
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public prefs:PreferencesProvider, public events:Events, public cache:CacheProvider) {
+    constructor(public navCtrl:NavController, public navParams:NavParams, public prefs:PreferencesProvider, public events:Events, public cache:CacheProvider, public utils:UtilsProvider) {
         this.preferences = prefs;
         this.currentWarehouse = prefs.getPreference('warehouse');
     }
@@ -57,6 +58,14 @@ export class PreferencesPage {
         }
 
         return options;
+    }
+
+    onSelectOptionClick(key, value){
+        if (["success_sound", "alert_sound", "prompt_sound"].indexOf(key) > -1){
+            this.utils.playSound(value);
+        } else if (key == "warehouse"){
+            this.cache.generateBinList();
+        }
     }
 
 }

@@ -19,7 +19,11 @@ export class PickListTab {
 
     objectKeys:any = Object.keys;
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public pickProvider:PickProvider, public alertCtrl:AlertController) {
+    constructor(public navCtrl:NavController,
+                public navParams:NavParams,
+                public pickProvider:PickProvider,
+                public alertCtrl:AlertController) {
+
     }
 
     ionViewDidLoad() {

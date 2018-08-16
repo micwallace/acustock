@@ -18,7 +18,10 @@ export class ReceiveShipmentListTab {
 
     objectKeys:any = Object.keys;
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public receiveProvider:ReceiveProvider, public alertController:AlertController) {
+    constructor(public navCtrl:NavController,
+                public navParams:NavParams,
+                public receiveProvider:ReceiveProvider,
+                public alertController:AlertController) {
     }
 
     ionViewDidLoad() {

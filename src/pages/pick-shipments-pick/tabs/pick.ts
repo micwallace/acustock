@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams, ViewController, Events, AlertContr
 import { PickProvider } from '../../../providers/providers';
 import { CacheProvider } from "../../../providers/cache/cache";
 import { LoadingController } from "ionic-angular/index";
+import {UtilsProvider} from "../../../providers/utils";
 
 /**
  * Generated class for the PickShipmentsPickPage page.
@@ -46,7 +47,8 @@ export class PickTab {
                 public events:Events,
                 public alertCtrl:AlertController,
                 public loadingCtrl: LoadingController,
-                private ngZone: NgZone) {
+                private ngZone: NgZone,
+                public utils:UtilsProvider) {
 
     }
 
@@ -58,6 +60,8 @@ export class PickTab {
         }, 150);
 
         if (this.pickProvider.hasSavedPicks()) {
+
+            this.utils.playPromptSound();
 
             let alert = this.alertCtrl.create({
                 title: "Load saved picks",
@@ -178,7 +182,7 @@ export class PickTab {
         this.showQty = false;
     }
 
-    setLocation(locId) {
+    setLocation(locId, isScan=false) {
 
         if (locId) {
             this.enteredData.location = locId;
@@ -187,11 +191,15 @@ export class PickTab {
         var curBin = this.getSuggestedAllocation().LocationID.value;
         var enteredBin = this.enteredData.location;
         if (curBin != enteredBin) {
-            alert(enteredBin + " is not the recommended bin " + curBin);
+
+            this.utils.playPromptSound(isScan);
+            this.utils.showAlert("Error", enteredBin + " is not the recommended bin " + curBin);
             this.enteredData.location = "";
             return;
             // TODO: allow location overide
         }
+
+        if (isScan) this.utils.playScanSuccessSound();
 
         if (locId)
             return;
@@ -201,7 +209,7 @@ export class PickTab {
         });
     }
 
-    setItem(itemId) {
+    setItem(itemId, isScan=false) {
 
         if (itemId) {
             this.enteredData.item = itemId;
@@ -218,7 +226,8 @@ export class PickTab {
                 if (allocIndexes == null){
                     this.enteredData.item = "";
                     this.enteredData.qty = 0;
-                    alert("The item does not exist on the picklist or has already been picked.");
+                    this.utils.playFailedSound(isScan);
+                    this.utils.showAlert("Error", "The item does not exist on the picklist or has already been picked.");
                     return;
                 }
 
@@ -230,6 +239,8 @@ export class PickTab {
             this.enteredData.qty = 1;
             this.enteredData.item = item.InventoryID.value;
 
+            if (isScan) this.utils.playScanSuccessSound();
+
             if (itemId)
                 return;
 
@@ -239,7 +250,7 @@ export class PickTab {
 
         }).catch((err)=> {
             this.enteredData.item = "";
-            alert(err.message);
+            this.utils.showAlert("Error", err.message);
         });
     }
 
@@ -255,20 +266,23 @@ export class PickTab {
                 if (i == "lot" && !this.serialTracked)
                     continue;
 
-                alert("Please enter all required fields.");
-                return;
+                this.utils.playFailedSound(true);
+                this.utils.showAlert("Error", "Please enter all required fields.");
+                return false;
             }
         }
 
         // validate qty
         if (this.enteredData.qty < 1) {
-            alert("Quantity must be greater than 0.");
-            return;
+            this.utils.playFailedSound(true);
+            this.utils.showAlert("Error", "Quantity must be greater than 0.");
+            return false;
         }
 
         if (this.enteredData.qty > this.getTotalRemainingQty()) {
-            alert("The entered quantity exceeds the quantity needed for this item.");
-            return;
+            this.utils.playFailedSound(true);
+            this.utils.showAlert("Error", "The entered quantity exceeds the quantity needed for this item.");
+            return false;
         }
 
         console.log(JSON.stringify(this.enteredData));
@@ -309,6 +323,7 @@ export class PickTab {
             alert.present();
         }
 
+        return true;
     }
 
     cancelPicks() {
@@ -352,7 +367,7 @@ export class PickTab {
             this.events.publish('closeModal');
         }).catch((err)=> {
             loader.dismissAll();
-            alert(err.message);
+            this.utils.showAlert("Error", err.message);
         });
     }
 
@@ -361,7 +376,7 @@ export class PickTab {
 
         if (this.enteredData.location == "") {
             this.ngZone.run(()=> {
-                this.setLocation(barcodeText);
+                this.setLocation(barcodeText, true);
                 return;
             });
         }
@@ -371,11 +386,11 @@ export class PickTab {
             this.ngZone.run(()=> {
                 // check if quantity is set. If it is then save the current entry
                 if (this.enteredData.item != "" && this.enteredData.qty > 0) {
-                    this.addPick();
+                    this.addPick(true);
                     return;
                 }
 
-                this.setLocation(barcodeText);
+                this.setLocation(barcodeText, true);
             });
 
         }).catch((err) => {
@@ -385,7 +400,7 @@ export class PickTab {
                 this.ngZone.run(()=> {
 
                     if (this.enteredData.item == "" || this.enteredData.qty == 0) {
-                        this.setItem(item.InventoryID.value);
+                        this.setItem(item.InventoryID.value, true);
                         return;
                     }
 
@@ -393,25 +408,29 @@ export class PickTab {
                     if (item.InventoryID.value == this.enteredData.item) {
 
                         if (this.getTotalRemainingQty() - (this.enteredData.qty + 1) < 0){
-                            alert("You've already picked the quantity required for this item.");
+                            this.utils.playFailedSound(true);
+                            this.utils.showAlert("Error", "You've already picked the quantity required for this item.");
                             return;
                         }
+
                         this.enteredData.qty++;
+
+                        this.utils.playScanSuccessSound();
 
                         // If the completed quantity is reached let's automatically move to the next suggested pick
                         if (this.getTotalRemainingQty() - this.enteredData.qty == 0){
                             this.addPick(true);
                         }
                     } else {
-                        this.addPick(true);
-
-                        this.setItem(item.InventoryID.value);
+                        if (this.addPick(true))
+                            this.setItem(item.InventoryID.value, true);
                     }
 
                 });
 
             }).catch((err) => {
-                alert(err.message);
+                this.utils.playFailedSound(true);
+                this.utils.showAlert("Error", err.message);
             });
 
         });

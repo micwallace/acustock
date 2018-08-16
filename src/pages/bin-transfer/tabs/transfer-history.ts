@@ -16,7 +16,9 @@ import { TransferProvider } from '../../../providers/transfer/transfer'
 })
 export class TransferHistoryTab {
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public transferProvider:TransferProvider) {
+    constructor(public navCtrl:NavController,
+                public navParams:NavParams,
+                public transferProvider:TransferProvider) {
 
     }
 

@@ -5,6 +5,7 @@ import { ItemAutocompleteService } from './item-autocomplete/item-autocomplete';
 import { LocationAutocompleteService } from './item-autocomplete/bin-autocomplete';
 import { PickProvider } from './pick/pick';
 import { TransferProvider } from './transfer/transfer';
+import { CountProvider } from './count/count';
 import { PreferencesProvider } from './preferences/preferences';
 
 export {
@@ -14,5 +15,6 @@ export {
     LocationAutocompleteService,
     BarcodeListenerComponent,
     PickProvider,
-    PreferencesProvider
+    PreferencesProvider,
+    CountProvider
 };

@@ -90,4 +90,5 @@
         <variable name="ANDROID_SUPPORT_VERSION" value="27.+" />
     </plugin>
     <engine name="android" spec="~7.0.0" />
+    <plugin name="cordova-plugin-vibration" spec="^3.1.0" />
 </widget>

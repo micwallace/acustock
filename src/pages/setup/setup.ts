@@ -6,6 +6,7 @@ import { Api } from '../../providers/providers';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { PreferencesProvider } from "../../providers/preferences/preferences";
 import { PreferencesPage } from "../preferences/preferences";
+import { UtilsProvider } from "../../providers/utils";
 
 /**
  * Generated class for the SetupPage page.
@@ -21,7 +22,14 @@ import { PreferencesPage } from "../preferences/preferences";
 })
 export class SetupPage {
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public prefs:PreferencesProvider, public api:Api, public barcodeScanner:BarcodeScanner, public loadingCtrl:LoadingController, public events:Events) {
+    constructor(public navCtrl:NavController,
+                public navParams:NavParams,
+                public prefs:PreferencesProvider,
+                public api:Api,
+                public barcodeScanner:BarcodeScanner,
+                public loadingCtrl:LoadingController,
+                public events:Events,
+                public utils:UtilsProvider) {
 
     }
 
@@ -32,7 +40,7 @@ export class SetupPage {
     showPreferences() {
         this.events.subscribe('preferencesSaved', ()=> {
             if (this.prefs.getPreference('url') == "") {
-                alert("Please configure connection preferences to continue");
+                this.utils.showAlert("Error", "Please configure connection preferences to continue");
                 return;
             }
 
@@ -52,7 +60,7 @@ export class SetupPage {
 
         }, (err) => {
             // An error occurred
-            alert("Error accessing barcode device: " + err);
+            this.utils.showAlert("Error", "Error accessing barcode device: " + err);
         });
     }
 
@@ -76,14 +84,17 @@ export class SetupPage {
                 this.prefs.savePreferences();
             }
 
-            this.testConnection();
+            this.utils.playScanSuccessSound();
+
+            this.testConnection(true);
 
         } catch (e) {
-            alert("Invalid configuration barcode.");
+            this.utils.playFailedSound(true);
+            this.utils.showAlert("Error", "Invalid configuration barcode.");
         }
     }
 
-    private testConnection() {
+    private testConnection(isScan=false) {
 
         this.events.unsubscribe('preferencesSaved');
 
@@ -98,7 +109,8 @@ export class SetupPage {
         }).catch((err) => {
 
             loader.dismiss();
-            alert("Connection failed: " + err.message);
+            this.utils.playFailedSound(isScan);
+            this.utils.showAlert("Error", "Connection failed: " + err.message);
         });
     }
 

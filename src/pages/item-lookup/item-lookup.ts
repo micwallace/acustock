@@ -4,6 +4,7 @@ import { IonicPage, NavController, NavParams, LoadingController, ModalController
 import { Api, CacheProvider, ItemAutocompleteService, PreferencesProvider } from '../../providers/providers';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { ItemLookupDetailsPage } from '../item-lookup-details/item-lookup-details';
+import {UtilsProvider} from "../../providers/utils";
 
 /**
  * Generated class for the ItemLookupPage page.
@@ -34,7 +35,8 @@ export class ItemLookupPage {
                 public modalCtrl:ModalController,
                 public barcodeScanner:BarcodeScanner,
                 public cache:CacheProvider,
-                public prefs:PreferencesProvider) {
+                public prefs:PreferencesProvider,
+                public utils:UtilsProvider) {
     }
 
     ionViewDidLoad() {
@@ -70,7 +72,7 @@ export class ItemLookupPage {
 
         }, (err) => {
             // An error occurred
-            alert("Error accessing barcode device: " + err);
+            this.utils.showAlert("Error", "Error accessing barcode device: " + err);
         });
     }
 
@@ -96,7 +98,7 @@ export class ItemLookupPage {
         }).catch((err) => {
 
             this.dismissLoader();
-            alert(err.message);
+            this.utils.showAlert("Error", err.message);
         });
     }
 
@@ -123,7 +125,7 @@ export class ItemLookupPage {
         }).catch((err) => {
 
             loader.dismiss().then(()=> {
-                alert(err.message);
+                this.utils.showAlert("Error", err.message);
             });
         });
 

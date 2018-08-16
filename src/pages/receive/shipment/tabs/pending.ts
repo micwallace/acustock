@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { ReceiveProvider } from '../../../../providers/receive/receive'
+import { UtilsProvider } from "../../../../providers/utils";
 
 /**
  * Generated class for the PickShipmentsListPage page.
@@ -18,7 +19,11 @@ export class ReceiveShipmentPendingTab {
 
     objectKeys:any = Object.keys;
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public receiveProvider:ReceiveProvider, public alertCtrl:AlertController) {
+    constructor(public navCtrl:NavController,
+                public navParams:NavParams,
+                public receiveProvider:ReceiveProvider,
+                public alertCtrl:AlertController,
+                public utils:UtilsProvider) {
     }
 
     ionViewDidLoad() {
@@ -52,7 +57,7 @@ export class ReceiveShipmentPendingTab {
                         var remQty = this.receiveProvider.getCommittedRemainingQty(line);
 
                         if (remQty < data.qty){
-                            alert("The entered quantity is " + data.qty + " but there is only " + remQty + " left to receive.");
+                            this.utils.showAlert("Error", "The entered quantity is " + data.qty + " but there is only " + remQty + " left to receive.");
                             return false;
                         }
 

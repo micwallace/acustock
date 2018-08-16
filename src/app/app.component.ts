@@ -3,7 +3,7 @@ import { Platform, Nav, LoadingController, ToastController } from 'ionic-angular
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
-import { HomePage } from '../pages/home/home';
+import { CountPage } from '../pages/count/count';
 import { PickShipmentsPage } from '../pages/pick-shipments/pick-shipments';
 import { ItemLookupPage } from '../pages/item-lookup/item-lookup';
 import { BinLookupPage } from '../pages/bin-lookup/bin-lookup';
@@ -21,8 +21,14 @@ export class MyApp {
     @ViewChild(Nav) navCtrl:Nav;
     rootPage:any = ReceivePage;
 
-    constructor(platform:Platform, statusBar:StatusBar, splashScreen:SplashScreen, public prefs:PreferencesProvider, public api:Api,
-                public cache:CacheProvider, public loadingCtrl:LoadingController, public toastCtrl:ToastController) {
+    constructor(public platform:Platform,
+                public statusBar:StatusBar,
+                public splashScreen:SplashScreen,
+                public prefs:PreferencesProvider,
+                public api:Api,
+                public cache:CacheProvider,
+                public loadingCtrl:LoadingController,
+                public toastCtrl:ToastController) {
 
         platform.ready().then((readySrc) => {
 
@@ -84,9 +90,9 @@ export class MyApp {
         this.navCtrl.setRoot(ReceivePage);
     }
 
-    goToHome(params) {
+    goToCount(params) {
         if (!params) params = {};
-        this.navCtrl.setRoot(HomePage);
+        this.navCtrl.setRoot(CountPage);
     }
 
     goToItemLookup(params) {
