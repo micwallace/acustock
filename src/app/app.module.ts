@@ -12,12 +12,14 @@ import { SetupPage } from '../pages/setup/setup';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { AppPreferences } from '@ionic-native/app-preferences';
 import { Vibration } from '@ionic-native/vibration';
+import { EmailComposer } from '@ionic-native/email-composer';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { AutoCompleteModule } from 'ionic2-auto-complete';
 
 import { Api, CacheProvider, BarcodeListenerComponent, ItemAutocompleteService, LocationAutocompleteService, PickProvider, PreferencesProvider } from '../providers/providers';
 import { HTTP } from '@ionic-native/http';
+import { HttpModule } from '@angular/http'
 import { ItemLookupDetailsPage } from "../pages/item-lookup-details/item-lookup-details";
 import { PickShipmentsListPage } from "../pages/pick-shipments-list/pick-shipments-list";
 import { PickShipmentsPickPage } from "../pages/pick-shipments-pick/pick-shipments-pick";
@@ -32,18 +34,18 @@ import { TransferListTab } from "../pages/bin-transfer/tabs/transfer-list";
 import { TransferHistoryTab } from "../pages/bin-transfer/tabs/transfer-history";
 import { ReceiveProvider } from '../providers/receive/receive';
 import { ReceivePage } from "../pages/receive/receive";
-import {ReceiveShipmentPage} from "../pages/receive/shipment/receive-shipment";
-import {ReceiveShipmentListTab} from "../pages/receive/shipment/tabs/list";
-import {ReceiveShipmentPendingTab} from "../pages/receive/shipment/tabs/pending";
-import {ReceiveShipmentEnterTab} from "../pages/receive/shipment/tabs/shipment-enter";
+import { ReceiveShipmentPage } from "../pages/receive/shipment/receive-shipment";
+import { ReceiveShipmentListTab } from "../pages/receive/shipment/tabs/list";
+import { ReceiveShipmentPendingTab } from "../pages/receive/shipment/tabs/pending";
+import { ReceiveShipmentEnterTab } from "../pages/receive/shipment/tabs/shipment-enter";
 
 import { CountPage } from '../pages/count/count';
 import { CountEntryPage } from '../pages/count/entry/count-entry';
 import { CountEntryEnterTab } from '../pages/count/entry/tabs/count-enter';
 import { CountEntryListTab } from '../pages/count/entry/tabs/count-list';
 import { CountEntryPendingTab } from '../pages/count/entry/tabs/pending-list';
-import {CountProvider} from "../providers/count/count";
-import {UtilsProvider} from "../providers/utils";
+import { CountProvider } from "../providers/count/count";
+import { UtilsProvider } from "../providers/utils";
 
 @NgModule({
     declarations: [
@@ -78,6 +80,7 @@ import {UtilsProvider} from "../providers/utils";
     ],
     imports: [
         BrowserModule,
+        HttpModule,
         AutoCompleteModule,
         IonicModule.forRoot(MyApp),
     ],
@@ -128,7 +131,8 @@ import {UtilsProvider} from "../providers/utils";
         PreferencesProvider,
         UtilsProvider,
         ReceiveProvider,
-        Vibration
+        Vibration,
+        EmailComposer
     ]
 })
 export class AppModule {

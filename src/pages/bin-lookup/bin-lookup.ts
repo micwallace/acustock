@@ -56,9 +56,12 @@ export class BinLookupPage {
             this.dismissLoader();
 
         }).catch((err) => {
-            this.dismissLoader();
             this.utils.playFailedSound(isScan);
-            this.utils.showAlert("Error", err.message);
+            this.dismissLoader().then(()=> {
+                this.utils.showAlert("Error", err.message, {exception: err});
+            }).catch((err)=>{
+                this.utils.showAlert("Error", err.message, {exception: err});
+            });
         });
     }
 
@@ -71,7 +74,8 @@ export class BinLookupPage {
 
         }, (err) => {
             // An error occurred
-            this.utils.showAlert("Error", "Error accessing barcode device: " + err);
+            this.utils.playFailedSound(true);
+            this.utils.showAlert("Error", "Error accessing barcode device: " + err, {exception: err});
         });
     }
 
@@ -88,16 +92,28 @@ export class BinLookupPage {
 
         }).catch((err) => {
 
-            this.dismissLoader();
-            this.utils.showAlert("Error", err.message);
+            this.utils.playFailedSound(true);
+            this.dismissLoader().then(()=> {
+                this.utils.showAlert("Error", err.message, {exception: err});
+            }).catch((err)=>{
+                this.utils.showAlert("Error", err.message, {exception: err});
+            });
         });
     }
 
     private dismissLoader() {
-        if (this.loader != null) {
-            this.loader.dismissAll();
-            this.loader = null;
-        }
+        return new Promise((resolve, reject)=>{
+
+            if (this.loader == null)
+                return resolve();
+
+            this.loader.dismiss().then(()=>{
+                this.loader = null;
+                resolve();
+            }).catch((err)=>{
+                reject(err);
+            });
+        });
     }
 
     openDetailsModal(event, item) {
@@ -115,8 +131,9 @@ export class BinLookupPage {
 
         }).catch((err) => {
 
-            loader.dismiss();
-            this.utils.showAlert("Error", err.message);
+            loader.dismiss().then(()=> {
+                this.utils.showAlert("Error", err.message, {exception: err});
+            });
         });
 
     }

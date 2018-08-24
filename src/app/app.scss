@@ -13,3 +13,61 @@
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
 @import "../../node_modules/ionic2-auto-complete/auto-complete";
+
+.table-header {
+  border-bottom: 1px solid #888;
+  font-weight: bold;
+}
+
+.item-list {
+  padding: 0;
+  margin: 0;
+  ion-col {
+    display: flex;
+    flex-direction: row;
+    flex-flow: row;
+    align-items: center;
+  }
+}
+
+.list-group {
+  .item-inner {
+    padding: 0 !important;
+  }
+  .label {
+    margin-right: 0;
+    margin-bottom: 0;
+  }
+  background: #fafafa;
+}
+
+.list-item {
+  .item-inner {
+    padding: 5px 0 !important;
+  }
+  .label {
+    padding-right: 0;
+    margin: 0;
+  }
+  border-bottom: 1px solid #f4f4f4;
+}
+
+.column-right {
+  justify-content: right;
+}
+
+.qty-padding {
+  padding: 0 6px;
+}
+
+.qty-btn-space {
+  padding: 0 9px;
+}
+
+.no-margin {
+  margin: 0;
+}
+
+.no-padding {
+  margin: 0;
+}

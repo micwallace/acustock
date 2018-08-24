@@ -205,6 +205,7 @@ export class ReceiveProvider {
                     itemInfo.QtyReceived = 0;
                     itemInfo.QtyRemaining = item.ShippedQty.value;
                     itemInfo.Allocations = item.Allocations;
+                    itemInfo.LocationID = item.LocationID.value;
                     break;
 
                 case "transfer":

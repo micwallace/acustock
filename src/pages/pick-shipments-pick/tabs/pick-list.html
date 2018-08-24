@@ -15,28 +15,36 @@
 
 <ion-content padding>
     <ion-grid>
-        <div class="row header">
-            <ion-col col-5>Location</ion-col>
-            <ion-col col-4>LotSerial</ion-col>
-            <ion-col col-3>Qty</ion-col>
-        </div>
-        <ion-item tappable no-margin no-padding *ngFor="let key of objectKeys(pickProvider.pendingPicks)">
-            <strong>{{pickProvider.pendingPicks[key].InventoryID.value}}</strong>
-            <span item-end float-end>{{pickProvider.getPendingItemQty(key)}}/{{pickProvider.pendingPicks[key].RemainingQty}}</span>
-            <div no-margin no-padding>
-                <ion-row tappable *ngFor="let allocation of pickProvider.pendingPicks[key].Allocations" (click)="editPickItem(allocation);">
-                    <ion-col col-5>
-                        <ion-icon name="close"></ion-icon>
-                        {{allocation.LocationID.value}}
+        <ion-row class="table-header">
+            <ion-col col-7>Item/Location</ion-col>
+            <ion-col col-5 text-right>Picked/Total</ion-col>
+        </ion-row>
+        <ion-list class="item-list">
+            <ion-item no-margin no-padding class="list-group" *ngFor="let key of objectKeys(pickProvider.pendingPicks)">
+                <ion-row>
+                    <ion-col col-7>
+                        <strong>{{pickProvider.pendingPicks[key].InventoryID.value}}</strong>
                     </ion-col>
-                    <ion-col col-5>{{allocation.LotSerialNbr.value}}</ion-col>
-                    <ion-col col-2>{{allocation.PendingQty}}/{{allocation.RemainingQty}}
-                        <button ion-button icon-only small float-right (click)="removePickItem(allocation); $event.stopPropagation();">
-                            <ion-icon name="trash"></ion-icon>
-                        </button>
+                    <ion-col col-5 class="column-right">
+                        <span class="qty-padding">{{pickProvider.getPendingItemQty(key)}}</span>/<span class="qty-padding">{{pickProvider.pendingPicks[key].RemainingQty}}</span>
                     </ion-col>
                 </ion-row>
-            </div>
-        </ion-item>
+                <ion-list class="list">
+                    <ion-item no-margin no-padding class="list-item" tappable *ngFor="let allocation of pickProvider.pendingPicks[key].Allocations" (click)="editPickItem(allocation);">
+                        <ion-row no-margin no-padding>
+                            <ion-col col-7>
+                                {{allocation.LocationID.value}}
+                            </ion-col>
+                            <ion-col col-5 class="column-right">
+                                <span class="qty-btn-space">{{allocation.PendingQty}}</span>
+                                <button ion-button icon-only small (click)="removePickItem(allocation); $event.stopPropagation();">
+                                    <ion-icon name="trash"></ion-icon>
+                                </button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-item>
+                </ion-list>
+            </ion-item>
+        </ion-list>
     </ion-grid>
 </ion-content>

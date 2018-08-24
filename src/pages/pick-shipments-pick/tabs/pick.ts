@@ -32,7 +32,7 @@ export class PickTab {
     enteredData = {
         location: "",
         item: "",
-        lot: "",
+        //lot: "",
         qty: 0
     };
 
@@ -173,7 +173,7 @@ export class PickTab {
             this.enteredData.location = "";
 
         this.enteredData.item = "";
-        this.enteredData.lot = "";
+        //this.enteredData.lot = "";
         this.enteredData.qty = 0;
 
         if (focus)
@@ -188,25 +188,37 @@ export class PickTab {
             this.enteredData.location = locId;
         }
 
-        var curBin = this.getSuggestedAllocation().LocationID.value;
-        var enteredBin = this.enteredData.location;
-        if (curBin != enteredBin) {
+        this.cache.getBinById(this.enteredData.location).then((bin)=>{
 
-            this.utils.playPromptSound(isScan);
-            this.utils.showAlert("Error", enteredBin + " is not the recommended bin " + curBin);
+            var curItem = this.getSuggestedAllocation();
+
+            if (this.enteredData.item != "" && curItem.LocationID.value != this.enteredData.location){
+                // try find another allocation which matches this location
+                var allocIndexes = this.pickProvider.getBestFitAllocation(this.enteredData.item, this.enteredData.location);
+
+                if (allocIndexes != null){
+                    this.currentLocationIndex = allocIndexes[0];
+                    this.currentItemIndex = allocIndexes[1];
+                }
+            }
+
+            // prompt to overrride if it's not the suggested location
+            if ((this.enteredData.item == "" || this.verifyLocation(isScan)) && isScan){
+                this.utils.playScanSuccessSound();
+            }
+
+            if (locId)
+                return;
+            //document.getElementById("item").focus();
+            setTimeout(()=> {
+                this.itemInput.setFocus();
+            });
+
+        }).catch((err)=>{
             this.enteredData.location = "";
-            return;
-            // TODO: allow location overide
-        }
-
-        if (isScan) this.utils.playScanSuccessSound();
-
-        if (locId)
-            return;
-        //document.getElementById("item").focus();
-        setTimeout(()=> {
-            this.itemInput.setFocus();
+            this.utils.showAlert("Error", err.message, {exception: err});
         });
+
     }
 
     setItem(itemId, isScan=false) {
@@ -215,9 +227,9 @@ export class PickTab {
             this.enteredData.item = itemId;
         }
 
-        var curItem = this.getSuggestedAllocation();
-
         this.cache.getItemById(this.enteredData.item).then((item:any)=> {
+
+            var curItem = this.getSuggestedAllocation();
 
             if (item.InventoryID.value != curItem.InventoryID.value) {
                 // Search the picklist for the item & load the best match
@@ -239,7 +251,9 @@ export class PickTab {
             this.enteredData.qty = 1;
             this.enteredData.item = item.InventoryID.value;
 
-            if (isScan) this.utils.playScanSuccessSound();
+            if (this.verifyLocation(isScan) && isScan){
+                this.utils.playScanSuccessSound();
+            }
 
             if (itemId)
                 return;
@@ -250,12 +264,44 @@ export class PickTab {
 
         }).catch((err)=> {
             this.enteredData.item = "";
-            this.utils.showAlert("Error", err.message);
+            this.utils.showAlert("Error", err.message, {exception: err});
         });
     }
 
-    setLotSerial() {
+    private verifyLocation(isScan=false){
 
+        var curBin = this.getSuggestedAllocation().LocationID.value;
+        var enteredBin = this.enteredData.location;
+        if (curBin != enteredBin) {
+
+            this.utils.playPromptSound(isScan);
+
+            let alert = this.alertCtrl.create({
+                title: "Override Bin",
+                message: enteredBin + " is not a recommended bin (" + curBin + ") for this item, override?",
+                buttons: [
+                    {
+                        text: "No",
+                        role: "cancel",
+                        handler: ()=> {
+                            this.enteredData.location = curBin;
+                        }
+                    },
+                    {
+                        text: "Yes",
+                        handler: ()=> {
+                            // TODO: Validate bin & available qty
+                        }
+                    }
+                ]
+            });
+
+            alert.present();
+
+            return false;
+        }
+
+        return true;
     }
 
     addPick(isScan=false) {
@@ -263,8 +309,8 @@ export class PickTab {
         for (var i in this.enteredData) {
             if (this.enteredData[i] == "") {
 
-                if (i == "lot" && !this.serialTracked)
-                    continue;
+                //if (i == "lot" && !this.serialTracked)
+                    //continue;
 
                 this.utils.playFailedSound(true);
                 this.utils.showAlert("Error", "Please enter all required fields.");
@@ -290,7 +336,7 @@ export class PickTab {
         var data = {
             location: this.enteredData.location,
             item: this.enteredData.item,
-            lot: this.enteredData.lot,
+            //lot: this.enteredData.lot,
             qty: this.enteredData.qty
         };
 
@@ -300,7 +346,7 @@ export class PickTab {
 
         var newAlloc = this.getSuggestedAllocation();
 
-        this.resetForm((newAlloc != null && curAlloc.LocationID.value == newAlloc.LocationID.value), isScan);
+        this.resetForm((newAlloc != null && curAlloc.LocationID.value == newAlloc.LocationID.value), !isScan);
 
         if (!newAlloc) {
             let alert = this.alertCtrl.create({
@@ -367,7 +413,7 @@ export class PickTab {
             this.events.publish('closeModal');
         }).catch((err)=> {
             loader.dismissAll();
-            this.utils.showAlert("Error", err.message);
+            this.utils.showAlert("Error", err.message, {exception: err});
         });
     }
 
@@ -377,8 +423,8 @@ export class PickTab {
         if (this.enteredData.location == "") {
             this.ngZone.run(()=> {
                 this.setLocation(barcodeText, true);
-                return;
             });
+            return;
         }
 
         this.cache.getBinById(barcodeText).then((bin:any)=> {
@@ -386,8 +432,8 @@ export class PickTab {
             this.ngZone.run(()=> {
                 // check if quantity is set. If it is then save the current entry
                 if (this.enteredData.item != "" && this.enteredData.qty > 0) {
-                    this.addPick(true);
-                    return;
+                    if (!this.addPick(true))
+                        return;
                 }
 
                 this.setLocation(barcodeText, true);

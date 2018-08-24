@@ -62,7 +62,7 @@ export class PreferencesPage {
 
     onSelectOptionClick(key, value){
         if (["success_sound", "alert_sound", "prompt_sound"].indexOf(key) > -1){
-            this.utils.playSound(value);
+            UtilsProvider.playSound(value);
         } else if (key == "warehouse"){
             this.cache.generateBinList();
         }

@@ -54,7 +54,7 @@ export class ReceivePage {
             loader.dismiss();
             this.referenceNbr = "";
             this.utils.playFailedSound(isScan);
-            this.utils.showAlert("Error", err.message);
+            this.utils.showAlert("Error", err.message, {exception: err});
 
         });
     }
@@ -68,7 +68,7 @@ export class ReceivePage {
 
         }, (err) => {
             // An error occurred
-            this.utils.showAlert("Error", "Error accessing barcode device: " + err);
+            this.utils.showAlert("Error", "Error accessing barcode device: " + err, {exception: err});
         });
     }
 
@@ -108,7 +108,7 @@ export class ReceivePage {
                                         this.navCtrl.push(ReceiveShipmentPage);
                                     }).catch((err)=>{
                                         loader.dismiss().then(()=>{
-                                            this.utils.showAlert("Error", err.message);
+                                            this.utils.showAlert("Error", err.message, {exception: err});
                                         });
                                     });
                                 }

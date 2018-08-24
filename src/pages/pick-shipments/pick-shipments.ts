@@ -37,7 +37,7 @@ export class PickShipmentsPage {
 
         }, (err) => {
             // An error occurred
-            this.utils.showAlert("Error", "Error accessing barcode device: " + err);
+            this.utils.showAlert("Error", "Error accessing barcode device: " + err, {exception: err});
         });
     }
 
@@ -53,7 +53,7 @@ export class PickShipmentsPage {
             loader.dismiss();
             this.shipmentNbr = "";
             this.utils.playFailedSound(isScan);
-            this.utils.showAlert("Error", err.message);
+            this.utils.showAlert("Error", err.message, {exception: err});
         });
     }
 

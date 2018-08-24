@@ -80,12 +80,16 @@
                 </ion-item>
             </ion-col>
         </ion-row>
+        <ion-row>
+            <button type="button" ion-button small (click)="addPick()">OK</button>
+            <button type="button" ion-button small (click)="resetForm()">Cancel</button>
+        </ion-row>
     </ion-grid>
 </ion-content>
 <ion-footer no-shadow>
     <ion-toolbar position="bottom">
         <div class="row">
-            <div class="col">
+            <div class="col-6">
                 <button type="button" ion-button small (click)="previousItem()">
                     <ion-icon name="arrow-back"></ion-icon>
                 </button>
@@ -93,22 +97,11 @@
                     <ion-icon name="arrow-forward"></ion-icon>
                 </button>
             </div>
-            <div class="col">
-                <button type="button" ion-button small (click)="addPick()">OK</button>
-            </div>
-            <div class="col">
-                <button type="button" ion-button small (click)="resetForm()">Cancel</button>
-            </div>
-            <div class="col">
+            <div class="col-6">
                 <button type="button" ion-button small (click)="confirmPicks()">Commit</button>
-            </div>
-            <div class="col">
                 <button type="button" ion-button small (click)="cancelPicks()">Cancel All</button>
             </div>
         </div>
-        <!--<div class="row">
-
-        </div>-->
     </ion-toolbar>
 </ion-footer>
 

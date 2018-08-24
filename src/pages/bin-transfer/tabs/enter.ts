@@ -116,7 +116,7 @@ export class EnterTab {
                 this.enteredData.location = "";
                 this.utils.playFailedSound(isScan);
                 this.dismissLoader().then(()=> {
-                    this.utils.showAlert("Error", err.message);
+                    this.utils.showAlert("Error", err.message, {exception: err});
                 });
             });
 
@@ -124,7 +124,7 @@ export class EnterTab {
             this.enteredData.location = "";
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
-                this.utils.showAlert("Error", err.message);
+                this.utils.showAlert("Error", err.message, {exception: err});
             });
         });
 
@@ -164,7 +164,7 @@ export class EnterTab {
             this.enteredData.toLocation = "";
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
-                this.utils.showAlert("Error", err.message);
+                this.utils.showAlert("Error", err.message, {exception: err});
             });
         });
     }
@@ -211,7 +211,7 @@ export class EnterTab {
             this.enteredData.item = "";
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
-                this.utils.showAlert("Error", err.message);
+                this.utils.showAlert("Error", err.message, {exception: err});
             });
         });
     }
@@ -273,7 +273,7 @@ export class EnterTab {
         }).catch((err)=> {
             this.dismissLoader();
             this.utils.playFailedSound();
-            this.utils.showAlert("Error", err.message);
+            this.utils.showAlert("Error", err.message, {exception: err});
         });
     }
 

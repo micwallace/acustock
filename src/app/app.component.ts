@@ -19,7 +19,7 @@ import { ReceivePage } from "../pages/receive/receive";
 })
 export class MyApp {
     @ViewChild(Nav) navCtrl:Nav;
-    rootPage:any = ReceivePage;
+    rootPage:any = PickShipmentsPage;
 
     constructor(public platform:Platform,
                 public statusBar:StatusBar,

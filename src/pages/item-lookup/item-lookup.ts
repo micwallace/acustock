@@ -43,7 +43,7 @@ export class ItemLookupPage {
         console.log('ionViewDidLoad ItemLookupPage');
     }
 
-    loadItemLocations(item) {
+    loadItemLocations(item, isScan=false) {
         //console.log(JSON.stringify(item));
         if (this.loader == null) {
             this.loader = this.loadingCtrl.create({content: "Loading..."});
@@ -56,8 +56,14 @@ export class ItemLookupPage {
             this.dismissLoader();
 
         }).catch((err) => {
-            console.log(JSON.stringify(err));
-            this.dismissLoader();
+
+            //console.log(JSON.stringify(err));
+            this.utils.playFailedSound(isScan);
+            this.dismissLoader().then(()=> {
+                this.utils.showAlert("Error", err.message, {exception: err});
+            }).catch((err)=>{
+                this.utils.showAlert("Error", err.message, {exception: err});
+            });
         });
     }
 
@@ -97,16 +103,28 @@ export class ItemLookupPage {
 
         }).catch((err) => {
 
-            this.dismissLoader();
-            this.utils.showAlert("Error", err.message);
+            this.utils.playFailedSound(true);
+            this.dismissLoader().then(()=> {
+                this.utils.showAlert("Error", err.message, {exception: err});
+            }).catch((err)=>{
+                this.utils.showAlert("Error", err.message, {exception: err});
+            });
         });
     }
 
     private dismissLoader() {
-        if (this.loader != null) {
-            this.loader.dismissAll();
-            this.loader = null;
-        }
+        return new Promise((resolve, reject)=>{
+
+            if (this.loader == null)
+                return resolve();
+
+            this.loader.dismiss().then(()=>{
+                this.loader = null;
+                resolve();
+            }).catch((err)=>{
+                reject(err);
+            });
+        });
     }
 
     openDetailsModal(event, item) {
@@ -125,7 +143,7 @@ export class ItemLookupPage {
         }).catch((err) => {
 
             loader.dismiss().then(()=> {
-                this.utils.showAlert("Error", err.message);
+                this.utils.showAlert("Error", err.message, {exception: err});
             });
         });
 

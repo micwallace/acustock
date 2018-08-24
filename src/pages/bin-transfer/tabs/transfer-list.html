@@ -18,10 +18,10 @@
 
 <ion-content padding>
     <ion-grid>
-        <div class="row header">
+        <ion-row class="table-header">
             <ion-col col-8>Locations / Item</ion-col>
-            <ion-col col-2>Qty</ion-col>
-        </div>
+            <ion-col col-2 text-right>Qty</ion-col>
+        </ion-row>
         <ion-item no-margin no-padding *ngFor="let key of objectKeys(transferProvider.pendingItems)">
             <strong>{{transferProvider.pendingItems[key].Location.value}}
                 <ion-icon name="arrow-round-forward"></ion-icon>

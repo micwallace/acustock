@@ -14,25 +14,28 @@
 
 
 <ion-content no-padding>
-    <ng-container *ngFor="let group of preferences.schema">
-        <ion-list>
-            <ion-list-header>{{group.title}}</ion-list-header>
-            <ion-item *ngFor="let pref of group.preferences">
-                <ion-label color="primary">{{pref.title}}</ion-label>
+    <ion-list>
+        <ion-item-group *ngFor="let group of preferences.schema">
+                <ion-item-divider>
+                    <ion-icon name="settings"></ion-icon>
+                    <ion-label>{{group.title}}</ion-label>
+                </ion-item-divider>
+                <ion-item *ngFor="let pref of group.preferences">
+                    <ion-label color="primary">{{pref.title}}</ion-label>
 
-                <ion-input *ngIf="['text', 'password', 'url', 'number'].indexOf(pref.type) > -1"
-                           placeholder="{{pref.placeholder}}" type="{{pref.type}}" [value]="pref.def_value"
-                           [(ngModel)]="preferences.preferences[pref.key]"></ion-input>
+                    <ion-input *ngIf="['text', 'password', 'url', 'number'].indexOf(pref.type) > -1"
+                               placeholder="{{pref.placeholder}}" type="{{pref.type}}" [value]="pref.def_value"
+                               [(ngModel)]="preferences.preferences[pref.key]"></ion-input>
 
-                <ion-toggle *ngIf="pref.type == 'toggle'" [checked]="pref.def_value"
-                            [(ngModel)]="preferences.preferences[pref.key]"></ion-toggle>
+                    <ion-toggle *ngIf="pref.type == 'toggle'" [checked]="pref.def_value"
+                                [(ngModel)]="preferences.preferences[pref.key]"></ion-toggle>
 
-                <ion-select *ngIf="pref.type == 'select'" [(ngModel)]="preferences.preferences[pref.key]">
-                    <ion-option *ngFor="let option of getPreferenceOptions(pref)" [value]="option.value" (ionSelect)="onSelectOptionClick(pref.key, option.value);">
-                        {{option.label}}
-                    </ion-option>
-                </ion-select>
-            </ion-item>
-        </ion-list>
-    </ng-container>
+                    <ion-select *ngIf="pref.type == 'select'" [(ngModel)]="preferences.preferences[pref.key]">
+                        <ion-option *ngFor="let option of getPreferenceOptions(pref)" [value]="option.value" (ionSelect)="onSelectOptionClick(pref.key, option.value);">
+                            {{option.label}}
+                        </ion-option>
+                    </ion-select>
+                </ion-item>
+        </ion-item-group>
+    </ion-list>
 </ion-content>

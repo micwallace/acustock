@@ -82,7 +82,7 @@ export class ReceiveShipmentEnterTab {
         }
     }
 
-    resetForm() {
+    resetForm(clearLocation=false) {
 
         this.enteredData.item = "";
         this.enteredData.qty = 0;
@@ -96,8 +96,18 @@ export class ReceiveShipmentEnterTab {
     }
 
     private dismissLoader() {
-        return this.loader.dismiss();
-        //this.loader = null;
+        return new Promise((resolve, reject)=>{
+
+            if (this.loader == null)
+                return resolve();
+
+            this.loader.dismiss().then(()=>{
+                this.loader = null;
+                resolve();
+            }).catch((err)=>{
+                reject(err);
+            });
+        });
     }
 
     setItem(itemId, isScan=false) {
@@ -108,8 +118,10 @@ export class ReceiveShipmentEnterTab {
             itemId = this.enteredData.item;
         }
 
-        this.loader = this.loadingCtrl.create({content: "Loading..."});
-        this.loader.present();
+        if (this.loader == null) {
+            this.loader = this.loadingCtrl.create({content: "Loading..."});
+            this.loader.present();
+        }
 
         this.cache.getItemById(itemId).then((item:any)=> {
 
@@ -135,9 +147,25 @@ export class ReceiveShipmentEnterTab {
                 this.enteredData.qty = 1;
             }
 
-            if (isScan) this.utils.playScanSuccessSound();
+            if (isScan)
+                this.utils.playScanSuccessSound();
 
-            //TODO: load item warehouse details for default receipt location
+            if (line.hasOwnProperty("LocationID")){
+                this.setLocation(line.LocationID);
+                return;
+            } else {
+                var warehouseDetails = this.cache.getItemWarehouseDetails(item);
+                if (warehouseDetails && warehouseDetails.hasOwnProperty("DefaultReceiptLocationID")){
+                    this.setLocation(warehouseDetails.DefaultReceiptLocationID.value);
+                    return;
+                } else {
+                    var warehouse = this.cache.getCurrentWarehouse();
+                    if (warehouse && warehouse.hasOwnProperty("ReceivingLocationID")){
+                        this.setLocation(warehouse.ReceivingLocationID.value);
+                        return;
+                    }
+                }
+            }
 
             this.dismissLoader();
 
@@ -145,7 +173,9 @@ export class ReceiveShipmentEnterTab {
             this.enteredData.item = "";
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
-                this.utils.showAlert("Error", err.message);
+                this.utils.showAlert("Error", err.message, {exception: err});
+            }).catch((err)=>{
+                this.utils.showAlert("Error", err.message, {exception: err});
             });
         });
     }
@@ -158,8 +188,10 @@ export class ReceiveShipmentEnterTab {
             locId = this.enteredData.location;
         }
 
-        this.loader = this.loadingCtrl.create({content: "Loading..."});
-        this.loader.present();
+        if (this.loader == null) {
+            this.loader = this.loadingCtrl.create({content: "Loading..."});
+            this.loader.present();
+        }
 
         this.cache.getBinById(locId).then((bin)=> {
 
@@ -176,7 +208,7 @@ export class ReceiveShipmentEnterTab {
             this.enteredData.location = "";
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
-                this.utils.showAlert("Error", err.message);
+                this.utils.showAlert("Error", err.message, {exception: err});
             });
         });
 
@@ -221,7 +253,7 @@ export class ReceiveShipmentEnterTab {
 
         this.resetForm();
 
-        if (this.receiveProvider.unreceivedQty - this.receiveProvider.pendingItems) {
+        if ((this.receiveProvider.unreceivedQty - this.receiveProvider.pendingQty) <= 0) {
 
             let alert = this.alertCtrl.create({
                 title: "Receipt Complete",
@@ -265,7 +297,7 @@ export class ReceiveShipmentEnterTab {
         }).catch((err)=>{
             this.dismissLoader();
             this.utils.playFailedSound(false);
-            this.utils.showAlert("Error", err.message);
+            this.utils.showAlert("Error", err.message, {exception: err});
         });
     }
 

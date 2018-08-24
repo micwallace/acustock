@@ -98,6 +98,21 @@ export class CacheProvider {
         });
     }
 
+    public getItemWarehouseDetails(item){
+
+        var warehouse = this.getCurrentWarehouse();
+
+        if (item.WarehouseDetails != null){
+            for (var i=0; i<item.WarehouseDetails.length; i++){
+                if (warehouse.WarehouseID.value == item.WarehouseDetails[i].WarehouseID.value){
+                    return item.WarehouseDetails[i];
+                }
+            }
+        }
+
+        return null;
+    }
+
     public getBinList() {
 
         return new Promise((resolve, reject) => {

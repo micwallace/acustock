@@ -23,6 +23,7 @@
     "@ionic-native/barcode-scanner": "^4.5.3",
     "@ionic-native/core": "4.4.0",
     "@ionic-native/dialogs": "^4.6.0",
+    "@ionic-native/email-composer": "^4.12.0",
     "@ionic-native/http": "^4.5.3",
     "@ionic-native/splash-screen": "4.4.0",
     "@ionic-native/status-bar": "4.4.0",
@@ -33,6 +34,7 @@
     "cordova-plugin-advanced-http": "^1.11.1",
     "cordova-plugin-device": "^2.0.1",
     "cordova-plugin-dialogs": "^2.0.1",
+    "cordova-plugin-email-composer": "^0.8.15",
     "cordova-plugin-file": "^6.0.1",
     "cordova-plugin-ionic-keyboard": "^2.0.5",
     "cordova-plugin-ionic-webview": "^1.1.16",
@@ -46,7 +48,8 @@
     "phonegap-plugin-barcodescanner": "^7.0.2",
     "rxjs": "5.5.2",
     "sw-toolbox": "3.6.0",
-    "zone.js": "0.8.18"
+    "zone.js": "0.8.18",
+    "cordova-browser": "~5.0.4"
   },
   "devDependencies": {
     "@ionic/app-scripts": "3.1.8",
@@ -68,10 +71,12 @@
       "cordova-android-support-gradle-release": {
         "ANDROID_SUPPORT_VERSION": "27.+"
       },
-      "cordova-plugin-vibration": {}
+      "cordova-plugin-vibration": {},
+      "cordova-plugin-email-composer": {}
     },
     "platforms": [
-      "android"
+      "android",
+      "browser"
     ]
   }
 }

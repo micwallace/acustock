@@ -1,8 +1,9 @@
 import { HTTP } from '@ionic-native/http';
+import { Http, Headers, RequestOptions } from '@angular/http'
 import { Injectable } from '@angular/core';
-
 import { PreferencesProvider } from "../preferences/preferences";
 import { LoginPage } from "../../pages/login/login";
+import { Platform } from "ionic-angular";
 
 /**
  * Api is a generic REST Api handler. Set your API url first.
@@ -16,12 +17,26 @@ export class Api {
     private password:string = '';
     private company:string = '';
 
-    constructor(public http:HTTP, public prefs:PreferencesProvider) {
+    private jsReqOptions:RequestOptions = new RequestOptions();
+
+    constructor(public http:HTTP, public prefs:PreferencesProvider, public jsHttp:Http, public platform:Platform) {
         this.updateSettings(null, null);
 
-        this.http.setHeader('*', 'Content-Type', 'application/json');
-        this.http.setHeader('*', 'Accept', 'application/json');
-        this.http.setDataSerializer('json');
+        if (this.useNativeHttp()) {
+            this.http.setHeader('*', 'Content-Type', 'application/json');
+            this.http.setHeader('*', 'Accept', 'application/json');
+            this.http.setDataSerializer('json');
+        } else {
+            let headers = new Headers();
+            headers.append('Content-Type', 'application/json');
+            headers.append('Accept', 'application/json');
+            this.jsReqOptions.headers = headers;
+            this.jsReqOptions.withCredentials = true;
+        }
+    }
+
+    private useNativeHttp(){
+        return (this.platform.is("android") || this.platform.is("ios"));
     }
 
     updateSettings(username, password) {
@@ -55,10 +70,21 @@ export class Api {
 
                     reject(err);
                 } catch (e) {
-                    err.message = err.error;
+
+                    err.message = (err.hasOwnProperty("status") ? err.status+" " : "") +
+                                     (err.hasOwnProperty("statusText") ? err.statusText+" " : "") +
+                                        (err.hasOwnProperty("error") ? err.error : "");
                     reject(err);
                 }
+
+                console.log("Boo!");
+                console.log(JSON.stringify(err));
+
             }).catch((err)=> {
+
+                console.log("Boo!");
+                console.log(JSON.stringify(err));
+
                 err.message = err.error;
                 reject(err);
             });
@@ -73,7 +99,18 @@ export class Api {
             company: this.company
         };
 
-        return this.http.post(this.url + '/entity/auth/login', data, {});
+        if (this.useNativeHttp()) {
+            return this.http.post(this.url + '/entity/auth/login', data, {});
+        } else {
+            return new Promise((resolve, reject)=>{
+                //this.jsReqOptions.withCredentials = false;
+                this.jsHttp.post(this.url + '/entity/auth/login', JSON.stringify(data), this.jsReqOptions).toPromise().then((res)=>{
+                    resolve(res);
+                }).catch((err)=>{
+                    reject(err);
+                });
+            });
+        }
     }
 
     logout() {
@@ -81,8 +118,7 @@ export class Api {
     }
 
     getItemList() {
-
-        return this.get('StockItem?$expand=CrossReferences');
+        return this.get('StockItem?$expand=CrossReferences&$expand=WarehouseDetails');
     }
 
     getWarehouseList() {
@@ -207,7 +243,21 @@ export class Api {
     }
 
     getLongRunningOpResult(url, resolve, reject, count) {
-        this.http.get(url, {}, null).then((res:any)=> {
+
+        var req;
+        if (this.useNativeHttp()) {
+            req = this.http.get(url, {}, null);
+        } else {
+            req = new Promise((resolve, reject)=>{
+                this.jsHttp.post(url, this.jsReqOptions).toPromise().then((res)=>{
+                    resolve(res);
+                }).catch((err)=>{
+                    reject(err);
+                });
+            });
+        }
+
+        req.then((res:any)=> {
 
             if (res.status == 204)
                 return resolve(true);
@@ -259,22 +309,56 @@ export class Api {
 
             console.log(url);
 
-            switch (method) {
-                case "get":
-                    promise = this.http.get(url, headers, params);
-                    break;
+            if (this.useNativeHttp()) {
 
-                case "post":
-                    promise = this.http.post(url, body, headers);
-                    break;
+                switch (method) {
+                    case "get":
+                        promise = this.http.get(url, headers, params);
+                        break;
 
-                case "put":
-                    promise = this.http.put(url, body, headers);
-                    break;
+                    case "post":
+                        promise = this.http.post(url, body, headers);
+                        break;
 
-                case "delete":
-                    promise = this.http.delete(url, params, headers);
-                    break;
+                    case "put":
+                        promise = this.http.put(url, body, headers);
+                        break;
+
+                    case "delete":
+                        promise = this.http.delete(url, params, headers);
+                        break;
+                }
+
+            } else {
+
+                let req;
+                //this.jsReqOptions.withCredentials = true;
+
+                switch (method) {
+                    case "get":
+                        req = this.jsHttp.get(url, this.jsReqOptions).toPromise();
+                        break;
+
+                    case "post":
+                        req = this.jsHttp.post(url, JSON.stringify(body), this.jsReqOptions).toPromise();
+                        break;
+
+                    case "put":
+                        req = this.jsHttp.put(url, JSON.stringify(body), this.jsReqOptions).toPromise();
+                        break;
+
+                    case "delete":
+                        req = this.jsHttp.delete(url, this.jsReqOptions).toPromise();
+                        break;
+                }
+
+                promise = new Promise((resolve, reject)=>{
+                    req.then((res)=>{
+                        resolve(res);
+                    }).catch((err)=>{
+                        reject(err);
+                    });
+                });
             }
 
             promise.then((res) => {
@@ -288,9 +372,9 @@ export class Api {
                         return resolve(true);
 
                     try {
-                        var data = JSON.parse(res.data);
+                        var data = this.useNativeHttp() ? JSON.parse(res.data) : res.json();
                     } catch (e) {
-                        reject({"message": "JSON parse error"});
+                        reject({"message": "JSON parse error: " + JSON.stringify(e)});
                         return;
                     }
 

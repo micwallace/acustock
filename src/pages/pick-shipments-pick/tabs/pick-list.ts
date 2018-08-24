@@ -31,7 +31,7 @@ export class PickListTab {
     }
 
     editPickItem(item) {
-        let alert = this.alertCtrl.create({
+        let alertDialog = this.alertCtrl.create({
             title: 'Update Quantity',
             inputs: [
                 {
@@ -50,12 +50,17 @@ export class PickListTab {
                 {
                     text: 'Ok',
                     handler: data => {
-                        this.pickProvider.updatePick(item, data.qty);
+
+                        if (data.qty > this.pickProvider.getPendingItem(item.LineNbr.value).RemainingQty){
+                            alert("The entered value exceed the required qty for this item.");
+                        } else {
+                            this.pickProvider.updatePick(item.LineNbr.value, item.id, data.qty);
+                        }
                     }
                 }
             ]
         });
-        alert.present();
+        alertDialog.present();
     }
 
     removePickItem(item) {
@@ -72,7 +77,7 @@ export class PickListTab {
                 {
                     text: 'OK',
                     handler: () => {
-                        this.pickProvider.removePick(item.LineNbr.value, item.id);
+                        this.pickProvider.updatePick(item.LineNbr.value, item.id, 0);
                     }
                 }
             ]

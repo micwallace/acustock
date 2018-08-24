@@ -94,7 +94,7 @@ export class SetupPage {
         }
     }
 
-    private testConnection(isScan=false) {
+    protected testConnection(isScan=false) {
 
         this.events.unsubscribe('preferencesSaved');
 
