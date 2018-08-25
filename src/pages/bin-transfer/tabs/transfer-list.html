@@ -22,26 +22,38 @@
             <ion-col col-8>Locations / Item</ion-col>
             <ion-col col-2 text-right>Qty</ion-col>
         </ion-row>
-        <ion-item no-margin no-padding *ngFor="let key of objectKeys(transferProvider.pendingItems)">
-            <strong>{{transferProvider.pendingItems[key].Location.value}}
-                <ion-icon name="arrow-round-forward"></ion-icon>
-                {{transferProvider.pendingItems[key].ToLocation.value}}</strong>
-            <strong>Items</strong>
-            <div no-margin no-padding>
-                <ion-row tappable *ngFor="let skey of objectKeys(transferProvider.pendingItems[key].Items)"
-                         (click)="openEditDialog(key, skey);">
-                    <ion-col col-8>{{transferProvider.pendingItems[key].Items[skey].InventoryID.value}}</ion-col>
-                    <ion-col col-2 text-right>
-                        {{transferProvider.pendingItems[key].Items[skey].Qty.value}}
-                    </ion-col>
-                    <ion-col col-2>
-                        <button ion-button icon-only small float-right
-                                (click)="deleteItem(key, skey); $event.stopPropagation();">
-                            <ion-icon name="trash"></ion-icon>
-                        </button>
-                    </ion-col>
+        <ion-list class="item-list">
+            <ion-item no-margin no-padding class="list-group" *ngFor="let key of objectKeys(transferProvider.pendingItems)">
+                <ion-row class="item-group-header" no-margin>
+                    <ion-col col-12><strong>{{transferProvider.pendingItems[key].Location.value}}
+                        <ion-icon name="arrow-round-forward"></ion-icon>
+                        {{transferProvider.pendingItems[key].ToLocation.value}}</strong></ion-col>
                 </ion-row>
-            </div>
-        </ion-item>
+                <ion-list no-margin no-padding>
+                    <ion-item no-margin no-padding class="list-item" tappable *ngFor="let skey of objectKeys(transferProvider.pendingItems[key].Items)"
+                             (click)="openEditDialog(key, skey);">
+                        <ion-row no-margin no-padding>
+                            <ion-col col-8>{{transferProvider.pendingItems[key].Items[skey].InventoryID.value}}</ion-col>
+                            <ion-col col-4 class="column-right">
+                                <span class="qty-btn-space">{{transferProvider.pendingItems[key].Items[skey].Qty.value}}</span>
+                                <button ion-button icon-only small float-right
+                                        (click)="deleteItem(key, skey); $event.stopPropagation();">
+                                    <ion-icon name="trash"></ion-icon>
+                                </button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-item>
+                </ion-list>
+            </ion-item>
+        </ion-list>
     </ion-grid>
 </ion-content>
+<ion-footer no-shadow>
+    <ion-toolbar position="bottom">
+        <ion-row>
+            <ion-col text-right>
+                <button type="button" ion-button (click)="commitTransfers()">Commit Transfers</button>
+            </ion-col>
+        </ion-row>
+    </ion-toolbar>
+</ion-footer>

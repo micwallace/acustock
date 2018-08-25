@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Events } from 'ionic-angular';
 import { PickProvider } from '../../../providers/providers';
 import { AlertController } from "ionic-angular/index";
 
@@ -22,7 +22,8 @@ export class PickListTab {
     constructor(public navCtrl:NavController,
                 public navParams:NavParams,
                 public pickProvider:PickProvider,
-                public alertCtrl:AlertController) {
+                public alertCtrl:AlertController,
+                public events:Events) {
 
     }
 
@@ -83,6 +84,14 @@ export class PickListTab {
             ]
         });
         alert.present();
+    }
+
+    confirmPicks(){
+        this.events.publish('picks:confirm');
+    }
+
+    cancelPicks(){
+        this.events.publish('picks:cancel');
     }
 
 }

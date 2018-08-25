@@ -53,6 +53,17 @@ export class PickTab {
     }
 
     ionViewDidLoad() {
+        this.events.subscribe('barcode:scan', (barcodeText)=>{
+            this.onBarcodeScan(barcodeText)
+        });
+
+        this.events.subscribe('picks:confirm', ()=>{
+            this.confirmPicks();
+        });
+
+        this.events.subscribe('picks:cancel', ()=>{
+            this.cancelPicks();
+        });
         console.log('ionViewDidLoad PickShipmentsPickPage Tab: Pick');
 
         setTimeout(()=> {
@@ -85,6 +96,12 @@ export class PickTab {
 
             alert.present();
         }
+    }
+
+    ionViewWillUnload(){
+        this.events.unsubscribe('barcode:scan');
+        this.events.unsubscribe('picks:confirm');
+        this.events.unsubscribe('picks:cancel');
     }
 
     getSuggestedLocation() {

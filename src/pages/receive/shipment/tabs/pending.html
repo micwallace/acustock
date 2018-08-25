@@ -20,27 +20,38 @@
     <ion-grid>
         <ion-row class="table-header">
             <ion-col col-8>Locations / Item</ion-col>
-            <ion-col col-2 text-right>Qty</ion-col>
+            <ion-col col-4 text-right>Qty</ion-col>
         </ion-row>
-        <ion-list no-margin no-padding>
-            <ion-item no-margin no-padding *ngFor="let key of objectKeys(receiveProvider.pendingItems)">
-                <ion-row no-padding>
+        <ion-list class="item-list">
+            <ion-item no-margin no-padding class="list-group" *ngFor="let key of objectKeys(receiveProvider.pendingItems)">
+                <ion-row class="item-group-header" no-margin>
                     <ion-col col-12><strong style="display: block;">{{receiveProvider.pendingItems[key].InventoryID}}</strong></ion-col>
                 </ion-row>
-                <ion-row no-padding tappable *ngFor="let skey of objectKeys(receiveProvider.pendingItems[key].Allocations)"
-                         (click)="editReceiptItem(key, skey, receiveProvider.pendingItems[key].Allocations[skey]);">
-                    <ion-col col-8>{{receiveProvider.pendingItems[key].Allocations[skey].LocationID}}</ion-col>
-                    <ion-col col-2 text-right>
-                        {{receiveProvider.pendingItems[key].Allocations[skey].Qty}}
-                    </ion-col>
-                    <ion-col col-2 text-right>
-                        <button ion-button icon-only small no-margin
-                                (click)="removeReceiptItem(key, skey); $event.stopPropagation();">
-                            <ion-icon name="trash"></ion-icon>
-                        </button>
-                    </ion-col>
-                </ion-row>
+                <ion-list no-margin no-padding>
+                    <ion-item no-margin no-padding tappable class="list-item" *ngFor="let skey of objectKeys(receiveProvider.pendingItems[key].Allocations)"
+                             (click)="editReceiptItem(key, skey, receiveProvider.pendingItems[key].Allocations[skey]);">
+                        <ion-row no-margin no-padding>
+                            <ion-col col-8>{{receiveProvider.pendingItems[key].Allocations[skey].LocationID}}</ion-col>
+                            <ion-col col-4 class="column-right">
+                                <span class="qty-btn-space">{{receiveProvider.pendingItems[key].Allocations[skey].Qty}}</span>
+                                <button ion-button icon-only small no-margin
+                                        (click)="removeReceiptItem(key, skey); $event.stopPropagation();">
+                                    <ion-icon name="trash"></ion-icon>
+                                </button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-item>
+                </ion-list>
             </ion-item>
         </ion-list>
     </ion-grid>
 </ion-content>
+<ion-footer no-shadow>
+    <ion-toolbar position="bottom">
+        <ion-row>
+            <ion-col text-right>
+                <button type="button" ion-button small (click)="confirmReceipts()">Confirm Receipt</button>
+            </ion-col>
+        </ion-row>
+    </ion-toolbar>
+</ion-footer>

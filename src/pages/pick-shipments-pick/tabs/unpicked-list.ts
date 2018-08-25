@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Events } from 'ionic-angular';
 import { PickProvider } from '../../../providers/pick/pick'
 
 /**
@@ -18,7 +18,8 @@ export class UnpickedListTab {
 
     constructor(public navCtrl:NavController,
                 public navParams:NavParams,
-                public pickProvider:PickProvider) {
+                public pickProvider:PickProvider,
+                public events:Events) {
 
     }
 
@@ -28,6 +29,14 @@ export class UnpickedListTab {
 
     openPickItem(item) {
 
+    }
+
+    confirmPicks(){
+        this.events.publish('picks:confirm');
+    }
+
+    cancelPicks(){
+        this.events.publish('picks:cancel');
     }
 
 }

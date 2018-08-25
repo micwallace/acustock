@@ -48,12 +48,13 @@ export class CountEntryEnterTab {
                 public renderer:Renderer,
                 public utils:UtilsProvider) {
 
-        events.subscribe('barcode:scan', (barcodeText)=>{
-            this.onBarcodeScan(barcodeText)
-        });
     }
 
     ionViewDidLoad() {
+        this.events.subscribe('barcode:scan', (barcodeText)=>{
+            this.onBarcodeScan(barcodeText)
+        });
+
         if (this.countProvider.hasSavedCounts()) {
 
             let alert = this.alertCtrl.create({
@@ -78,6 +79,10 @@ export class CountEntryEnterTab {
 
             alert.present();
         }
+    }
+
+    ionViewWillUnload(){
+        this.events.unsubscribe('barcode:scan');
     }
 
     resetForm() {

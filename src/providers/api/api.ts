@@ -50,6 +50,11 @@ export class Api {
 
         return new Promise((resolve, reject) => {
 
+            if (!this.prefs.isSetupComplete() || this.prefs.getPreference('connection_password')==""){
+                reject({message: "Please enter all required settings."});
+                return;
+            }
+
             this.updateSettings(username, password);
 
             this.login().then((res) => {
@@ -58,32 +63,9 @@ export class Api {
 
             }, (err) => {
 
-                try {
-                    var error = JSON.parse(err.error);
-
-                    if (error.hasOwnProperty('exceptionMessage')) {
-                        err.errorData = error;
-                        err.message = error.exceptionMessage;
-                    } else {
-                        err.message = err.error;
-                    }
-
-                    reject(err);
-                } catch (e) {
-
-                    err.message = (err.hasOwnProperty("status") ? err.status+" " : "") +
-                                     (err.hasOwnProperty("statusText") ? err.statusText+" " : "") +
-                                        (err.hasOwnProperty("error") ? err.error : "");
-                    reject(err);
-                }
-
-                console.log("Boo!");
-                console.log(JSON.stringify(err));
+                reject(this.processApiError(err));
 
             }).catch((err)=> {
-
-                console.log("Boo!");
-                console.log(JSON.stringify(err));
 
                 err.message = err.error;
                 reject(err);
@@ -154,7 +136,7 @@ export class Api {
     }
 
     getShipment(shipmentNbr, expand = "Details,Details/Allocations") {
-        return this.get("Shipment?$expand=" + expand + "&$filter=ShipmentNbr eq '" + shipmentNbr + "'");
+        return this.get("Shipment/" + shipmentNbr + "?$expand=" + expand);
     }
 
     getShipmentList() {
@@ -399,21 +381,7 @@ export class Api {
 
                         }, (err) => {
 
-                            try {
-                                var error = JSON.parse(err.error);
-
-                                if (error.hasOwnProperty('exceptionMessage')) {
-                                    err.errorData = error;
-                                    err.message = error.exceptionMessage;
-                                } else {
-                                    err.message = err.error;
-                                }
-
-                            } catch (e) {
-                                err.message = err.error;
-                            }
-
-                            reject(err);
+                            reject(this.processApiError(err));
                             //this.navCtrl.setRoot(LoginPage, {message: "Login failed: " + err.message});
 
                         }).catch((err)=> {
@@ -427,16 +395,7 @@ export class Api {
                     return;
                 }
 
-                try {
-                    var error = JSON.parse(err.error);
-                    err.message = "API Error: " + (error.hasOwnProperty('exceptionMessage') ? error.exceptionMessage : error.message);
-                    err.errorData = error;
-
-                    reject(err);
-                } catch (e) {
-                    err.message = err.error;
-                    reject(err);
-                }
+                reject(this.processApiError(err));
 
             }).catch((err) => {
                 err.message = err.error;
@@ -444,5 +403,32 @@ export class Api {
             });
 
         });
+    }
+
+    private processApiError(err){
+        // Process the exception and add a user displayed message and other debug info
+        try {
+            err.responseData =  this.useNativeHttp() ? JSON.parse(err.error) : err.json();
+            this.useNativeHttp() ? delete err.error : delete err._body;
+        } catch (e) {}
+
+        delete err.headers;
+
+        // Build error message
+        err.message = "API Error: " + (err.hasOwnProperty("status") ? err.status+" " : "");
+
+        if (err.responseData){
+            err.message += (err.responseData.hasOwnProperty('exceptionMessage') ? err.responseData.exceptionMessage : err.responseData.message)
+
+            // Detect not found error and modify status to 404
+            if (err.responseData.exceptionType == "PX.Api.ContractBased.NoEntitySatisfiesTheConditionException")
+                err.status = 404;
+        } else {
+            err.message += (err.hasOwnProperty("statusText") ? err.statusText+" " : "")
+        }
+
+        console.log(JSON.stringify(err));
+
+        return err;
     }
 }

@@ -28,7 +28,7 @@
                 <ion-item no-padding>
                     <ion-label color="primary">From Bin:</ion-label>
                     <ion-input id="location" #location type="text" [(ngModel)]="enteredData.location"
-                               (keyup.enter)="setLocation()" autofocus autocorrect="on"></ion-input>
+                               (keyup.enter)="setLocation(); $event.stopPropagation();" (keypress)="$event.stopPropagation();" autofocus autocorrect="on"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -37,7 +37,7 @@
                 <ion-item no-padding>
                     <ion-label color="primary">To Bin:</ion-label>
                     <ion-input id="to-location" #tolocation type="text" [(ngModel)]="enteredData.toLocation"
-                               (keyup.enter)="setToLocation()"></ion-input>
+                               (keyup.enter)="setToLocation(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -46,7 +46,7 @@
                 <ion-item no-padding>
                     <ion-label color="primary">Item:</ion-label>
                     <ion-input id="item" #item type="text" [(ngModel)]="enteredData.item"
-                               (keyup.enter)="setItem()"></ion-input>
+                               (keyup.enter)="setItem(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -55,23 +55,22 @@
                 <ion-item no-padding>
                     <ion-label color="primary">Quantity:</ion-label>
                     <ion-input id="qty" #qty type="number" min="0" [(ngModel)]="enteredData.qty"
-                               (keyup.enter)="setQuantity()"></ion-input>
+                               (keyup.enter)="addTransferItem(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
     </ion-grid>
-    <barcode-listener (scan)='onBarcodeScan($event)'></barcode-listener>
 </ion-content>
 <ion-footer no-shadow>
     <ion-toolbar position="bottom">
-        <div class="row">
-            <div class="col">
+        <ion-row>
+            <ion-col>
                 <button type="button" ion-button (click)="nextFromBin()">Next</button>
-            </div>
-            <div class="col">
+            </ion-col>
+            <ion-col text-right>
                 <button type="button" ion-button (click)="commitTransfers()">Commit Transfers</button>
-            </div>
-        </div>
+            </ion-col>
+        </ion-row>
     </ion-toolbar>
 </ion-footer>
 

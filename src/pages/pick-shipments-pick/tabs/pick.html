@@ -7,11 +7,13 @@
 <ion-header>
 
     <ion-navbar>
+        <button ion-button menuToggle>
+            <ion-icon name="menu"></ion-icon>
+        </button>
         <ion-title>Pick</ion-title>
     </ion-navbar>
 
 </ion-header>
-<barcode-listener (scan)='onBarcodeScan($event);'></barcode-listener>
 <ion-content padding style="position: relative;">
     <div *ngIf="getSuggestedAllocation() != null">
         <h5 style="text-align: center;">{{getSuggestedAllocation()?.InventoryID?.value}}</h5>
@@ -32,7 +34,7 @@
                 <ion-item>
                     <ion-label color="primary">&nbsp;</ion-label>
                     <ion-input id="location" #location type="text" [(ngModel)]="enteredData.location"
-                               (focus)="$event.target.select();" (keypress)="$event.stopPropagation();" (keyup.enter)="setLocation(); $event.stopPropogation();"></ion-input>
+                               (focus)="$event.target.select();" (keypress)="$event.stopPropagation();" (keyup.enter)="setLocation(); $event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -61,7 +63,7 @@
             <ion-col>
                 <ion-item>
                     <ion-label color="primary">&nbsp;</ion-label>
-                    <ion-input id="lot" #lot [(ngModel)]="enteredData.lot" (keypress)="$event.stopPropagation();" (keyup.enter)="setLotSerial(); $event.stopPropogation();"></ion-input>
+                    <ion-input id="lot" #lot [(ngModel)]="enteredData.lot" (keypress)="$event.stopPropagation();" (keyup.enter)="setLotSerial(); $event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -76,32 +78,34 @@
                 <ion-item>
                     <ion-label color="primary">&nbsp;</ion-label>
                     <ion-input id="qty" type="number" #qty [(ngModel)]="enteredData.qty"
-                               (focus)="$event.target.select();" (keypress)="$event.stopPropagation();" (keyup.enter)="addPick(); $event.stopPropogation();"></ion-input>
+                               (focus)="$event.target.select();" (keypress)="$event.stopPropagation();" (keyup.enter)="addPick(); $event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
-        <ion-row>
-            <button type="button" ion-button small (click)="addPick()">OK</button>
-            <button type="button" ion-button small (click)="resetForm()">Cancel</button>
+        <ion-row text-right>
+            <ion-col col-12 text-right>
+                <button type="button" ion-button small (click)="addPick()">OK</button>
+                <button type="button" ion-button small (click)="resetForm()">Cancel</button>
+            </ion-col>
         </ion-row>
     </ion-grid>
 </ion-content>
 <ion-footer no-shadow>
     <ion-toolbar position="bottom">
-        <div class="row">
-            <div class="col-6">
+        <ion-row>
+            <ion-col col-4>
                 <button type="button" ion-button small (click)="previousItem()">
                     <ion-icon name="arrow-back"></ion-icon>
                 </button>
                 <button type="button" ion-button small (click)="nextItem()">
                     <ion-icon name="arrow-forward"></ion-icon>
                 </button>
-            </div>
-            <div class="col-6">
-                <button type="button" ion-button small (click)="confirmPicks()">Commit</button>
+            </ion-col>
+            <ion-col col-8 text-right>
                 <button type="button" ion-button small (click)="cancelPicks()">Cancel All</button>
-            </div>
-        </div>
+                <button type="button" ion-button small (click)="confirmPicks()">Commit</button>
+            </ion-col>
+        </ion-row>
     </ion-toolbar>
 </ion-footer>
 

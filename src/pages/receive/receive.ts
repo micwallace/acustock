@@ -1,10 +1,8 @@
 import { Component } from '@angular/core';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
-import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
 import { ReceiveProvider } from "../../providers/receive/receive";
 import { ReceiveShipmentPage } from "./shipment/receive-shipment";
-import { AlertController } from "ionic-angular/index";
-import { Events } from "ionic-angular/index";
 import { UtilsProvider } from "../../providers/utils";
 
 /**

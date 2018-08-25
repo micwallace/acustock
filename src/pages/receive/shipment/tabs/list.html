@@ -22,19 +22,32 @@
             <ion-col col-8>Locations / Item</ion-col>
             <ion-col col-4 text-right>Qty</ion-col>
         </ion-row>
-        <ion-list no-margin no-padding>
-            <ion-item no-margin no-padding *ngFor="let key of objectKeys(receiveProvider.sourceIndex)">
-                <ion-row no-padding>
+        <ion-list class="item-list">
+            <ion-item no-margin no-padding class="list-group" *ngFor="let key of objectKeys(receiveProvider.sourceIndex)">
+                <ion-row class="item-group-header" no-margin>
                     <ion-col col-8><strong>{{receiveProvider.sourceIndex[key].InventoryID}}</strong></ion-col>
-                    <ion-col col-4 text-right style="padding-right:0;">{{receiveProvider.getReceivedAndPendingQty(key)}} / {{receiveProvider.getTotalQty(key)}}</ion-col>
+                    <ion-col col-4 class="column-right">{{receiveProvider.getReceivedAndPendingQty(key)}} / {{receiveProvider.getTotalQty(key)}}</ion-col>
                 </ion-row>
-                <ion-row tappable *ngFor="let alloc of receiveProvider.sourceIndex[key].Allocations">
-                    <ion-col col-8>{{alloc.LocationID?.value}}</ion-col>
-                    <ion-col col-4 text-right style="padding-right:0;">
-                        {{alloc.Qty?.value}}
-                    </ion-col>
-                </ion-row>
+                <ion-list no-margin no-padding>
+                    <ion-item no-margin no-padding class="list-item" tappable *ngFor="let alloc of receiveProvider.sourceIndex[key].Allocations">
+                        <ion-row no-margin no-padding>
+                            <ion-col col-8>{{alloc.LocationID?.value}}</ion-col>
+                            <ion-col col-4 class="column-right">
+                                {{alloc.Qty?.value}}
+                            </ion-col>
+                        </ion-row>
+                    </ion-item>
+                </ion-list>
             </ion-item>
         </ion-list>
     </ion-grid>
 </ion-content>
+<ion-footer no-shadow>
+    <ion-toolbar position="bottom">
+        <ion-row>
+            <ion-col text-right>
+                <button type="button" ion-button small (click)="confirmReceipts()">Confirm Receipt</button>
+            </ion-col>
+        </ion-row>
+    </ion-toolbar>
+</ion-footer>

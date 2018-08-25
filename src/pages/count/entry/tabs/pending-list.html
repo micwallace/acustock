@@ -18,26 +18,37 @@
 
 <ion-content padding>
     <ion-grid>
-        <ion-row style="border-bottom: 1px solid #888;">
+        <ion-row class="table-header">
             <ion-col col-9><strong>Locations / Item</strong></ion-col>
-            <ion-col col-3 text-right style="padding-right: 15px;"><strong>Qty</strong></ion-col>
+            <ion-col col-3 text-right><strong>Qty</strong></ion-col>
         </ion-row>
-        <ion-list no-margin no-padding>
-            <ion-item no-margin no-padding *ngFor="let key of objectKeys(countProvider.pendingCounts)" (click)="editCountItem(key);">
-                <ion-row no-padding>
-                    <ion-col col-3><strong style="display: block;">{{countProvider.pendingCounts[key].InventoryID.value}}</strong></ion-col>
-                    <ion-col col-9 text-right>
+        <ion-list no-margin no-padding class="item-list">
+            <ion-item no-margin no-padding class="list-item" *ngFor="let key of objectKeys(countProvider.pendingCounts)" (click)="editCountItem(key);">
+                <ion-row class="item-group-header" no-margin>
+                    <ion-col col-3>
+                        <strong style="display: block;">{{countProvider.pendingCounts[key].InventoryID.value}}</strong>
+                    </ion-col>
+                    <ion-col col-9 class="column-right">
                         <button ion-button icon-only small no-margin
                                 (click)="removeCountItem(key); $event.stopPropagation();">
                             <ion-icon name="trash"></ion-icon>
                         </button>
                     </ion-col>
                 </ion-row>
-                <ion-row no-padding tappable >
+                <ion-row no-padding tappable>
                     <ion-col col-9>{{countProvider.pendingCounts[key].LocationID.value}}</ion-col>
-                    <ion-col col-3 text-right>{{countProvider.pendingCounts[key].PendingQty}}</ion-col>
+                    <ion-col col-3 class="column-right">{{countProvider.pendingCounts[key].PendingQty}}</ion-col>
                 </ion-row>
             </ion-item>
         </ion-list>
     </ion-grid>
 </ion-content>
+<ion-footer no-shadow>
+    <ion-toolbar position="bottom">
+        <ion-row>
+            <ion-col text-right>
+                <button type="button" ion-button (click)="commitCounts()">Commit Counts</button>
+            </ion-col>
+        </ion-row>
+    </ion-toolbar>
+</ion-footer>

@@ -27,7 +27,7 @@
                 <ion-item no-padding>
                     <ion-label color="primary">Location:</ion-label>
                     <ion-input id="location" #location type="text" [(ngModel)]="enteredData.location"
-                               (keyup.enter)="setLocation()" autofocus autocorrect="on"></ion-input>
+                               (keyup.enter)="setLocation(); $event.stopPropagation();" (keypress)="$event.stopPropagation();" autofocus autocorrect="on"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -36,7 +36,7 @@
                 <ion-item no-padding>
                     <ion-label color="primary">Item:</ion-label>
                     <ion-input id="item" #item type="text" [(ngModel)]="enteredData.item"
-                               (keydown.enter)="setItem(); $event.stopPropogation();" (keypress)="$event.stopPropagation();"></ion-input>
+                               (keydown.enter)="setItem(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -46,12 +46,12 @@
                 <ion-item no-padding>
                     <ion-label color="primary">Quantity:</ion-label>
                     <ion-input id="qty" #qty type="number" min="0" [(ngModel)]="enteredData.qty"
-                               (keyup.enter)="addCountItem(); $event.stopPropogation();" (keypress)="$event.stopPropagation();"></ion-input>
+                               (keyup.enter)="addCountItem(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
         <ion-row *ngIf="showQty">
-            <ion-col>
+            <ion-col col-12 text-right>
                 <button type="button" align-self-end ion-button (click)="resetForm()">Cancel</button>
                 <button type="button" align-self-end ion-button (click)="addCountItem()">OK</button>
             </ion-col>
@@ -72,11 +72,11 @@
 </ion-content>
 <ion-footer no-shadow>
     <ion-toolbar position="bottom">
-        <div class="row">
-            <div class="col">
+        <ion-row>
+            <ion-col text-right>
                 <button type="button" ion-button (click)="commitCounts()">Commit Counts</button>
-            </div>
-        </div>
+            </ion-col>
+        </ion-row>
     </ion-toolbar>
 </ion-footer>
 

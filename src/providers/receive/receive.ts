@@ -64,7 +64,7 @@ export class ReceiveProvider {
 
             } else {
 
-                this.api.getShipment(referenceNbr, "Details,Details/Allocations,Orders").then((res:Array<any>)=> {
+                this.api.getShipment(referenceNbr, "Details,Details/Allocations,Orders").then((res:any)=> {
 
                     /*if (res.length == 0) {
                      reject({message:"Shipment #" + referenceNbr + " was not found in the system."});
@@ -72,61 +72,56 @@ export class ReceiveProvider {
                      }*/
                     var curWarehouse = this.prefs.getPreference('warehouse');
 
-                    let shipment = null;
+                    let shipment = res;
 
-                    if (res.length > 0) {
+                    if (shipment.Operation.value != "Receipt" && shipment.Type.value != "Transfer"){
+                        reject({message: "Shipment #" + referenceNbr + " was found but is not a transfer or receipt shipment."});
+                        return;
+                    }
 
-                        let shipment = res[0];
+                    if (shipment.Type.value == "Shipment" && shipment.Operation.value == "Receipt") {
 
-                        /*if (shipment.Operation.value != "Receipt" && shipment.Type.value != "Transfer") {
-                         reject({message: "Shipment #" + referenceNbr + " was found but is not a transfer or receipt shipment."});
-                         return;
-                         }*/
-
-                        if (shipment.Type.value == "Shipment" && shipment.Operation.value == "Receipt") {
-
-                            if (shipment.WarehouseID.value !== curWarehouse) {
-                                reject({message: "Shipment #" + referenceNbr + " was found but belongs to warehouse " + shipment.WarehouseID.value + ", not the currently selected warehouse which is " + curWarehouse});
-                                return;
-                            }
-
-                            this.sourceDocument = shipment;
-                            this.sourceDocument.id = referenceNbr;
-                            this.type = "shipment";
-                            this.initialiseSource();
-                            resolve(true);
+                        if (shipment.WarehouseID.value !== curWarehouse) {
+                            reject({message: "Shipment #" + referenceNbr + " was found but belongs to warehouse " + shipment.WarehouseID.value + ", not the currently selected warehouse which is " + curWarehouse});
                             return;
                         }
 
-                        if (shipment.Type.value == "Transfer") {
+                        this.sourceDocument = shipment;
+                        this.sourceDocument.id = referenceNbr;
+                        this.type = "shipment";
+                        this.initialiseSource();
+                        resolve(true);
+                        return;
+                    }
 
-                            if (shipment.ToWarehouseID.value !== curWarehouse) {
-                                reject({message: "Transfer shipment #" + referenceNbr + " was found but is in-transit to warehouse " + shipment.ToWarehouseID.value + ", not the currently selected warehouse which is " + curWarehouse});
-                                return;
-                            }
+                    if (shipment.Type.value == "Transfer") {
 
-                            // Get transfer reference numbers from the order list
-                            var transferRefs = [];
-                            for (let order of shipment.Orders) {
-                                transferRefs.push({
-                                    InventoryRefNbr: order.InventoryRefNbr.value,
-                                    OrderType: order.OrderType.value,
-                                    OrderNbr: order.OrderNbr.value,
-                                    ShipmentNbr: shipment.ShipmentNbr.value
-                                })
-                            }
-
-                            if (transferRefs.length == 0) {
-                                reject({message: "Shipment #" + referenceNbr + " was found but does not have an associated transfer document. Use the 'Post to IN' action from the shipment page in Acumatica."});
-                                return;
-                            }
-
-                            // TODO: allow selection of transfer? Can a transfer shipment even have more than one transfer document?
-                            this.transferShipmentRef = transferRefs[0];
-
-                            referenceNbr = transferRefs[0].InventoryRefNbr;
-
+                        if (shipment.ToWarehouseID.value !== curWarehouse) {
+                            reject({message: "Transfer shipment #" + referenceNbr + " was found but is in-transit to warehouse " + shipment.ToWarehouseID.value + ", not the currently selected warehouse which is " + curWarehouse});
+                            return;
                         }
+
+                        // Get transfer reference numbers from the order list
+                        var transferRefs = [];
+                        for (let order of shipment.Orders) {
+                            transferRefs.push({
+                                InventoryRefNbr: order.InventoryRefNbr.value,
+                                OrderType: order.OrderType.value,
+                                OrderNbr: order.OrderNbr.value,
+                                ShipmentNbr: shipment.ShipmentNbr.value
+                            })
+                        }
+
+                        if (transferRefs.length == 0) {
+                            reject({message: "Shipment #" + referenceNbr + " was found but does not have an associated transfer document. Use the 'Post to IN' action from the shipment page in Acumatica."});
+                            return;
+                        }
+
+                        // TODO: allow selection of transfer? Can a transfer shipment even have more than one transfer document?
+                        this.transferShipmentRef = transferRefs[0];
+
+                        referenceNbr = transferRefs[0].InventoryRefNbr;
+
                     }
 
                     this.api.getTransfer(referenceNbr).then((transfer:any)=> {
@@ -146,15 +141,34 @@ export class ReceiveProvider {
 
                     }).catch((err)=> {
 
-                        if (err.hasOwnProperty('errorData') && err.errorData.exceptionType == "PX.Api.ContractBased.NoEntitySatisfiesTheConditionException"){
-                            reject({message: "A transfer or receipt shipment document with #" + referenceNbr + " could not be found."});
-                            return;
-                        }
+                        if (err.status == 404)
+                            err.message =  "A transfer or receipt shipment document with #" + referenceNbr + " could not be found.";
 
                         reject(err);
                     });
 
                 }).catch((err)=> {
+
+                    if (err.status == 404){
+
+                        this.api.getTransfer(referenceNbr).then((transfer:any)=> {
+
+                            this.sourceDocument = transfer;
+                            this.sourceDocument.id = referenceNbr;
+                            this.type = "transfer";
+                            this.initialiseSource();
+                            resolve(true);
+
+                        }).catch((err)=> {
+
+                            if (err.status == 404)
+                                err.message =  "A transfer or receipt shipment document with #" + referenceNbr + " could not be found.";
+
+                            reject(err);
+                        });
+
+                    }
+
                     reject(err);
                 });
 

@@ -49,6 +49,10 @@ export class EnterTab {
                 public loadingCtrl:LoadingController,
                 public utils:UtilsProvider) {
 
+
+        events.subscribe('barcode:scan', (barcodeText)=>{
+            this.onBarcodeScan(barcodeText)
+        });
     }
 
     ionViewDidLoad() {

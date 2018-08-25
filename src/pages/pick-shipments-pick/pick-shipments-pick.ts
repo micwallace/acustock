@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController, Events } from 'ionic-angular';
+import { Component, ViewChild } from '@angular/core';
+import { IonicPage, NavController, NavParams, ViewController, Events, Tabs } from 'ionic-angular';
 import { PickTab } from "./tabs/pick";
 import { PickListTab } from "./tabs/pick-list";
 import { UnpickedListTab } from "./tabs/unpicked-list";
@@ -19,6 +19,8 @@ import { PickProvider } from "../../providers/pick/pick";
 })
 export class PickShipmentsPickPage {
 
+    @ViewChild("tabs") tabs: Tabs;
+
     tab1Root = PickTab;
     tab2Root = UnpickedListTab;
     tab3Root = PickListTab;
@@ -31,6 +33,15 @@ export class PickShipmentsPickPage {
 
     public dismiss() {
         //this.viewCtrl.dismiss();
+    }
+
+    onBarcodeScan(barcodeText){
+        if (this.tabs.selectedIndex !== 0) {
+            this.tabs.select(0, {});
+            //this.tabs.selectedIndex = 0;
+        }
+
+        this.events.publish('barcode:scan', barcodeText);
     }
 
 }

@@ -39,7 +39,7 @@
                 <ion-item no-padding>
                     <ion-label color="primary">Item:</ion-label>
                     <ion-input id="item" #item type="text" [(ngModel)]="enteredData.item"
-                               (keydown.enter)="setItem(); $event.stopPropogation();" (keypress)="$event.stopPropagation();"></ion-input>
+                               (keydown.enter)="setItem(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -48,7 +48,7 @@
                 <ion-item no-padding>
                     <ion-label color="primary">To Bin:</ion-label>
                     <ion-input id="location" #location type="text" [(ngModel)]="enteredData.location"
-                               (keyup.enter)="setLocation(); $event.stopPropogation();" (keypress)="$event.stopPropagation();"></ion-input>
+                               (keyup.enter)="setLocation(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -58,13 +58,13 @@
                 <ion-item no-padding>
                     <ion-label color="primary">Quantity:</ion-label>
                     <ion-input id="qty" #qty type="number" min="0" [(ngModel)]="enteredData.qty"
-                               (keyup.enter)="addReceiptItem(); $event.stopPropogation();" (keypress)="$event.stopPropagation();"></ion-input>
+                               (keyup.enter)="addReceiptItem(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
                 </ion-item>
                 <ion-label color="primary">Quantity Remaining: {{getRemainingQty()}}</ion-label>
             </ion-col>
         </ion-row>
         <ion-row *ngIf="showQty">
-            <ion-col>
+            <ion-col col-12 text-right>
                 <button type="button" align-self-end ion-button (click)="resetForm()">Cancel</button>
                 <button type="button" align-self-end ion-button (click)="addReceiptItem()">OK</button>
             </ion-col>
@@ -73,15 +73,11 @@
 </ion-content>
 <ion-footer no-shadow>
     <ion-toolbar position="bottom">
-        <div class="row">
-            <!-- For inter-warehouse transfers
-            <div class="col">
-                <button type="button" ion-button (click)="nextFromBin()">Next</button>
-            </div>-->
-            <div class="col">
-                <button type="button" ion-button (click)="confirmReceipts()">Confirm Receipt</button>
-            </div>
-        </div>
+        <ion-row>
+            <ion-col text-right>
+                <button type="button" ion-button small (click)="confirmReceipts()">Confirm Receipt</button>
+            </ion-col>
+        </ion-row>
     </ion-toolbar>
 </ion-footer>
 

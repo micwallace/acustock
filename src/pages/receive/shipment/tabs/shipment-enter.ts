@@ -48,12 +48,13 @@ export class ReceiveShipmentEnterTab {
                 public renderer:Renderer,
                 public utils:UtilsProvider) {
 
-        events.subscribe('barcode:scan', (barcodeText)=>{
-            this.onBarcodeScan(barcodeText)
-        });
     }
 
     ionViewDidLoad() {
+        this.events.subscribe('barcode:scan', (barcodeText)=>{
+            this.onBarcodeScan(barcodeText)
+        });
+
         if (this.receiveProvider.hasSavedReceipts()) {
 
             this.utils.playPromptSound();
@@ -80,6 +81,10 @@ export class ReceiveShipmentEnterTab {
 
             alert.present();
         }
+    }
+
+    ionViewWillUnload(){
+        this.events.unsubscribe('barcode:scan');
     }
 
     resetForm(clearLocation=false) {

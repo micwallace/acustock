@@ -18,21 +18,30 @@
 
 <ion-content padding>
     <ion-grid>
-        <ion-row style="border-bottom: 1px solid #888;">
+        <ion-row class="table-header">
             <ion-col col-6><strong>Locations / Item</strong></ion-col>
-            <ion-col col-6 text-right style="padding-right: 15px;"><strong>Counted/Book Qty</strong></ion-col>
+            <ion-col col-6 text-right><strong>Counted/Book Qty</strong></ion-col>
         </ion-row>
-        <ion-list no-margin no-padding>
-            <ion-item no-margin no-padding *ngFor="let key of objectKeys(countProvider.countIndex)">
-                <ion-row no-padding>
+        <ion-list no-margin no-padding class="item-list">
+            <ion-item no-margin no-padding class="list-item" *ngFor="let key of objectKeys(countProvider.countIndex)">
+                <ion-row class="item-group-header" no-margin>
                     <ion-col col-8><strong>{{countProvider.countIndex[key].InventoryID.value}}</strong></ion-col>
-                    <ion-col col-4 text-right style="padding-right:0;">{{countProvider.getCountedQty(key)}} / {{countProvider.getBookQty(key)}}</ion-col>
+                    <ion-col col-4 class="column-right">{{countProvider.getCountedQty(key)}} / {{countProvider.getBookQty(key)}}</ion-col>
                 </ion-row>
                 <ion-row no-padding>
                     <ion-col col-8><strong>{{countProvider.countIndex[key].LocationID.value}}</strong></ion-col>
-                    <ion-col col-4 text-right style="padding-right:0;"></ion-col>
+                    <ion-col col-4 class="column-right"></ion-col>
                 </ion-row>
             </ion-item>
         </ion-list>
     </ion-grid>
 </ion-content>
+<ion-footer no-shadow>
+    <ion-toolbar position="bottom">
+        <ion-row>
+            <ion-col text-right>
+                <button type="button" ion-button (click)="commitCounts()">Commit Counts</button>
+            </ion-col>
+        </ion-row>
+    </ion-toolbar>
+</ion-footer>

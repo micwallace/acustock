@@ -17,9 +17,7 @@ export class PickProvider {
 
     public sourceIndex = {};
 
-    private deletedAllocations = {};
-
-    private adjustedAllocations = {};
+    private modifiedAllocations = {};
 
     public pickList = [];
 
@@ -46,14 +44,7 @@ export class PickProvider {
 
             this.api.getShipment(shipmentNbr).then((res:any) => {
 
-                //console.log(JSON.stringify(res));
-
-                if (res.length == 0) {
-                    reject({message:"Shipment #" + shipmentNbr + " was not found in the system."});
-                    return;
-                }
-
-                let shipment = res[0];
+                let shipment = res;
 
                 if (shipment.Operation.value == "Receipt"){
                     reject({message:"Shipment #" + shipmentNbr + " was found but is a receipt shipment and cannot be picked."});
@@ -88,6 +79,10 @@ export class PickProvider {
                 resolve(true);
 
             }).catch((err) => {
+
+                if (err.status == 404)
+                    err.message = "Shipment #" + shipmentNbr + " was not found in the system.";
+
                 reject(err);
             });
         });
@@ -152,12 +147,13 @@ export class PickProvider {
 
                 if (!this.sourceIndex.hasOwnProperty(shipmentLine))
                     this.sourceIndex[shipmentLine] = {
+                        InventoryID: item.InventoryID,
                         ShippedQty: {value: item.ShippedQty.value},
                         PickedQty: {value: item.PickedQty.value},
                         Allocations: {}
                     };
 
-                this.sourceIndex["UNALLOCATED"].Allocations.push({
+                this.sourceIndex[shipmentLine].Allocations["UNALLOCATED"] = {
                     InventoryID: item.InventoryID,
                     Description: item.Description,
                     LineNbr: item.LineNbr,
@@ -169,7 +165,7 @@ export class PickProvider {
                     ShippedQty: item.ShippedQty,
                     TotalPickedQty: item.PickedQty,
                     TotalRemainingQty: item.ShippedQty.value - item.PickedQty.value
-                });
+                };
             }
 
         }
@@ -183,6 +179,7 @@ export class PickProvider {
     private processPendingAllocations(){
 
         console.log("Triming source index for allocations");
+        this.modifiedAllocations = {};
 
         for (var x in this.pendingPicks) {
 
@@ -200,6 +197,7 @@ export class PickProvider {
 
                 // Consume the original allocation first if available, and then the rest until remaining pending qty is 0.
                 var pendingQty = alloc.PendingQty;
+                var diff;
 
                 if (alloc.hasOwnProperty("SplitLineNbr") && this.sourceIndex[x].Allocations.hasOwnProperty(alloc.SplitLineNbr.value)) {
 
@@ -207,9 +205,12 @@ export class PickProvider {
 
                     if (pendingQty < srcAlloc.RemainingQty) {
 
-                        var diff = srcAlloc.RemainingQty - pendingQty;
+                        diff = srcAlloc.RemainingQty - pendingQty;
 
                         this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value].RemainingQty = diff;
+                        //this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value].Qty.value = srcAlloc.Qty.value - pendingQty;
+
+                        this.addModifiedAllocation(this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value]);
 
                         console.log("Stage 1: Reduced remaining qty of current allocation " + pendingQty + " (remaining " + diff + ")");
 
@@ -233,15 +234,21 @@ export class PickProvider {
 
                         if (pendingQty < srcItem.RemainingQty){
 
-                            var diff = srcItem.RemainingQty - pendingQty;
+                            diff = srcItem.RemainingQty - pendingQty;
 
                             this.sourceIndex[x].Allocations[y].RemainingQty = diff;
+                            this.sourceIndex[x].Allocations[y].Qty.value = srcAlloc.Qty.value - pendingQty;
+
+                            this.addModifiedAllocation(this.sourceIndex[x].Allocations[y]);
 
                             console.log("Stage 2: Reduced remaining qty of other allocations "+ pendingQty + " (remaining "+ diff +")");
 
                             pendingQty -= diff;
 
                         } else {
+
+                            this.sourceIndex[x].Allocations[y]["delete"] = true;
+                            this.addModifiedAllocation(this.sourceIndex[x].Allocations[y]);
 
                             delete this.sourceIndex[x].Allocations[y];
 
@@ -262,6 +269,21 @@ export class PickProvider {
 
         }
 
+    }
+
+    private addModifiedAllocation(alloc){
+
+        if (!this.modifiedAllocations.hasOwnProperty(alloc.LineNbr.value)){
+            this.modifiedAllocations[alloc.LineNbr.value] = {
+                LineNbr: alloc.LineNbr,
+                InventoryID: alloc.InventoryID,
+                Allocations: {}
+            };
+        }
+
+        console.log(alloc);
+
+        this.modifiedAllocations[alloc.LineNbr.value].Allocations[alloc.SplitLineNbr.value] = alloc;
     }
 
     private generatePickList() {
@@ -436,7 +458,7 @@ export class PickProvider {
 
         var pendingAlloc = this.getPendingAllocation(sugAlloc.LineNbr.value, sugAlloc.SplitLineNbr.value);
 
-        if (pendingAlloc != null){
+        if (pendingAlloc != null && pendingAlloc.LocationID != data.location){
 
             var newAlloc = JSON.parse(JSON.stringify(sugAlloc));
             delete newAlloc.SplitLineNbr;
@@ -518,8 +540,7 @@ export class PickProvider {
                 Allocations: []
             };
 
-            this.pendingPicks[shipLineNum].Qty = pick.Qty;
-            this.pendingPicks[shipLineNum].PendingQty = parseFloat(pick.PendingQty);
+            this.pendingPicks[shipLineNum].PendingQty = pick.PendingQty;
             this.pendingPicks[shipLineNum].RemainingQty = pick.TotalRemainingQty;
 
             this.pendingPicks[shipLineNum].Allocations.push(pick);
@@ -534,8 +555,8 @@ export class PickProvider {
                     if (alloc.hasOwnProperty("SplitLineNbr") && alloc.SplitLineNbr.value == pick.SplitLineNbr.value) {
                         this.pendingPicks[shipLineNum].Allocations[index].Qty = pick.Qty;
                         this.pendingPicks[shipLineNum].Allocations[index].RemainingQty = pick.RemainingQty;
-                        this.pendingPicks[shipLineNum].Allocations[index].PendingQty += parseFloat(pick.PendingQty);
-                        this.pendingPicks[shipLineNum].PendingQty += parseFloat(pick.PendingQty);
+                        this.pendingPicks[shipLineNum].Allocations[index].PendingQty += pick.PendingQty;
+                        this.pendingPicks[shipLineNum].PendingQty += pick.PendingQty;
                         return;
                     }
 
@@ -544,7 +565,7 @@ export class PickProvider {
 
             // TODO add based on location match too
 
-            this.pendingPicks[shipLineNum].PendingQty += parseFloat(pick.PendingQty);
+            this.pendingPicks[shipLineNum].PendingQty += pick.PendingQty;
 
             this.pendingPicks[shipLineNum].Allocations.push(pick);
         }
@@ -572,7 +593,6 @@ export class PickProvider {
     public loadSavedPicks() {
         this.pendingPicks = this.savedPicks;
         this.calculateQtys();
-        //this.trimPicklist();
         this.generateSourceList();
     }
 
@@ -605,23 +625,58 @@ export class PickProvider {
                     Allocations: []
                 };
 
+                var alloc:any;
+
+                var modified = this.modifiedAllocations.hasOwnProperty(i) ? this.modifiedAllocations[i] : {};
+
+                console.log(JSON.stringify(modified));
+
+                var allocs = [];
+
                 for (var x = 0; x < this.pendingPicks[i].Allocations.length; x++) {
 
                     var pendingAlloc = this.pendingPicks[i].Allocations[x];
 
-                    var alloc:any = {
-                        SplitLineNbr: {},
+                    alloc = {
                         LineNbr: {value: i},
                         Qty: pendingAlloc.Qty,
-                        PickedQty: {value: pendingAlloc.PickedQty.value + pendingAlloc.PendingQty}
+                        PickedQty: {value: pendingAlloc.PickedQty.value + pendingAlloc.PendingQty},
+                        LocationID: pendingAlloc.LocationID
                     };
 
-                    if (pendingAlloc.SplitLineNbr.value) {
+                    if (pendingAlloc.hasOwnProperty("SplitLineNbr")) {
                         alloc.SplitLineNbr = pendingAlloc.SplitLineNbr;
+
+                        if (modified.Allocations.hasOwnProperty(pendingAlloc.SplitLineNbr.value)) {
+                            alloc.Qty.value = modified.Allocations[pendingAlloc.SplitLineNbr.value].Qty.value;
+                            delete modified.Allocations[pendingAlloc.SplitLineNbr.value];
+                        }
                     }
+
+                    if (alloc.Qty.value < alloc.PickedQty.value)
+                        alloc.Qty.value = alloc.PickedQty.value;
+
+                    allocs.push(alloc);
+                }
+
+                for (var y in modified.Allocations){
+
+                    var modAlloc = modified.Allocations[y];
+
+                    alloc = {
+                        LineNbr: {value: i},
+                        SplitLineNbr: modAlloc.SplitLineNbr,
+                        Qty: modAlloc.Qty,
+                    };
+
+                    if (modAlloc.hasOwnProperty("delete"))
+                        alloc["delete"] = true;
 
                     item.Allocations.push(alloc);
                 }
+
+                // Deleted allocations should be added first, otherwise API returns "shipped qty exceeds order qty" error
+                item.Allocations = item.Allocations.concat(allocs);
 
                 data.Details.push(item);
             }
@@ -637,7 +692,6 @@ export class PickProvider {
                 this.clearSavedPicks();
 
                 this.generateSourceList();
-                //this.trimPicklist();
                 this.calculateQtys();
 
                 resolve(res);

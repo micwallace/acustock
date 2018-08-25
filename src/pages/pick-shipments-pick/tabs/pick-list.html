@@ -7,6 +7,9 @@
 <ion-header>
 
     <ion-navbar>
+        <button ion-button menuToggle>
+            <ion-icon name="menu"></ion-icon>
+        </button>
         <ion-title>Picked Items</ion-title>
     </ion-navbar>
 
@@ -21,7 +24,7 @@
         </ion-row>
         <ion-list class="item-list">
             <ion-item no-margin no-padding class="list-group" *ngFor="let key of objectKeys(pickProvider.pendingPicks)">
-                <ion-row>
+                <ion-row class="item-group-header" no-margin>
                     <ion-col col-7>
                         <strong>{{pickProvider.pendingPicks[key].InventoryID.value}}</strong>
                     </ion-col>
@@ -29,7 +32,7 @@
                         <span class="qty-padding">{{pickProvider.getPendingItemQty(key)}}</span>/<span class="qty-padding">{{pickProvider.pendingPicks[key].RemainingQty}}</span>
                     </ion-col>
                 </ion-row>
-                <ion-list class="list">
+                <ion-list no-margin no-padding>
                     <ion-item no-margin no-padding class="list-item" tappable *ngFor="let allocation of pickProvider.pendingPicks[key].Allocations" (click)="editPickItem(allocation);">
                         <ion-row no-margin no-padding>
                             <ion-col col-7>
@@ -48,3 +51,13 @@
         </ion-list>
     </ion-grid>
 </ion-content>
+<ion-footer no-shadow>
+    <ion-toolbar position="bottom">
+        <ion-row>
+            <ion-col col-12 text-right>
+                <button type="button" ion-button small (click)="cancelPicks()">Cancel All</button>
+                <button type="button" ion-button small (click)="confirmPicks()">Commit</button>
+            </ion-col>
+        </ion-row>
+    </ion-toolbar>
+</ion-footer>

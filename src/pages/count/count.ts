@@ -45,6 +45,8 @@ export class CountPage {
 
         this.countProvider.loadCount(this.referenceNbr).then((res)=> {
 
+            // TODO: check warehouse
+
             loader.dismiss();
 
         }).catch((err)=> {
@@ -52,9 +54,7 @@ export class CountPage {
             loader.dismiss();
             this.referenceNbr = "";
             this.utils.playFailedSound(isScan);
-            //this.utils.showAlert("Error", err.message);
-
-            this.utils.showAlert("Error", err.message);
+            this.utils.showAlert("Error", err.message, err);
         });
     }
 

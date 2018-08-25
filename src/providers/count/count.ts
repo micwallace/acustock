@@ -59,6 +59,9 @@ export class CountProvider {
 
             }).catch((err)=>{
 
+                if (err.status == 404)
+                    err.message = "Physical Count with ID " + referenceNbr + " was not found in the system.";
+
                 reject(err);
             });
         });

@@ -7,6 +7,7 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { PreferencesProvider } from "../../providers/preferences/preferences";
 import { PreferencesPage } from "../preferences/preferences";
 import { UtilsProvider } from "../../providers/utils";
+import { CacheProvider } from "../../providers/cache/cache";
 
 /**
  * Generated class for the SetupPage page.
@@ -29,7 +30,8 @@ export class SetupPage {
                 public barcodeScanner:BarcodeScanner,
                 public loadingCtrl:LoadingController,
                 public events:Events,
-                public utils:UtilsProvider) {
+                public utils:UtilsProvider,
+                public cache:CacheProvider) {
 
     }
 
@@ -105,6 +107,8 @@ export class SetupPage {
 
             loader.dismiss();
             this.navCtrl.setRoot(PickShipmentsPage);
+
+            this.cache.initialLoad();
 
         }).catch((err) => {
 
