@@ -23,13 +23,13 @@
             <ion-col col-5 text-right>Qty</ion-col>
         </ion-row>
         <ion-list class="item-list">
-            <ion-item no-margin no-padding class="list-group" *ngFor="let loc of pickProvider.pickList; let i = index" (click)="openPickItem(item);">
+            <ion-item no-margin no-padding class="list-group" *ngFor="let loc of pickProvider.pickList; let i = index">
                 <ion-row class="item-group-header" no-margin>
                     <ion-col col-7><strong>{{loc.LocationID?.value}}</strong></ion-col>
                     <ion-col col-5></ion-col>
                 </ion-row>
                 <ion-list no-margin no-padding>
-                    <ion-item no-margin no-padding class="list-item" tappable *ngFor="let item of loc.Items">
+                    <ion-item no-margin no-padding class="list-item" tappable *ngFor="let item of loc.Items; let x = index" (click)="openPickItem(i, x);">
                         <ion-row  no-margin no-padding>
                             <ion-col col-7>{{item.InventoryID?.value}}</ion-col>
                             <ion-col col-5 class="column-right">{{item.RemainingQty}}</ion-col>

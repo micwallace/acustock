@@ -27,8 +27,12 @@ export class UnpickedListTab {
         console.log('ionViewDidLoad PickShipmentPickPage Tab: Unpicked List');
     }
 
-    openPickItem(item) {
+    openPickItem(locationIndex, itemIndex) {
+        this.events.publish('picks:open', [locationIndex, itemIndex]);
 
+        if (this.navCtrl.parent.selectedIndex !== 0) {
+            this.navCtrl.parent.select(0, {});
+        }
     }
 
     confirmPicks(){

@@ -25,20 +25,27 @@ export class PickShipmentsPickPage {
     tab2Root = UnpickedListTab;
     tab3Root = PickListTab;
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public viewCtrl:ViewController, public events:Events, public pickProvider:PickProvider) {
-        events.subscribe('closeModal', () => {
-            this.dismiss();
+    constructor(public navCtrl:NavController,
+                public navParams:NavParams,
+                public viewCtrl:ViewController,
+                public events:Events,
+                public pickProvider:PickProvider) {
+
+    }
+
+    ionOnViewDidLoad(){
+        this.events.subscribe('closeModal', () => {
+            this.navCtrl.pop();
         });
     }
 
-    public dismiss() {
-        //this.viewCtrl.dismiss();
+    ionOnViewDidUnload(){
+        this.events.unsubscribe('closeModal');
     }
 
     onBarcodeScan(barcodeText){
         if (this.tabs.selectedIndex !== 0) {
             this.tabs.select(0, {});
-            //this.tabs.selectedIndex = 0;
         }
 
         this.events.publish('barcode:scan', barcodeText);

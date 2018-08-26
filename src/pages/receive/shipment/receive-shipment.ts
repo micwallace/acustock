@@ -30,15 +30,21 @@ export class ReceiveShipmentPage {
                 public viewCtrl:ViewController,
                 public events:Events, public receiveProvider:ReceiveProvider) {
 
-        events.subscribe('closeReceiveScreen', () => {
+    }
+
+    ionOnViewDidLoad(){
+        this.events.subscribe('closeReceiveScreen', () => {
             this.navCtrl.pop();
         });
+    }
+
+    ionViewDidLoad(){
+        this.events.unsubscribe('closeReceiveScreen');
     }
 
     onBarcodeScan(barcodeText){
         if (this.tabs.selectedIndex !== 0) {
             this.tabs.select(0, {});
-            //this.tabs.selectedIndex = 0;
         }
 
         this.events.publish('barcode:scan', barcodeText);

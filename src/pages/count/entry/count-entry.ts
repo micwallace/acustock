@@ -33,15 +33,14 @@ export class CountEntryPage {
                 public countProvider:CountProvider,
                 public utils:UtilsProvider) {
 
-        events.subscribe('closeReceiveScreen', () => {
+        /*events.subscribe('closeCountScreen', () => {
             this.navCtrl.pop();
-        });
+        });*/
     }
 
     onBarcodeScan(barcodeText){
         if (this.tabs.selectedIndex !== 0) {
             this.tabs.select(0, {});
-            //this.tabs.selectedIndex = 0;
         }
 
         this.events.publish('barcode:scan', barcodeText);

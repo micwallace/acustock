@@ -3,7 +3,8 @@ import { IonicPage, NavController, NavParams, ViewController, Events, AlertContr
 import { PickProvider } from '../../../providers/providers';
 import { CacheProvider } from "../../../providers/cache/cache";
 import { LoadingController } from "ionic-angular/index";
-import {UtilsProvider} from "../../../providers/utils";
+import { UtilsProvider } from "../../../providers/utils";
+import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 
 /**
  * Generated class for the PickShipmentsPickPage page.
@@ -48,7 +49,8 @@ export class PickTab {
                 public alertCtrl:AlertController,
                 public loadingCtrl: LoadingController,
                 private ngZone: NgZone,
-                public utils:UtilsProvider) {
+                public utils:UtilsProvider,
+                public barcodeScanner:BarcodeScanner) {
 
     }
 
@@ -63,6 +65,9 @@ export class PickTab {
 
         this.events.subscribe('picks:cancel', ()=>{
             this.cancelPicks();
+        });
+        this.events.subscribe('picks:open', (indexes)=>{
+            this.openPicklistItem(indexes);
         });
         console.log('ionViewDidLoad PickShipmentsPickPage Tab: Pick');
 
@@ -102,6 +107,24 @@ export class PickTab {
         this.events.unsubscribe('barcode:scan');
         this.events.unsubscribe('picks:confirm');
         this.events.unsubscribe('picks:cancel');
+        this.events.unsubscribe('picks:open');
+    }
+
+    openPicklistItem(indexes){
+        this.currentLocationIndex = indexes[0];
+        this.currentItemIndex = indexes[1];
+
+        // Set location & item to suggested
+        var item = this.getSuggestedAllocation();
+
+        if (!item) return;
+
+        this.setLocation(item.LocationID.value);
+        this.setItem(item.InventoryID.value);
+
+        setTimeout(()=> {
+            this.qtyInput.setFocus();
+        }, 500);
     }
 
     getSuggestedLocation() {
@@ -199,7 +222,7 @@ export class PickTab {
         this.showQty = false;
     }
 
-    setLocation(locId, isScan=false) {
+    setLocation(locId, isScan=false, callback=null) {
 
         if (locId) {
             this.enteredData.location = locId;
@@ -222,6 +245,9 @@ export class PickTab {
             // prompt to overrride if it's not the suggested location
             if ((this.enteredData.item == "" || this.verifyLocation(isScan)) && isScan){
                 this.utils.playScanSuccessSound();
+
+                if (callback != null)
+                    callback();
             }
 
             if (locId)
@@ -238,7 +264,7 @@ export class PickTab {
 
     }
 
-    setItem(itemId, isScan=false) {
+    setItem(itemId, isScan=false, callback=null) {
 
         if (itemId) {
             this.enteredData.item = itemId;
@@ -270,6 +296,9 @@ export class PickTab {
 
             if (this.verifyLocation(isScan) && isScan){
                 this.utils.playScanSuccessSound();
+
+                if (callback != null)
+                    callback();
             }
 
             if (itemId)
@@ -422,6 +451,15 @@ export class PickTab {
     }
 
     confirmPicks() {
+
+        if (this.enteredData.item != "" &&  this.enteredData.location != "" && this.enteredData.qty > 0) {
+            if (!this.addPick())
+                return;
+        }
+
+        if (Object.keys(this.pickProvider.pendingPicks).length == 0)
+            return this.utils.showAlert("Error",  "There are no picked items to commit.");
+
         let loader = this.loadingCtrl.create({content: "Confirming picks..."});
         loader.present();
 
@@ -434,12 +472,27 @@ export class PickTab {
         });
     }
 
-    onBarcodeScan(barcodeText){
+    startCameraScanner(){
+        this.barcodeScanner.scan().then((barcodeData) => {
+            if (barcodeData.cancelled)
+                return;
+
+            this.onBarcodeScan(barcodeData.text, function(){
+                this.startCameraScanner();
+            });
+
+        }, (err) => {
+            // An error occurred
+            this.utils.showAlert("Error", "Error accessing barcode device: " + err, {exception: err});
+        });
+    }
+
+    onBarcodeScan(barcodeText, callback=null){
         console.log(barcodeText);
 
         if (this.enteredData.location == "") {
             this.ngZone.run(()=> {
-                this.setLocation(barcodeText, true);
+                this.setLocation(barcodeText, true, callback);
             });
             return;
         }
@@ -453,7 +506,7 @@ export class PickTab {
                         return;
                 }
 
-                this.setLocation(barcodeText, true);
+                this.setLocation(barcodeText, true, callback);
             });
 
         }).catch((err) => {
@@ -463,7 +516,7 @@ export class PickTab {
                 this.ngZone.run(()=> {
 
                     if (this.enteredData.item == "" || this.enteredData.qty == 0) {
-                        this.setItem(item.InventoryID.value, true);
+                        this.setItem(item.InventoryID.value, true, callback);
                         return;
                     }
 
@@ -482,11 +535,15 @@ export class PickTab {
 
                         // If the completed quantity is reached let's automatically move to the next suggested pick
                         if (this.getTotalRemainingQty() - this.enteredData.qty == 0){
-                            this.addPick(true);
+                            return this.addPick(true);
                         }
+
+                        if (callback != null)
+                            callback();
+
                     } else {
                         if (this.addPick(true))
-                            this.setItem(item.InventoryID.value, true);
+                            this.setItem(item.InventoryID.value, true, callback);
                     }
 
                 });
