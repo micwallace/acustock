@@ -20,7 +20,7 @@ import { LoginPage } from "../pages/login/login";
 })
 export class MyApp {
     @ViewChild(Nav) navCtrl:Nav;
-    rootPage:any = PickShipmentsPage;
+    rootPage:any = LoginPage;
 
     constructor(public platform:Platform,
                 public statusBar:StatusBar,
@@ -58,13 +58,14 @@ export class MyApp {
                 context.api.testConnection(null, null).then(() => {
 
                     loader.dismiss();
-
-                    console.log("Login succeeded, loading initial data...");
+                    context.navCtrl.setRoot(PickShipmentsPage);
                     context.cache.initialLoad();
+                    console.log("Login succeeded, loading initial data...");
 
                 }).catch((err) => {
                     loader.dismiss();
-                    this.utils.processApiError("Error", "Connection failed: "+err.message, err, this.navCtrl);
+                    context.navCtrl.setRoot(SetupPage);
+                    this.utils.processApiError("Error", "Connection failed: "+err.message, err);
                 });
 
             }

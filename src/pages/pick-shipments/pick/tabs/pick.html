@@ -14,8 +14,11 @@
     </ion-navbar>
 
 </ion-header>
-<ion-content padding style="position: relative;">
+<ion-content padding>
     <div *ngIf="getSuggestedAllocation() != null">
+        <button type="button" ion-button icon-only style="float:right;" (click)="startCameraScanner()">
+            <ion-icon name="barcode"></ion-icon>
+        </button>
         <h5 style="text-align: center;">{{getSuggestedAllocation()?.InventoryID?.value}}</h5>
         <h6 style="text-align: center;">{{getSuggestedAllocation()?.Description?.value}}</h6>
         <h6 style="text-align: center;">Picked {{getTotalPickedQty()}} of

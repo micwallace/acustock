@@ -29,6 +29,8 @@ export class PickProvider {
 
     public unpickedQty = 0;
 
+    public pendingQty = 0;
+
     constructor(public api:Api, public cache:CacheProvider, public loadingCtrl:LoadingController, public prefs:PreferencesProvider) {
         console.log('Hello PickProvider Provider');
     }
@@ -82,6 +84,8 @@ export class PickProvider {
 
                 if (err.status == 404)
                     err.message = "Shipment #" + shipmentNbr + " was not found in the system.";
+
+                console.log(JSON.stringify(err, Object.getOwnPropertyNames(err)));
 
                 reject(err);
             });
@@ -330,6 +334,7 @@ export class PickProvider {
     calculateQtys() {
 
         this.totalQty = 0;
+        this.pendingQty = 0;
         var pickedQty = 0;
 
         for (var i = 0; i < this.currentShipment.Details.length; i++) {
@@ -342,6 +347,7 @@ export class PickProvider {
         // add uncommitted picks
         for (var x in this.pendingPicks) {
             pickedQty += this.pendingPicks[x].PendingQty;
+            this.pendingQty += this.pendingPicks[x].PendingQty;
         }
 
         this.unpickedQty = this.totalQty - pickedQty;

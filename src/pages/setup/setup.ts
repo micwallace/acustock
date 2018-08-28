@@ -113,7 +113,7 @@ export class SetupPage {
 
             loader.dismiss();
             this.utils.playFailedSound(isScan);
-            this.utils.showAlert("Error", "Connection failed: " + err.message);
+            this.utils.processApiError("Error", "Connection failed: " + err.message, err, this.navCtrl);
         });
     }
 

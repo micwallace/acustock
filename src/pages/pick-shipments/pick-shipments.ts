@@ -52,7 +52,7 @@ export class PickShipmentsPage {
             loader.dismiss();
             this.shipmentNbr = "";
             this.utils.playFailedSound(isScan);
-            this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
+            this.utils.processApiError("Error", err.message, err, this.navCtrl);
         });
     }
 

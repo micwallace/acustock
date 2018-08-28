@@ -52,7 +52,7 @@ export class ReceivePage {
             loader.dismiss();
             this.referenceNbr = "";
             this.utils.playFailedSound(isScan);
-            this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
+            this.utils.processApiError("Error", err.message, err, this.navCtrl);
 
         });
     }
@@ -106,7 +106,7 @@ export class ReceivePage {
                                         this.navCtrl.push(ReceiveShipmentPage);
                                     }).catch((err)=>{
                                         loader.dismiss().then(()=>{
-                                            this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
+                                            this.utils.processApiError("Error", err.message, err, this.navCtrl);
                                         });
                                     });
                                 }

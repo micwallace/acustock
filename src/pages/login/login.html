@@ -1,7 +1,7 @@
 <ion-header>
     <ion-navbar>
         <ion-title>
-            Login to AcuShip
+            Login to AcuStock
         </ion-title>
     </ion-navbar>
 </ion-header>
@@ -24,10 +24,11 @@
                 <ion-input name="password" type="password" placeholder="" [(ngModel)]="password"></ion-input>
             </ion-item>
         </ion-list>
-        <div class="spacer" style="height:40px;" id="login-spacer1"></div>
+        <div class="spacer" style="height:40px;"></div>
         <button id="login-button" ion-button color="stable" block (click)="login();">
             Log in
         </button>
+        <div class="spacer" style="height:10px;"></div>
         <button id="setup-button" ion-button color="stable" block (click)="goToSetup();">
             Go to Setup
         </button>

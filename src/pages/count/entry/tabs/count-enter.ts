@@ -194,7 +194,7 @@ export class CountEntryEnterTab {
 
                                         this.enteredData.item = "";
                                         this.dismissLoader().then(()=>{
-                                            this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
+                                            this.utils.processApiError("Error", err.message, err, this.navCtrl);
                                         });
 
                                         this.utils.playFailedSound();
@@ -291,7 +291,7 @@ export class CountEntryEnterTab {
             //this.events.publish("closeReceiveScreen");
         }).catch((err)=>{
             this.dismissLoader();
-            this.utils.processApiError("Error", err.message, {exception:err}, this.navCtrl);
+            this.utils.processApiError("Error", err.message, err, this.navCtrl);
         });
     }
 

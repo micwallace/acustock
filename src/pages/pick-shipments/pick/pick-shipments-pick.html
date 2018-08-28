@@ -1,6 +1,6 @@
 <ion-tabs #tabs>
     <ion-tab [root]="tab1Root" [rootParams]="data" tabTitle="Pick" (closeModal)="dismiss()" tabIcon="cube"></ion-tab>
     <ion-tab [root]="tab2Root" [rootParams]="data" tabTitle="Pick List" tabIcon="list-box" [tabBadge]="pickProvider.unpickedQty"></ion-tab>
-    <ion-tab [root]="tab3Root" [rootParams]="data" tabTitle="Pending" tabIcon="checkmark-circle"></ion-tab>
+    <ion-tab [root]="tab3Root" [rootParams]="data" tabTitle="Pending" tabIcon="checkmark-circle" [tabBadge]="pickProvider.pendingQty"></ion-tab>
     <barcode-listener (scan)='onBarcodeScan($event)'></barcode-listener>
 </ion-tabs>

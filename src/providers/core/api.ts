@@ -67,8 +67,7 @@ export class Api {
 
             }).catch((err)=> {
 
-                err.message = err.error;
-                reject(err);
+                reject(this.processApiError(err));
             });
         });
     }
@@ -283,7 +282,7 @@ export class Api {
         return this.request('delete', endpoint, null, headers);
     }
 
-    request(method:string, endpoint:string, body?:any, headers?:any, params?:any, loginAttempt?:boolean, returnFullResponse?:any) {
+    request(method:string, endpoint:string, body?:any, headers?:any, params?:any, loginAttempt?:boolean=false, returnFullResponse?:any) {
         return new Promise((resolve, reject) => {
 
             let url = this.url + this.api_endpoint + '/' + endpoint;
@@ -368,15 +367,17 @@ export class Api {
             }, (err) => {
 
                 if (err.status == 401) {
+
                     if (this.prefs.hasPreference("connection_password") && !loginAttempt) {
+
                         this.login().then((res) => {
 
                             this.request(method, endpoint, body, headers, params, true).then((res) => {
                                 resolve(res);
                             }, (err) => {
-                                reject(err);
+                                reject(this.processApiError(err));
                             }).catch((err) => {
-                                reject(err);
+                                reject(this.processApiError(err));
                             });
 
                         }, (err) => {
@@ -384,8 +385,8 @@ export class Api {
                             reject(this.processApiError(err));
 
                         }).catch((err)=> {
-                            err.message = err.error;
-                            reject(err);
+
+                            reject(this.processApiError(err));
                         });
                     } else {
                         reject(err);
@@ -403,7 +404,7 @@ export class Api {
         });
     }
 
-    private processApiError(err){
+    private processApiError(err:any){
         // Process the exception and add a user displayed message and other debug info
         try {
             err.responseData =  this.useNativeHttp() ? JSON.parse(err.error) : err.json();
@@ -413,28 +414,34 @@ export class Api {
         delete err.headers;
 
         // Build error message
-        err.message = "API Error: " + (err.hasOwnProperty("status") ? err.status+" " : "");
-
         if (err.responseData){
-            err.message += (err.responseData.hasOwnProperty('exceptionMessage') ? err.responseData.exceptionMessage.substring(0, 120) : err.responseData.message);
+            var exceptionMsg = (err.responseData.hasOwnProperty('exceptionMessage') ? err.responseData.exceptionMessage : err.responseData.message);
 
             // Detect not found error and modify status to 404: Acumatica, do you even no what REST is!!
-            if (err.responseData.exceptionType == "PX.Api.ContractBased.NoEntitySatisfiesTheConditionException")
+            if (err.responseData.hasOwnProperty('exceptionType') &&
+                err.responseData.exceptionType == "PX.Api.ContractBased.NoEntitySatisfiesTheConditionException")
                 err.status = 404;
 
             // Detect login error
-            if (err.responseData.exceptionMessage.indexOf("Invalid credentials") > -1 ||
-                err.responseData.exceptionMessage.indexOf("locked out") > -1) {
+            if (exceptionMsg.indexOf("Invalid credentials") > -1 ||
+                exceptionMsg.indexOf("locked out") > -1 ||
+                exceptionMsg.indexOf("account is disabled") > -1 ||
+                exceptionMsg.indexOf("account has been disabled") > -1) {
                 err.status = 401;
                 err.authFailed = true;
             }
 
+            if (!err.responseData.hasOwnProperty('exceptionMessage'))
+                err.responseData.exceptionMessage = err.responseData.message;
+
+            err.message = "API Error: " + (err.hasOwnProperty("status") ? err.status+" " : "") + exceptionMsg.substring(0, 250);
+
         } else {
-            err.message += (err.hasOwnProperty("statusText") ? err.statusText+" " : "")
-                            + (err.hasOwnProperty("error") ? err.error : "")
+            err.message = (err.hasOwnProperty("statusText") ? err.statusText+" " : "")
+                + (err.hasOwnProperty("error") ? err.error : "")
         }
 
-        console.log(JSON.stringify(err));
+        console.log(JSON.stringify(err, Object.getOwnPropertyNames(err)));
 
         return err;
     }

@@ -277,7 +277,7 @@ export class EnterTab {
         }).catch((err)=> {
             this.dismissLoader();
             this.utils.playFailedSound();
-            this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
+            this.utils.processApiError("Error", err.message, err, this.navCtrl);
         });
     }
 

@@ -58,9 +58,9 @@ export class BinLookupPage {
         }).catch((err) => {
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
-                this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
+                this.utils.processApiError("Error", err.message, err, this.navCtrl);
             }).catch((err)=>{
-                this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
+                this.utils.processApiError("Error", err.message, err, this.navCtrl);
             });
         });
     }
@@ -94,9 +94,9 @@ export class BinLookupPage {
 
             this.utils.playFailedSound(true);
             this.dismissLoader().then(()=> {
-                this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
+                this.utils.processApiError("Error", err.message, err, this.navCtrl);
             }).catch((err)=>{
-                this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
+                this.utils.processApiError("Error", err.message, err, this.navCtrl);
             });
         });
     }
@@ -132,7 +132,7 @@ export class BinLookupPage {
         }).catch((err) => {
 
             loader.dismiss().then(()=> {
-                this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
+                this.utils.processApiError("Error", err.message, err, this.navCtrl);
             });
         });
 

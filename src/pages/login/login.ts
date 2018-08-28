@@ -46,6 +46,10 @@ export class LoginPage {
             console.log("Login succeeded, loading initial data...");
             this.cache.initialLoad();
 
+            this.cache.prefs.setPreference("connection_username", this.username);
+            // TODO: Optional remember password
+            this.cache.prefs.setPreference("connection_password", this.password);
+
         }).catch((err) => {
             loader.dismiss();
             this.utils.processApiError("Error", "Login failed, please check connection. " + err.message, err);

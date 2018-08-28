@@ -60,9 +60,9 @@ export class ItemLookupPage {
             //console.log(JSON.stringify(err));
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
-                this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
+                this.utils.processApiError("Error", err.message, err, this.navCtrl);
             }).catch((err)=>{
-                this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
+                this.utils.processApiError("Error", err.message, err, this.navCtrl);
             });
         });
     }
@@ -143,7 +143,7 @@ export class ItemLookupPage {
         }).catch((err) => {
 
             loader.dismiss().then(()=> {
-                this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
+                this.utils.processApiError("Error", err.message, err, this.navCtrl);
             });
         });
 

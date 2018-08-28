@@ -42,7 +42,7 @@ export class UtilsProvider {
             }
         }
 
-        this.showAlert(title, message, err)
+        this.showAlert(title, message, err);
     }
 
     public showAlert(title, message, debugData = null){

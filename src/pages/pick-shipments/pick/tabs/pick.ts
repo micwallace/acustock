@@ -467,7 +467,7 @@ export class PickTab {
             this.events.publish('closeModal');
         }).catch((err)=> {
             loader.dismissAll();
-            this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
+            this.utils.processApiError("Error", err.message, err, this.navCtrl);
         });
     }
 
