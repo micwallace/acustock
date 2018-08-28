@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
-import { CountProvider } from "../../providers/count/count";
+import { CountProvider } from "../../providers/app/count";
 import { CountEntryPage } from "./entry/count-entry";
 import { AlertController } from "ionic-angular/index";
 import { Events } from "ionic-angular/index";
-import { UtilsProvider } from "../../providers/utils";
+import { UtilsProvider } from "../../providers/core/utils";
 
 /**
  * Generated class for the ReceivePage page.
@@ -54,7 +54,7 @@ export class CountPage {
             loader.dismiss();
             this.referenceNbr = "";
             this.utils.playFailedSound(isScan);
-            this.utils.showAlert("Error", err.message, err);
+            this.utils.processApiError("Error", err.message, err, this.navCtrl);
         });
     }
 

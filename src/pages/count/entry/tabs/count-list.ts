@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
-import { CountProvider } from '../../../../providers/count/count'
+import { CountProvider } from '../../../../providers/app/count'
 
 /**
  * Generated class for the PickShipmentsListPage page.

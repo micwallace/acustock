@@ -3,7 +3,7 @@ import { IonicPage, NavController, NavParams, ViewController, Events, Tabs } fro
 import { ReceiveShipmentEnterTab } from "./tabs/shipment-enter";
 import { ReceiveShipmentListTab } from "./tabs/list";
 import { ReceiveShipmentPendingTab } from "./tabs/pending";
-import { ReceiveProvider } from "../../../providers/receive/receive";
+import { ReceiveProvider } from "../../../providers/app/receive";
 
 /**
  * Generated class for the PickShipmentsPickPage page.

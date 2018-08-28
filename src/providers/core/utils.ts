@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { PreferencesProvider } from "./preferences/preferences";
-import { ToastController } from "ionic-angular/index";
+import { PreferencesProvider } from "./preferences";
+import { App, ToastController, AlertController, NavController } from "ionic-angular";
 import { Vibration } from '@ionic-native/vibration';
 import { EmailComposer } from '@ionic-native/email-composer';
-import { AlertController } from "ionic-angular/index";
+import { LoginPage } from "../../pages/login/login";
+import { SetupPage } from "../../pages/setup/setup";
 
 /*
  Generated class for the CacheProvider provider.
@@ -14,8 +15,34 @@ import { AlertController } from "ionic-angular/index";
 @Injectable()
 export class UtilsProvider {
 
-    constructor(public prefs:PreferencesProvider, public toastCtrl:ToastController, public vibration:Vibration, public alertCtrl: AlertController, public emailComposer:EmailComposer) {
-        console.log('Hello CacheProvider Provider');
+    constructor(private app:App,
+                public prefs:PreferencesProvider,
+                public toastCtrl:ToastController,
+                public vibration:Vibration,
+                public alertCtrl: AlertController,
+                public emailComposer:EmailComposer) {
+    }
+
+    public processApiError(title, message, err, navCtrl:NavController=null){
+
+        if (err.hasOwnProperty('status')){
+            // Check for login error and show login screen
+            if (err.status == 401) {
+                if (navCtrl != null)
+                    navCtrl.setRoot('LoginPage');
+                // If the error is
+                this.showAlert('Login Failed', err.authFailed ? err.responseData.exceptionMessage : "Your session expired, please login again.");
+                return;
+            // Check for connection failure; show setup screen
+            } else if (err.status < 1){
+                if (navCtrl != null)
+                    navCtrl.setRoot('SetupPage');
+                this.showAlert('Connection Failed', 'Error connecting to Acumatica: '+err.message, err);
+                return;
+            }
+        }
+
+        this.showAlert(title, message, err)
     }
 
     public showAlert(title, message, debugData = null){

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
-import { ReceiveProvider } from '../../../../providers/receive/receive'
-import { UtilsProvider } from "../../../../providers/utils";
+import { ReceiveProvider } from '../../../../providers/app/receive'
+import { UtilsProvider } from "../../../../providers/core/utils";
 
 /**
  * Generated class for the PickShipmentsListPage page.

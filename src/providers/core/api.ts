@@ -1,7 +1,7 @@
 import { HTTP } from '@ionic-native/http';
 import { Http, Headers, RequestOptions } from '@angular/http'
 import { Injectable } from '@angular/core';
-import { PreferencesProvider } from "../preferences/preferences";
+import { PreferencesProvider } from "./preferences";
 import { LoginPage } from "../../pages/login/login";
 import { Platform } from "ionic-angular";
 
@@ -382,7 +382,6 @@ export class Api {
                         }, (err) => {
 
                             reject(this.processApiError(err));
-                            //this.navCtrl.setRoot(LoginPage, {message: "Login failed: " + err.message});
 
                         }).catch((err)=> {
                             err.message = err.error;
@@ -390,7 +389,6 @@ export class Api {
                         });
                     } else {
                         reject(err);
-                        //this.navCtrl.setRoot(LoginPage, {message: "Session expired, please login."});
                     }
                     return;
                 }
@@ -418,13 +416,22 @@ export class Api {
         err.message = "API Error: " + (err.hasOwnProperty("status") ? err.status+" " : "");
 
         if (err.responseData){
-            err.message += (err.responseData.hasOwnProperty('exceptionMessage') ? err.responseData.exceptionMessage : err.responseData.message)
+            err.message += (err.responseData.hasOwnProperty('exceptionMessage') ? err.responseData.exceptionMessage.substring(0, 120) : err.responseData.message);
 
-            // Detect not found error and modify status to 404
+            // Detect not found error and modify status to 404: Acumatica, do you even no what REST is!!
             if (err.responseData.exceptionType == "PX.Api.ContractBased.NoEntitySatisfiesTheConditionException")
                 err.status = 404;
+
+            // Detect login error
+            if (err.responseData.exceptionMessage.indexOf("Invalid credentials") > -1 ||
+                err.responseData.exceptionMessage.indexOf("locked out") > -1) {
+                err.status = 401;
+                err.authFailed = true;
+            }
+
         } else {
             err.message += (err.hasOwnProperty("statusText") ? err.statusText+" " : "")
+                            + (err.hasOwnProperty("error") ? err.error : "")
         }
 
         console.log(JSON.stringify(err));

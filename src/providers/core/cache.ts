@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Api } from "../api/api";
-import { PreferencesProvider } from "../preferences/preferences";
-import {ToastController} from "ionic-angular/index";
+import { Api } from "./api";
+import { PreferencesProvider } from "./preferences";
+import { ToastController } from "ionic-angular";
 
 /*
  Generated class for the CacheProvider provider.

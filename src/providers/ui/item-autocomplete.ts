@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AutoCompleteService } from "ionic2-auto-complete/auto-complete.service";
-import { CacheProvider } from "../cache/cache";
+import { CacheProvider } from "../core/cache";
 
 /*
  Generated class for the ItemAutocompleteProvider provider.

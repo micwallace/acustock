@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
-import { ReceiveProvider } from "../../providers/receive/receive";
+import { ReceiveProvider } from "../../providers/app/receive";
 import { ReceiveShipmentPage } from "./shipment/receive-shipment";
-import { UtilsProvider } from "../../providers/utils";
+import { UtilsProvider } from "../../providers/core/utils";
 
 /**
  * Generated class for the ReceivePage page.
@@ -52,7 +52,7 @@ export class ReceivePage {
             loader.dismiss();
             this.referenceNbr = "";
             this.utils.playFailedSound(isScan);
-            this.utils.showAlert("Error", err.message, {exception: err});
+            this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
 
         });
     }
@@ -106,7 +106,7 @@ export class ReceivePage {
                                         this.navCtrl.push(ReceiveShipmentPage);
                                     }).catch((err)=>{
                                         loader.dismiss().then(()=>{
-                                            this.utils.showAlert("Error", err.message, {exception: err});
+                                            this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
                                         });
                                     });
                                 }

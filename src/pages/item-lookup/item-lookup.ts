@@ -4,7 +4,7 @@ import { IonicPage, NavController, NavParams, LoadingController, ModalController
 import { Api, CacheProvider, ItemAutocompleteService, PreferencesProvider } from '../../providers/providers';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { ItemLookupDetailsPage } from '../item-lookup-details/item-lookup-details';
-import {UtilsProvider} from "../../providers/utils";
+import {UtilsProvider} from "../../providers/core/utils";
 
 /**
  * Generated class for the ItemLookupPage page.
@@ -60,9 +60,9 @@ export class ItemLookupPage {
             //console.log(JSON.stringify(err));
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
-                this.utils.showAlert("Error", err.message, {exception: err});
+                this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
             }).catch((err)=>{
-                this.utils.showAlert("Error", err.message, {exception: err});
+                this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
             });
         });
     }
@@ -143,7 +143,7 @@ export class ItemLookupPage {
         }).catch((err) => {
 
             loader.dismiss().then(()=> {
-                this.utils.showAlert("Error", err.message, {exception: err});
+                this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
             });
         });
 

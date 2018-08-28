@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { ModalController } from "ionic-angular/index";
-import { PickProvider } from '../../providers/providers';
+import { IonicPage, NavController, NavParams, ModalController  } from 'ionic-angular';
+import { PickProvider } from '../../../providers/providers';
 
 /**
  * Generated class for the PickShipmentsListPage page.

@@ -3,7 +3,7 @@ import { IonicPage, NavController, NavParams, ViewController, Events, Tabs } fro
 import { PickTab } from "./tabs/pick";
 import { PickListTab } from "./tabs/pick-list";
 import { UnpickedListTab } from "./tabs/unpicked-list";
-import { PickProvider } from "../../providers/pick/pick";
+import { PickProvider } from "../../../providers/app/pick";
 
 /**
  * Generated class for the PickShipmentsPickPage page.

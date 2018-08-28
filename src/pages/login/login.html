@@ -1,8 +1,5 @@
 <ion-header>
     <ion-navbar>
-        <button ion-button menuToggle>
-            <ion-icon name="menu"></ion-icon>
-        </button>
         <ion-title>
             Login to AcuShip
         </ion-title>
@@ -18,18 +15,21 @@
                 <ion-label>
                     Username
                 </ion-label>
-                <ion-input type="text" placeholder="" [(ngModel)]="username"></ion-input>
+                <ion-input name="username" type="text" placeholder="" [(ngModel)]="username"></ion-input>
             </ion-item>
             <ion-item id="login-input2">
                 <ion-label>
                     Password
                 </ion-label>
-                <ion-input type="password" placeholder="" [(ngModel)]="password"></ion-input>
+                <ion-input name="password" type="password" placeholder="" [(ngModel)]="password"></ion-input>
             </ion-item>
         </ion-list>
         <div class="spacer" style="height:40px;" id="login-spacer1"></div>
-        <button id="login-button1" ion-button color="stable" block (click)="login();">
+        <button id="login-button" ion-button color="stable" block (click)="login();">
             Log in
+        </button>
+        <button id="setup-button" ion-button color="stable" block (click)="goToSetup();">
+            Go to Setup
         </button>
     </form>
 </ion-content>

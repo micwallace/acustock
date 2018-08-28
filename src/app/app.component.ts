@@ -11,8 +11,9 @@ import { SetupPage } from '../pages/setup/setup';
 import { Api, CacheProvider, PreferencesProvider } from '../providers/providers';
 import { PreferencesPage } from "../pages/preferences/preferences";
 import { BinTransferPage } from "../pages/bin-transfer/bin-transfer";
-import { LoginPage } from "../pages/login/login";
 import { ReceivePage } from "../pages/receive/receive";
+import { UtilsProvider } from "../providers/core/utils";
+import { LoginPage } from "../pages/login/login";
 
 @Component({
     templateUrl: 'app.html'
@@ -28,7 +29,7 @@ export class MyApp {
                 public api:Api,
                 public cache:CacheProvider,
                 public loadingCtrl:LoadingController,
-                public toastCtrl:ToastController) {
+                public utils:UtilsProvider) {
 
         platform.ready().then((readySrc) => {
 
@@ -63,9 +64,7 @@ export class MyApp {
 
                 }).catch((err) => {
                     loader.dismiss();
-                    context.navCtrl.setRoot(SetupPage);
-                    console.log(JSON.stringify(err));
-                    alert("Login failed, please check connection. " + err.message);
+                    this.utils.processApiError("Error", "Connection failed: "+err.message, err, this.navCtrl);
                 });
 
             }
@@ -106,9 +105,6 @@ export class MyApp {
     }
 
     showPreferences() {
-        /*this.appPreferences.show().catch((err) => {
-         //TODO: add setup check here. alert(err);
-         });*/
         this.navCtrl.push(PreferencesPage);
     }
 

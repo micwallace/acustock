@@ -2,7 +2,7 @@ import { Component, OnInit, Output, EventEmitter, HostListener } from '@angular/
 
 @Component({
     selector: 'barcode-listener',
-    templateUrl: './barcode-listener.component.html'
+    templateUrl: 'barcode-listener.component.html'
 })
 
 export class BarcodeListenerComponent implements OnInit {

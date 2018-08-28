@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Api } from '../../providers/api/api'
-import { CacheProvider } from '../../providers/cache/cache'
+import { Api } from '../core/api'
+import { CacheProvider } from '../core/cache'
 import { LoadingController } from 'ionic-angular';
-import { PreferencesProvider } from "../preferences/preferences";
+import { PreferencesProvider } from "../core/preferences";
 
 /*
  Generated class for the PickProvider provider.

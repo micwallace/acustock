@@ -1,9 +1,9 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController, Events, AlertController } from 'ionic-angular';
-import { TransferProvider } from '../../../providers/transfer/transfer'
-import { CacheProvider } from "../../../providers/cache/cache";
+import { TransferProvider } from '../../../providers/app/transfer'
+import { CacheProvider } from "../../../providers/core/cache";
 import { LoadingController } from "ionic-angular/index";
-import { UtilsProvider } from "../../../providers/utils";
+import { UtilsProvider } from "../../../providers/core/utils";
 
 /**
  * Generated class for the PickShipmentsPickPage page.
@@ -277,7 +277,7 @@ export class EnterTab {
         }).catch((err)=> {
             this.dismissLoader();
             this.utils.playFailedSound();
-            this.utils.showAlert("Error", err.message, {exception: err});
+            this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
         });
     }
 

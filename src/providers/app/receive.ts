@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Api } from "../api/api";
-import {PreferencesProvider} from "../preferences/preferences";
+import { Api } from "../core/api";
+import { PreferencesProvider } from "../core/preferences";
 
 /*
  Generated class for the ReceiveProvider provider.

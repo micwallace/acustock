@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Api } from '../../providers/api/api'
-import { CacheProvider } from '../../providers/cache/cache'
+import { Api } from '../core/api'
+import { CacheProvider } from '../core/cache'
 import { LoadingController } from 'ionic-angular';
-import { PreferencesProvider } from "../preferences/preferences";
+import { PreferencesProvider } from "../core/preferences";
 
 /*
  Generated class for the PickProvider provider.
@@ -631,6 +631,8 @@ export class PickProvider {
 
                 console.log(JSON.stringify(modified));
 
+                // Deleted allocations should be added first, otherwise API returns "shipped qty exceeds order qty" error
+                // We will use this array to keep track of all unmodified or newly created allocations and add then to the array last
                 var allocs = [];
 
                 for (var x = 0; x < this.pendingPicks[i].Allocations.length; x++) {
@@ -650,6 +652,9 @@ export class PickProvider {
                         if (modified.Allocations.hasOwnProperty(pendingAlloc.SplitLineNbr.value)) {
                             alloc.Qty.value = modified.Allocations[pendingAlloc.SplitLineNbr.value].Qty.value;
                             delete modified.Allocations[pendingAlloc.SplitLineNbr.value];
+
+                            item.Allocations.push(alloc);
+                            continue;
                         }
                     }
 
@@ -675,7 +680,7 @@ export class PickProvider {
                     item.Allocations.push(alloc);
                 }
 
-                // Deleted allocations should be added first, otherwise API returns "shipped qty exceeds order qty" error
+                // Combine pending picks along with the modified/deleted ones they are replacing
                 item.Allocations = item.Allocations.concat(allocs);
 
                 data.Details.push(item);

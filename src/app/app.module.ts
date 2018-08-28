@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 
-import { LoginPage } from '../pages/login/login';
+import { LoginPageModule } from '../pages/login/login.module';
 import { PickShipmentsPage } from '../pages/pick-shipments/pick-shipments';
 import { ItemLookupPage } from '../pages/item-lookup/item-lookup';
 import { BinLookupPage } from '../pages/bin-lookup/bin-lookup';
@@ -21,18 +21,18 @@ import { Api, CacheProvider, BarcodeListenerComponent, ItemAutocompleteService, 
 import { HTTP } from '@ionic-native/http';
 import { HttpModule } from '@angular/http'
 import { ItemLookupDetailsPage } from "../pages/item-lookup-details/item-lookup-details";
-import { PickShipmentsListPage } from "../pages/pick-shipments-list/pick-shipments-list";
-import { PickShipmentsPickPage } from "../pages/pick-shipments-pick/pick-shipments-pick";
-import { PickTab} from "../pages/pick-shipments-pick/tabs/pick";
-import { PickListTab } from "../pages/pick-shipments-pick/tabs/pick-list";
-import { UnpickedListTab } from "../pages/pick-shipments-pick/tabs/unpicked-list";
+import { PickShipmentsListPage } from "../pages/pick-shipments/list/pick-shipments-list";
+import { PickShipmentsPickPage } from "../pages/pick-shipments/pick/pick-shipments-pick";
+import { PickTab} from "../pages/pick-shipments/pick/tabs/pick";
+import { PickListTab } from "../pages/pick-shipments/pick/tabs/pick-list";
+import { UnpickedListTab } from "../pages/pick-shipments/pick/tabs/unpicked-list";
 import { PreferencesPage } from "../pages/preferences/preferences";
 import { BinTransferPage } from "../pages/bin-transfer/bin-transfer";
-import { TransferProvider } from "../providers/transfer/transfer";
+import { TransferProvider } from "../providers/app/transfer";
 import { EnterTab } from "../pages/bin-transfer/tabs/enter";
 import { TransferListTab } from "../pages/bin-transfer/tabs/transfer-list";
 import { TransferHistoryTab } from "../pages/bin-transfer/tabs/transfer-history";
-import { ReceiveProvider } from '../providers/receive/receive';
+import { ReceiveProvider } from '../providers/app/receive';
 import { ReceivePage } from "../pages/receive/receive";
 import { ReceiveShipmentPage } from "../pages/receive/shipment/receive-shipment";
 import { ReceiveShipmentListTab } from "../pages/receive/shipment/tabs/list";
@@ -44,13 +44,12 @@ import { CountEntryPage } from '../pages/count/entry/count-entry';
 import { CountEntryEnterTab } from '../pages/count/entry/tabs/count-enter';
 import { CountEntryListTab } from '../pages/count/entry/tabs/count-list';
 import { CountEntryPendingTab } from '../pages/count/entry/tabs/pending-list';
-import { CountProvider } from "../providers/count/count";
-import { UtilsProvider } from "../providers/utils";
+import { CountProvider } from "../providers/app/count";
+import { UtilsProvider } from "../providers/core/utils";
 
 @NgModule({
     declarations: [
         MyApp,
-        LoginPage,
         BinTransferPage,
         EnterTab,
         TransferListTab,
@@ -83,11 +82,11 @@ import { UtilsProvider } from "../providers/utils";
         HttpModule,
         AutoCompleteModule,
         IonicModule.forRoot(MyApp),
+        LoginPageModule
     ],
     bootstrap: [IonicApp],
     entryComponents: [
         MyApp,
-        LoginPage,
         BinTransferPage,
         EnterTab,
         TransferListTab,

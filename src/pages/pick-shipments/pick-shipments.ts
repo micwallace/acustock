@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
-import { NavController, ModalController } from 'ionic-angular';
+import { NavController, ModalController, LoadingController } from 'ionic-angular';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
-import { PickProvider } from '../../providers/providers';
-import { PickShipmentsListPage } from "../pick-shipments-list/pick-shipments-list";
-import { PickShipmentsPickPage } from "../pick-shipments-pick/pick-shipments-pick";
-import { LoadingController } from "ionic-angular/index";
-import { UtilsProvider } from "../../providers/utils";
+import { PickProvider } from '../../providers/app/pick';
+import { PickShipmentsListPage } from "./list/pick-shipments-list";
+import { PickShipmentsPickPage } from "./pick/pick-shipments-pick";
+import { UtilsProvider } from "../../providers/core/utils";
 
 @Component({
     selector: 'page-pick-shipments',
@@ -53,7 +52,7 @@ export class PickShipmentsPage {
             loader.dismiss();
             this.shipmentNbr = "";
             this.utils.playFailedSound(isScan);
-            this.utils.showAlert("Error", err.message, {exception: err});
+            this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
         });
     }
 

@@ -3,7 +3,7 @@ import { IonicPage, NavController, NavParams, ViewController, Events, Tabs } fro
 import { EnterTab } from "./tabs/enter";
 import { TransferListTab } from "./tabs/transfer-list";
 import { TransferHistoryTab } from "./tabs/transfer-history";
-import { TransferProvider } from "../../providers/transfer/transfer";
+import { TransferProvider } from "../../providers/app/transfer";
 
 /**
  * Generated class for the PickShipmentsPickPage page.

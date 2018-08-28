@@ -1,9 +1,8 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController, Events, AlertController } from 'ionic-angular';
-import { PickProvider } from '../../../providers/providers';
-import { CacheProvider } from "../../../providers/cache/cache";
-import { LoadingController } from "ionic-angular/index";
-import { UtilsProvider } from "../../../providers/utils";
+import { IonicPage, NavController, NavParams, ViewController, Events, AlertController, LoadingController } from 'ionic-angular';
+import { PickProvider } from '../../../../providers/providers';
+import { CacheProvider } from "../../../../providers/core/cache";
+import { UtilsProvider } from "../../../../providers/core/utils";
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 
 /**
@@ -468,7 +467,7 @@ export class PickTab {
             this.events.publish('closeModal');
         }).catch((err)=> {
             loader.dismissAll();
-            this.utils.showAlert("Error", err.message, {exception: err});
+            this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
         });
     }
 

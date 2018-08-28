@@ -3,8 +3,8 @@ import { IonicPage, NavController, NavParams, ViewController, Events, Tabs } fro
 import { CountEntryEnterTab } from "./tabs/count-enter";
 import { CountEntryListTab } from "./tabs/count-list";
 import { CountEntryPendingTab } from "./tabs/pending-list";
-import { CountProvider } from "../../../providers/count/count";
-import {UtilsProvider} from "../../../providers/utils";
+import { CountProvider } from "../../../providers/app/count";
+import {UtilsProvider} from "../../../providers/core/utils";
 
 /**
  * Generated class for the PickShipmentsPickPage page.

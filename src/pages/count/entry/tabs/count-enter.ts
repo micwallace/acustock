@@ -1,9 +1,9 @@
 import { Component, ViewChild, NgZone, Renderer } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController, Events, AlertController } from 'ionic-angular';
-import { CountProvider } from '../../../../providers/count/count'
-import { CacheProvider } from "../../../../providers/cache/cache";
+import { CountProvider } from '../../../../providers/app/count'
+import { CacheProvider } from "../../../../providers/core/cache";
 import { LoadingController } from "ionic-angular/index";
-import { UtilsProvider } from "../../../../providers/utils";
+import { UtilsProvider } from "../../../../providers/core/utils";
 
 /**
  * Generated class for the PickShipmentsPickPage page.
@@ -194,7 +194,7 @@ export class CountEntryEnterTab {
 
                                         this.enteredData.item = "";
                                         this.dismissLoader().then(()=>{
-                                            this.utils.showAlert("Error", err.message);
+                                            this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
                                         });
 
                                         this.utils.playFailedSound();
@@ -291,7 +291,7 @@ export class CountEntryEnterTab {
             //this.events.publish("closeReceiveScreen");
         }).catch((err)=>{
             this.dismissLoader();
-            this.utils.showAlert("Error", err.message);
+            this.utils.processApiError("Error", err.message, {exception:err}, this.navCtrl);
         });
     }
 

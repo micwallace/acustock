@@ -1,13 +1,12 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, Events } from 'ionic-angular';
-
 import { PickShipmentsPage } from "../pick-shipments/pick-shipments";
 import { Api } from '../../providers/providers';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
-import { PreferencesProvider } from "../../providers/preferences/preferences";
+import { PreferencesProvider } from "../../providers/core/preferences";
 import { PreferencesPage } from "../preferences/preferences";
-import { UtilsProvider } from "../../providers/utils";
-import { CacheProvider } from "../../providers/cache/cache";
+import { UtilsProvider } from "../../providers/core/utils";
+import { CacheProvider } from "../../providers/core/cache";
 
 /**
  * Generated class for the SetupPage page.

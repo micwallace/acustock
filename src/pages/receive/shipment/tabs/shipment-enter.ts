@@ -1,9 +1,9 @@
 import { Component, ViewChild, NgZone, Renderer } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController, Events, AlertController } from 'ionic-angular';
-import { ReceiveProvider } from '../../../../providers/receive/receive'
-import { CacheProvider } from "../../../../providers/cache/cache";
+import { ReceiveProvider } from '../../../../providers/app/receive'
+import { CacheProvider } from "../../../../providers/core/cache";
 import { LoadingController } from "ionic-angular/index";
-import { UtilsProvider } from "../../../../providers/utils";
+import { UtilsProvider } from "../../../../providers/core/utils";
 
 /**
  * Generated class for the PickShipmentsPickPage page.
@@ -155,6 +155,7 @@ export class ReceiveShipmentEnterTab {
             if (isScan)
                 this.utils.playScanSuccessSound();
 
+            // Set default location
             if (line.hasOwnProperty("LocationID")){
                 this.setLocation(line.LocationID);
                 return;
@@ -302,7 +303,7 @@ export class ReceiveShipmentEnterTab {
         }).catch((err)=>{
             this.dismissLoader();
             this.utils.playFailedSound(false);
-            this.utils.showAlert("Error", err.message, {exception: err});
+            this.utils.processApiError("Error", err.message, {exception: err}, this.navCtrl);
         });
     }
 

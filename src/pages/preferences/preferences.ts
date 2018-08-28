@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, Events } from 'ionic-angular';
 import { PreferencesProvider, CacheProvider } from '../../providers/providers'
-import { UtilsProvider } from "../../providers/utils";
+import { UtilsProvider } from "../../providers/core/utils";
 
 /**
  * Generated class for the PreferencesPage page.

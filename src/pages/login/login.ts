@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController } from 'ionic-angular';
-import { NavParams } from "ionic-angular/index";
-import { LoadingController } from "ionic-angular/index";
-import { Api, CacheProvider } from "../../providers/providers";
+import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
+import { Api } from "../../providers/core/api";
+import { CacheProvider } from "../../providers/core/cache";
 import { PickShipmentsPage } from "../pick-shipments/pick-shipments";
-import { UtilsProvider } from "../../providers/utils";
+import { UtilsProvider } from "../../providers/core/utils";
+import {SetupPage} from "../setup/setup";
 
 @IonicPage()
 @Component({
@@ -33,6 +33,7 @@ export class LoginPage {
     }
 
     login() {
+
         let loader = this.loadingCtrl.create({content: "Logging in..."});
         loader.present();
 
@@ -46,18 +47,16 @@ export class LoginPage {
             this.cache.initialLoad();
 
         }).catch((err) => {
-            // TODO: Open settings page if the error is something other than 401
             loader.dismiss();
-            console.log(JSON.stringify(err));
-            this.utils.showAlert("Error", "Login failed, please check connection. " + err.message);
+            this.utils.processApiError("Error", "Login failed, please check connection. " + err.message, err);
         });
     }
 
-    onScan() {
-
+    goToSetup(){
+        this.navCtrl.setRoot(SetupPage);
     }
 
-    onCameraScan() {
+    onScan() {
 
     }
 
