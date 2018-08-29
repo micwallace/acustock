@@ -282,7 +282,7 @@ export class Api {
         return this.request('delete', endpoint, null, headers);
     }
 
-    request(method:string, endpoint:string, body?:any, headers?:any, params?:any, loginAttempt?:boolean=false, returnFullResponse?:any) {
+    request(method:string, endpoint:string, body?:any, headers?:any, params?:any, loginAttempt:boolean=false, returnFullResponse?:any) {
         return new Promise((resolve, reject) => {
 
             let url = this.url + this.api_endpoint + '/' + endpoint;
@@ -411,10 +411,12 @@ export class Api {
             this.useNativeHttp() ? delete err.error : delete err._body;
         } catch (e) {}
 
+        console.log(JSON.stringify(err, Object.getOwnPropertyNames(err)));
+
         delete err.headers;
 
         // Build error message
-        if (err.responseData){
+        if (err.responseData && err.responseData.type != "error"){
             var exceptionMsg = (err.responseData.hasOwnProperty('exceptionMessage') ? err.responseData.exceptionMessage : err.responseData.message);
 
             // Detect not found error and modify status to 404: Acumatica, do you even no what REST is!!
@@ -437,11 +439,13 @@ export class Api {
             err.message = "API Error: " + (err.hasOwnProperty("status") ? err.status+" " : "") + exceptionMsg.substring(0, 250);
 
         } else {
-            err.message = (err.hasOwnProperty("statusText") ? err.statusText+" " : "")
+            // CORS errors return status 0, give the user a hint.
+            if (err.status == 0 && err.statusText == "")
+                err.statusText = "Unidentifiable error. This may be a CORS related issue. Check that the server is returning the correct CORS headers in response to a HEAD request.";
+
+            err.message = (err.hasOwnProperty("status") ? err.status+" " : "") + (err.hasOwnProperty("statusText") ? err.statusText+" " : "")
                 + (err.hasOwnProperty("error") ? err.error : "")
         }
-
-        console.log(JSON.stringify(err, Object.getOwnPropertyNames(err)));
 
         return err;
     }

@@ -115,7 +115,7 @@ export class PickProvider {
 
             for (var x = 0; x < item.Allocations.length; x++) {
 
-                var shipmentAlloc = item.Allocations[x];
+                var shipmentAlloc = JSON.parse(JSON.stringify(item.Allocations[x]));
 
                 /*var pending = this.getPendingAllocation(pickItem.LineNbr.value, pickItem.SplitLineNbr.value);
 
@@ -185,6 +185,8 @@ export class PickProvider {
         console.log("Triming source index for allocations");
         this.modifiedAllocations = {};
 
+        var srcAlloc, diff, pendingQty;
+
         for (var x in this.pendingPicks) {
 
             var pending = this.pendingPicks[x];
@@ -200,12 +202,11 @@ export class PickProvider {
                 console.log(JSON.stringify(alloc));
 
                 // Consume the original allocation first if available, and then the rest until remaining pending qty is 0.
-                var pendingQty = alloc.PendingQty;
-                var diff;
+                pendingQty = alloc.PendingQty;
 
                 if (alloc.hasOwnProperty("SplitLineNbr") && this.sourceIndex[x].Allocations.hasOwnProperty(alloc.SplitLineNbr.value)) {
 
-                    var srcAlloc = this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value];
+                    srcAlloc = this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value];
 
                     if (pendingQty < srcAlloc.RemainingQty) {
 
@@ -234,11 +235,11 @@ export class PickProvider {
 
                     for (var y in this.sourceIndex[x].Allocations) {
 
-                        var srcItem = this.sourceIndex[x].Allocations[y];
+                        srcAlloc = this.sourceIndex[x].Allocations[y];
 
-                        if (pendingQty < srcItem.RemainingQty){
+                        if (pendingQty < srcAlloc.RemainingQty){
 
-                            diff = srcItem.RemainingQty - pendingQty;
+                            diff = srcAlloc.RemainingQty - pendingQty;
 
                             this.sourceIndex[x].Allocations[y].RemainingQty = diff;
                             this.sourceIndex[x].Allocations[y].Qty.value = srcAlloc.Qty.value - pendingQty;
@@ -466,14 +467,13 @@ export class PickProvider {
 
         if (pendingAlloc != null && pendingAlloc.LocationID != data.location){
 
-            var newAlloc = JSON.parse(JSON.stringify(sugAlloc));
-            delete newAlloc.SplitLineNbr;
-            newAlloc.LocationID.value = data.location;
-            newAlloc.RemainingQty = data.qty;
-            newAlloc.PendingQty = data.qty;
-            newAlloc.Qty.value = data.qty;
+            delete sugAlloc.SplitLineNbr;
+            sugAlloc.LocationID.value = data.location;
+            sugAlloc.RemainingQty = data.qty;
+            sugAlloc.PendingQty = data.qty;
+            sugAlloc.Qty.value = data.qty;
             sugAlloc.id = PickProvider.getUniqueId();
-            this.addPendingPick(newAlloc);
+            this.addPendingPick(sugAlloc);
 
         } else {
 
@@ -555,21 +555,35 @@ export class PickProvider {
 
             // try to find current allocation and update quantity
             var index = 0;
-            if (pick.hasOwnProperty("SplitLineNbr"))
-                for (let alloc of this.pendingPicks[shipLineNum].Allocations) {
+            var locationMatchIdx = null;
 
-                    if (alloc.hasOwnProperty("SplitLineNbr") && alloc.SplitLineNbr.value == pick.SplitLineNbr.value) {
-                        this.pendingPicks[shipLineNum].Allocations[index].Qty = pick.Qty;
-                        this.pendingPicks[shipLineNum].Allocations[index].RemainingQty = pick.RemainingQty;
-                        this.pendingPicks[shipLineNum].Allocations[index].PendingQty += pick.PendingQty;
-                        this.pendingPicks[shipLineNum].PendingQty += pick.PendingQty;
-                        return;
-                    }
+            for (let alloc of this.pendingPicks[shipLineNum].Allocations) {
 
-                    index++;
+                if (pick.hasOwnProperty("SplitLineNbr") && alloc.hasOwnProperty("SplitLineNbr") && alloc.SplitLineNbr.value == pick.SplitLineNbr.value) {
+
+                    this.pendingPicks[shipLineNum].Allocations[index].Qty = pick.Qty;
+                    this.pendingPicks[shipLineNum].Allocations[index].RemainingQty = pick.RemainingQty;
+                    this.pendingPicks[shipLineNum].Allocations[index].PendingQty += pick.PendingQty;
+                    this.pendingPicks[shipLineNum].PendingQty += pick.PendingQty;
+                    return;
+
+                } else if (alloc.LocationID.value == pick.LocationID.value){
+
+                    locationMatchIdx = index;
+                    if (!pick.hasOwnProperty("SplitLineNbr"))
+                        break;
                 }
 
-            // TODO add based on location match too
+                index++;
+            }
+
+            if (locationMatchIdx != null){
+                this.pendingPicks[shipLineNum].Allocations[locationMatchIdx].Qty = pick.Qty;
+                this.pendingPicks[shipLineNum].Allocations[locationMatchIdx].RemainingQty = pick.RemainingQty;
+                this.pendingPicks[shipLineNum].Allocations[locationMatchIdx].PendingQty += pick.PendingQty;
+                this.pendingPicks[shipLineNum].PendingQty += pick.PendingQty;
+                return;
+            }
 
             this.pendingPicks[shipLineNum].PendingQty += pick.PendingQty;
 

@@ -32,7 +32,6 @@ export class PickTab {
     enteredData = {
         location: "",
         item: "",
-        //lot: "",
         qty: 0
     };
 
@@ -54,6 +53,7 @@ export class PickTab {
     }
 
     ionViewDidLoad() {
+
         this.events.subscribe('barcode:scan', (barcodeText)=>{
             this.onBarcodeScan(barcodeText)
         });
@@ -68,11 +68,6 @@ export class PickTab {
         this.events.subscribe('picks:open', (indexes)=>{
             this.openPicklistItem(indexes);
         });
-        console.log('ionViewDidLoad PickShipmentsPickPage Tab: Pick');
-
-        setTimeout(()=> {
-            this.locationInput.setFocus();
-        }, 150);
 
         if (this.pickProvider.hasSavedPicks()) {
 
@@ -122,7 +117,7 @@ export class PickTab {
         this.setItem(item.InventoryID.value);
 
         setTimeout(()=> {
-            this.qtyInput.setFocus();
+            try { this.qtyInput.setFocus(); }catch(e){}
         }, 500);
     }
 
@@ -253,7 +248,7 @@ export class PickTab {
                 return;
             //document.getElementById("item").focus();
             setTimeout(()=> {
-                this.itemInput.setFocus();
+                try { this.itemInput.setFocus(); }catch(e){}
             });
 
         }).catch((err)=>{
@@ -304,7 +299,7 @@ export class PickTab {
                 return;
 
             setTimeout(()=> {
-                this.qtyInput.setFocus();
+                try { this.qtyInput.setFocus(); }catch(e){}
             }, 500);
 
         }).catch((err)=> {

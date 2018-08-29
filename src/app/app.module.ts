@@ -7,7 +7,7 @@ import { LoginPageModule } from '../pages/login/login.module';
 import { PickShipmentsPage } from '../pages/pick-shipments/pick-shipments';
 import { ItemLookupPage } from '../pages/item-lookup/item-lookup';
 import { BinLookupPage } from '../pages/bin-lookup/bin-lookup';
-import { SetupPage } from '../pages/setup/setup';
+import { SetupPageModule } from '../pages/setup/setup.module';
 
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { AppPreferences } from '@ionic-native/app-preferences';
@@ -73,7 +73,6 @@ import { UtilsProvider } from "../providers/core/utils";
         CountEntryEnterTab,
         CountEntryListTab,
         CountEntryPendingTab,
-        SetupPage,
         PreferencesPage,
         BarcodeListenerComponent,
     ],
@@ -82,7 +81,8 @@ import { UtilsProvider } from "../providers/core/utils";
         HttpModule,
         AutoCompleteModule,
         IonicModule.forRoot(MyApp),
-        LoginPageModule
+        LoginPageModule,
+        SetupPageModule
     ],
     bootstrap: [IonicApp],
     entryComponents: [
@@ -110,7 +110,6 @@ import { UtilsProvider } from "../providers/core/utils";
         CountEntryEnterTab,
         CountEntryListTab,
         CountEntryPendingTab,
-        SetupPage,
         PreferencesPage
     ],
     providers: [
