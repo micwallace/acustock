@@ -14,9 +14,12 @@ export class CacheProvider {
 
     itemList = null;
     binList = null;
+
     binIndex = null;
     itemIndex = {};
+
     binPickSequence = [];
+
     warehouseList = null;
 
     constructor(public api:Api, public prefs:PreferencesProvider, public toastCtrl:ToastController) {
@@ -41,10 +44,11 @@ export class CacheProvider {
     }
 
     public getItemList() {
+
         return new Promise((resolve, reject) => {
 
             if (this.itemList == null) {
-                this.initialLoad().then((res) => {
+                this.primeItemCache().then((res) => {
                     resolve(this.itemList);
                 }).catch((err) => {
                     reject(err);
@@ -60,51 +64,72 @@ export class CacheProvider {
 
         return new Promise((resolve, reject)=> {
 
+            // TODO: Perform fresh lookup on cache expiry
+
             if (this.itemIndex.hasOwnProperty(id))
                 return resolve(this.itemIndex[id]);
 
-            // TODO: Optimise by only fetching the requested item.
-            this.getItemList().then((itemList:any)=> {
+            for (var i = 0; i < this.itemList.length; i++) {
 
-                for (var i = 0; i < itemList.length; i++) {
+                if (this.itemList[i].InventoryID.value == id) {
 
-                    if (itemList[i].InventoryID.value == id) {
+                    this.itemIndex[id] = this.itemList[i];
+                    resolve(this.itemList[i]);
+                    return;
+                }
 
-                        this.itemIndex[id] = itemList[i];
-                        resolve(itemList[i]);
+
+                for (var x = 0; x < this.itemList[i].CrossReferences.length; x++) {
+
+                    if (this.itemList[i].CrossReferences[x].AlternateID.value == id) {
+
+                        this.itemIndex[id] = this.itemList[i];
+                        resolve(this.itemList[i]);
                         return;
                     }
 
-
-                    for (var x = 0; x < itemList[i].CrossReferences.length; x++) {
-
-                        if (itemList[i].CrossReferences[x].AlternateID.value == id) {
-
-                            this.itemIndex[id] = itemList[i];
-                            resolve(itemList[i]);
-                            return;
-                        }
-
-                    }
                 }
+            }
 
-                reject({message: "The item with ID " + id + " was not found."});
+            //if (this.prefs.getPreference("cache_prime_items") != "none")
+                //reject({message: "The item with ID " + id + " was not found."});
 
-                // TODO: Perform fresh lookup on cache expiry
+            this.api.getItemBySku(id).then((item:any)=> {
+
+                this.itemList.push(item);
+                this.itemIndex[id] = item;
+                resolve(item);
 
             }).catch((err)=> {
+
+                if (err.status == 404) {
+                    this.api.getItemByBarcode(id).then((itemList:any)=> {
+
+                        if (itemList.length > 0) {
+                            this.itemList.push(itemList[0]);
+                            this.itemIndex[id] = itemList[0];
+                            resolve(itemList[0]);
+                        } else {
+                            reject({message: "The item with ID " + id + " was not found."});
+                        }
+                    }).catch((err)=> {
+                        reject(err);
+                    });
+                    return;
+                }
+
                 reject(err);
             })
         });
     }
 
-    public getItemWarehouseDetails(item){
+    public getItemWarehouseDetails(item) {
 
         var warehouse = this.getCurrentWarehouse();
 
-        if (item.WarehouseDetails != null){
-            for (var i=0; i<item.WarehouseDetails.length; i++){
-                if (warehouse.WarehouseID.value == item.WarehouseDetails[i].WarehouseID.value){
+        if (item.WarehouseDetails != null) {
+            for (var i = 0; i < item.WarehouseDetails.length; i++) {
+                if (warehouse.WarehouseID.value == item.WarehouseDetails[i].WarehouseID.value) {
                     return item.WarehouseDetails[i];
                 }
             }
@@ -113,12 +138,29 @@ export class CacheProvider {
         return null;
     }
 
+    public getWarehouseList() {
+
+        return new Promise((resolve, reject) => {
+
+            if (this.warehouseList == null) {
+                this.loadWarehouseList().then(() => {
+                    resolve(this.warehouseList);
+                }).catch((err) => {
+                    reject(err);
+                });
+                return;
+            }
+
+            resolve(this.warehouseList);
+        });
+    }
+
     public getBinList() {
 
         return new Promise((resolve, reject) => {
 
             if (this.binList == null) {
-                this.initialLoad().then(() => {
+                this.loadWarehouseList().then(() => {
                     resolve(this.binList);
                 }).catch((err) => {
                     reject(err);
@@ -128,7 +170,6 @@ export class CacheProvider {
 
             resolve(this.binList);
         });
-
     }
 
     public getBinById(id) {
@@ -182,40 +223,44 @@ export class CacheProvider {
     }
 
     public initialLoad() {
-        return new Promise((resolve, reject) => {
-            var toast = this.toastCtrl.create({
-                message: 'Initial cache load in progress. Some operations will be slower until this completes.',
-                showCloseButton: true,
-                closeButtonText: "OK"
+
+        var toast = this.toastCtrl.create({
+            message: 'Initial cache load in progress. Some operations will be slower until this completes.',
+            showCloseButton: true,
+            closeButtonText: "OK"
+        });
+        toast.present();
+
+        if (this.warehouseList != null){
+
+            this.primeItemCache().then(()=>{
+                toast.setMessage('Initial load complete.');
+                setTimeout(()=> {
+                    toast.dismissAll();
+                }, 3000);
+                console.log("Initial data loaded.");
+            }).catch((err) => {
+                this.loadFailed(toast, err);
             });
-            toast.present();
 
-            this.api.getWarehouseList().then((warehouseList:any) => {
+        } else {
 
-                this.warehouseList = warehouseList;
+            this.loadWarehouseList().then(()=>{
 
-                this.generateBinList();
-
-                this.api.getItemList().then((itemList) => {
-
-                    this.itemList = itemList;
-
-                    resolve();
+                this.primeItemCache().then(()=>{
                     toast.setMessage('Initial load complete.');
                     setTimeout(()=> {
                         toast.dismissAll();
                     }, 3000);
-                    console.log("Initial data loaded.")
+                    console.log("Initial data loaded.");
                 }).catch((err) => {
-                    reject(err);
                     this.loadFailed(toast, err);
                 });
 
             }).catch((err) => {
-                reject(err);
                 this.loadFailed(toast, err);
             });
-        });
+        }
     }
 
     private loadFailed(toast, err) {
@@ -226,4 +271,63 @@ export class CacheProvider {
         console.log("Initial data load failed: " + err.message);
     }
 
+    private primeItemCache(){
+
+        return new Promise((resolve, reject)=>{
+
+            var cachePref = this.prefs.getPreference("cache_prime_items");
+
+            if (cachePref == "none")
+                return resolve();
+
+            if (cachePref == "full") {
+                this.api.getItemList().then((itemList) => {
+                    this.itemList = itemList;
+                    resolve();
+                }).catch((err) => {
+                    reject(err);
+                });
+            } else {
+                this.itemList = [];
+                this.batchLoadItems(resolve, reject);
+            }
+        });
+    }
+
+    private batchLoadItems(resolve, reject, skip=0, limit=200){
+
+        this.api.getItemList("$expand=CrossReferences&$expand=WarehouseDetails&$top=" + limit + (skip>0 ? "&$skip="+skip : "")).then((itemList:any) => {
+
+            this.itemList = this.itemList.concat(itemList);
+
+            if (itemList.length < limit){
+                resolve();
+                console.log("Item batch load "+skip+" to "+(skip+itemList.length)+" completed");
+            } else {
+                console.log("Item batch load "+skip+" to "+(skip+limit)+" completed");
+                skip += limit;
+                this.batchLoadItems(resolve, reject, skip);
+            }
+        }).catch((err) => {
+            reject(err);
+        });
+    }
+
+    private loadWarehouseList(){
+
+        return new Promise((resolve, reject)=>{
+
+            this.api.getWarehouseList().then((warehouseList:any) => {
+
+                this.warehouseList = warehouseList;
+                this.generateBinList();
+
+                resolve();
+
+            }).catch((err)=>{
+                reject(err);
+            });
+
+        });
+    }
 }

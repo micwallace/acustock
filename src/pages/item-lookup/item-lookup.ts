@@ -132,7 +132,7 @@ export class ItemLookupPage {
         let loader = this.loadingCtrl.create({content: "Loading..."});
         loader.present();
 
-        this.api.getItemBatches(item.InventoryID.value, item.Warehouse.value, item.Location.value).then((res) => {
+        this.api.getItemLotSerialInfo(item.InventoryID.value, item.Warehouse.value, item.Location.value).then((res) => {
 
             item.LotSerialDetails = res;
 

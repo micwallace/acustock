@@ -36,7 +36,8 @@ export class EnterTab {
     showItem = false;
     showQty = false;
 
-    loader;
+    loader = null;
+    loaderTimer = null;
 
     constructor(private zone:NgZone,
                 public navCtrl:NavController,
@@ -76,9 +77,39 @@ export class EnterTab {
         this.locationInput.setFocus();
     }
 
+    public showLoaderDelayed(message){
+
+        if (this.loader == null && this.loaderTimer == null){
+
+            this.loaderTimer = setTimeout(()=>{
+                this.loader = this.loadingCtrl.create({content: message});
+                this.loader.present();
+            }, 700);
+
+        } else if (this.loader != null){
+            this.loader.data.content = message;
+        }
+    }
+
     private dismissLoader() {
-        return this.loader.dismiss();
-        //this.loader = null;
+
+        if (this.loaderTimer != null){
+            clearTimeout(this.loaderTimer);
+            this.loaderTimer = null;
+        }
+
+        return new Promise((resolve, reject)=>{
+
+            if (this.loader == null)
+                return resolve();
+
+            this.loader.dismiss().then(()=>{
+                this.loader = null;
+                resolve();
+            }).catch((err)=>{
+                resolve();
+            });
+        });
     }
 
     setLocation(locId, isScan) {
@@ -89,11 +120,26 @@ export class EnterTab {
             locId = this.enteredData.location;
         }
 
-        this.loader = this.loadingCtrl.create({content: "Loading..."});
-        this.loader.present();
+        if (locId == "") {
+            this.utils.showAlert("Error", "Please enter a location");
+            return;
+        }
+
+        this.showLoaderDelayed("Loading...");
 
         // Validate bin and load current bin contents
-        this.cache.getBinById(locId).then((bin)=> {
+        this.cache.getBinById(locId).then((bin:any)=> {
+
+            // check if transfers are allowed from this location
+            if (!bin.TransfersAllowed.value){
+
+                this.enteredData.location = "";
+                this.utils.playFailedSound(isScan);
+                this.dismissLoader().then(()=>{
+                    this.utils.showAlert("Error", "Transfers are not allowed from location "+bin.Description.value+" ("+bin.LocationID+")");
+                });
+                return;
+            }
 
             this.cache.api.getLocationContents(locId, this.cache.prefs.getPreference('warehouse')).then((itemList:any)=> {
 
@@ -136,10 +182,6 @@ export class EnterTab {
 
     setToLocation(locId, isScan) {
 
-        if (this.enteredData.location == locId) {
-            this.utils.showAlert("Error", "From and to location must be different");
-            return;
-        }
 
         if (locId) {
             this.enteredData.toLocation = locId;
@@ -147,8 +189,18 @@ export class EnterTab {
             locId = this.enteredData.toLocation;
         }
 
-        this.loader = this.loadingCtrl.create({content: "Loading..."});
-        this.loader.present();
+        if (locId == "") {
+            this.utils.showAlert("Error", "Please enter a location");
+            return;
+        }
+
+        if (this.enteredData.location == locId) {
+            this.enteredData.location = "";
+            this.utils.showAlert("Error", "From and to location must be different");
+            return;
+        }
+
+        this.showLoaderDelayed("Loading...");
 
         this.cache.getBinById(locId).then((bin)=> {
 
@@ -181,8 +233,12 @@ export class EnterTab {
             itemId = this.enteredData.item;
         }
 
-        this.loader = this.loadingCtrl.create({content: "Loading..."});
-        this.loader.present();
+        if (this.enteredData.item == "") {
+            this.utils.showAlert("Error", "Please enter an item");
+            return;
+        }
+
+        this.showLoaderDelayed("Loading...");
 
         this.cache.getItemById(itemId).then((item:any)=> {
 
@@ -293,6 +349,8 @@ export class EnterTab {
             this.setToLocation(barcodeText, true);
             return;
         }
+
+        this.showLoaderDelayed("Loading...");
 
         // If the location and to-location is already set, scanning a bin barcode updates the to-location
         this.cache.getBinById(barcodeText).then((bin)=> {

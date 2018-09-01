@@ -51,6 +51,28 @@ export class PreferencesProvider {
                     title: "Warehouse",
                     type: "select",
                     def_value: ""
+                },
+                {
+                    key: "device",
+                    title: "Device Name",
+                    type: "text",
+                    def_value: "Device 1"
+                }
+            ]
+        },
+        {
+            title: "Cache",
+            preferences: [
+                {
+                    key: "cache_prime_items",
+                    title: "Prime Item Cache",
+                    type: "select",
+                    options: [
+                        {label: "Load all", value: "full"},
+                        {label: "Load all in batches", value: "batch"},
+                        {label: "Load on demand", value: "none"},
+                    ],
+                    def_value: "batch"
                 }
             ]
         },

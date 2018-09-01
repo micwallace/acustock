@@ -58,17 +58,12 @@ export class Api {
             this.updateSettings(username, password);
 
             this.login().then((res) => {
-
                 resolve();
-
-            }, (err) => {
-
-                reject(this.processApiError(err));
-
             }).catch((err)=> {
-
-                reject(this.processApiError(err));
+                reject(err);
             });
+
+            // TODO: Acumatica plugin version test
         });
     }
 
@@ -80,26 +75,40 @@ export class Api {
             company: this.company
         };
 
-        if (this.useNativeHttp()) {
-            return this.http.post(this.url + '/entity/auth/login', data, {});
-        } else {
-            return new Promise((resolve, reject)=>{
-                //this.jsReqOptions.withCredentials = false;
-                this.jsHttp.post(this.url + '/entity/auth/login', JSON.stringify(data), this.jsReqOptions).toPromise().then((res)=>{
+        return new Promise((resolve, reject)=> {
+            if (this.useNativeHttp()) {
+                this.http.post(this.url + '/entity/auth/login', data, {}).then((res)=>{
                     resolve(res);
-                }).catch((err)=>{
-                    reject(err);
+                }, (err)=>{
+                    reject(this.processApiError(err));
+                }).catch((err)=> {
+                    reject(this.processApiError(err));
                 });
-            });
-        }
+            } else {
+                //this.jsReqOptions.withCredentials = false;
+                this.jsHttp.post(this.url + '/entity/auth/login', JSON.stringify(data), this.jsReqOptions).toPromise().then((res)=> {
+                    resolve(res);
+                }).catch((err)=> {
+                    reject(this.processApiError(err));
+                });
+            }
+        });
     }
 
     logout() {
         return this.http.post(this.url + '/entity/auth/login', null, {});
     }
 
-    getItemList() {
-        return this.get('StockItem?$expand=CrossReferences&$expand=WarehouseDetails');
+    getItemBySku(itemId) {
+        return this.get('StockItem/'+itemId+'?$expand=CrossReferences,WarehouseDetails');
+    }
+
+    getItemByBarcode(barcode) {
+        return this.get("StockItem?$expand=CrossReferences,WarehouseDetails&filter=CrossReferences/AlternateID eq '"+barcode+"'");
+    }
+
+    getItemList(paramStr = "$expand=CrossReferences,WarehouseDetails") {
+        return this.get('StockItem?'+paramStr);
     }
 
     getWarehouseList() {
@@ -118,7 +127,7 @@ export class Api {
         return this.get("InventoryLocations?$filter=Location eq '" + locationId + "'" + warehouseFilter);
     }
 
-    getItemBatches(itemId:string, warehouseId:string, locationId:string) {
+    getItemLotSerialInfo(itemId:string, warehouseId:string, locationId:string) {
 
         let filter = [];
 
@@ -135,7 +144,7 @@ export class Api {
     }
 
     getShipment(shipmentNbr, expand = "Details,Details/Allocations") {
-        return this.get("Shipment/" + shipmentNbr + "?$expand=" + expand);
+        return this.get("Shipment/" + shipmentNbr + "?"+(expand ? "$expand=" + expand : ""));
     }
 
     getShipmentList() {
@@ -143,7 +152,7 @@ export class Api {
     }
 
     putShipment(data, expand = "Details,Details/Allocations") {
-        return this.put("Shipment?$expand=" + expand, data, {});
+        return this.put("Shipment"+(expand ? "?$expand=" + expand : ""), data, {});
     }
 
     confirmShipment(shipmentNbr){

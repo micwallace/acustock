@@ -7,6 +7,7 @@ import { PreferencesProvider } from "../../providers/core/preferences";
 import { PreferencesPage } from "../preferences/preferences";
 import { UtilsProvider } from "../../providers/core/utils";
 import { CacheProvider } from "../../providers/core/cache";
+import {AlertController} from "ionic-angular/index";
 
 /**
  * Generated class for the SetupPage page.
@@ -28,6 +29,7 @@ export class SetupPage {
                 public api:Api,
                 public barcodeScanner:BarcodeScanner,
                 public loadingCtrl:LoadingController,
+                public alertCtrl:AlertController,
                 public events:Events,
                 public utils:UtilsProvider,
                 public cache:CacheProvider) {
@@ -104,17 +106,79 @@ export class SetupPage {
 
         this.api.testConnection(null, null).then((res) => {
 
-            loader.dismiss();
-            this.navCtrl.setRoot(PickShipmentsPage);
+            this.cache.getWarehouseList().then((warehouseList:any)=>{
 
-            this.cache.initialLoad();
+                loader.dismiss();
+                this.promptForWarehouse(warehouseList);
+
+            }).catch((err) => {
+                loader.dismiss();
+                this.utils.playFailedSound(isScan);
+                this.utils.processApiError("Error", "Connection failed: " + err.message, err, this.navCtrl);
+            });
 
         }).catch((err) => {
-
             loader.dismiss();
             this.utils.playFailedSound(isScan);
             this.utils.processApiError("Error", "Connection failed: " + err.message, err, this.navCtrl);
         });
+    }
+
+    private promptForWarehouse(warehouseList){
+
+        let alert = this.alertCtrl.create({
+            title: "Warehouse",
+            message: "Please select Warehouse",
+            enableBackdropDismiss: false,
+            buttons: [
+                {
+                    text: "OK",
+                    handler: (data)=> {
+                        this.prefs.setPreference("warehouse", data);
+                        this.promptForDeviceName();
+                    }
+                }
+            ]
+        });
+
+        var curWarehouse = this.cache.getCurrentWarehouse();
+
+        for (let warehouse of warehouseList) {
+            if (warehouse.Active.value)
+                alert.addInput({
+                    type: "radio",
+                    label: warehouse.Description.value,
+                    value: warehouse.WarehouseID.value,
+                    checked: (warehouse.WarehouseID.value == curWarehouse.WarehouseID.value)
+                });
+        }
+
+        alert.present();
+    }
+
+    private promptForDeviceName(){
+        let alert = this.alertCtrl.create({
+            title: "Device Name",
+            message: "Please enter device name",
+            enableBackdropDismiss: false,
+            inputs: [{
+                name: 'device',
+                placeholder: 'Device Name',
+                value: this.prefs.getPreference("device")
+            }],
+            buttons: [
+                {
+                    text: "OK",
+                    handler: (data)=> {
+                        this.prefs.setPreference("device", data.device);
+                        this.navCtrl.setRoot(PickShipmentsPage);
+                        this.cache.initialLoad();
+                    }
+                }
+            ]
+        });
+
+        alert.present();
     }
 
 }

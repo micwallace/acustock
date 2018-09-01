@@ -93,6 +93,42 @@ export class PickProvider {
 
     }
 
+    public refreshStatus(){
+
+        return new Promise((resolve, reject)=> {
+
+            this.api.getShipment(this.currentShipment.ShipmentNbr.value, null).then((res:any)=>{
+                this.currentShipment.PickStatus = res.PickStatus;
+                this.currentShipment.PickDevice = res.PickDevice;
+
+                resolve();
+            }).catch((err)=>{
+                reject(err);
+            });
+        });
+    }
+
+    public assignShipment(){
+
+        return new Promise((resolve, reject)=> {
+
+            var data = {
+                ShipmentNbr: this.currentShipment.ShipmentNbr,
+                PickStatus: {value: "2"},
+                PickDevice: {value: this.prefs.getPreference("device")}
+            };
+
+            this.api.putShipment(data, null).then((res:any)=>{
+                this.currentShipment.PickStatus = res.PickStatus;
+                this.currentShipment.PickDevice = res.PickDevice;
+
+                resolve();
+            }).catch((err)=>{
+                reject(err);
+            });
+        });
+    }
+
     generateSourceList(){
 
         this.sourceIndex = {};

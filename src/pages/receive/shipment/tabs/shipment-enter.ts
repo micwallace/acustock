@@ -34,7 +34,8 @@ export class ReceiveShipmentEnterTab {
     showLocation = false;
     showQty = false;
 
-    loader;
+    loader = null;
+    loaderTimer = null;
 
     constructor(private zone:NgZone,
                 public navCtrl:NavController,
@@ -100,7 +101,27 @@ export class ReceiveShipmentEnterTab {
         this.locationInput.setFocus();
     }
 
+    public showLoaderDelayed(message){
+
+        if (this.loader == null && this.loaderTimer == null){
+
+            this.loaderTimer = setTimeout(()=>{
+                this.loader = this.loadingCtrl.create({content: message});
+                this.loader.present();
+            }, 700);
+
+        } else if (this.loader != null){
+            this.loader.data.content = message;
+        }
+    }
+
     private dismissLoader() {
+
+        if (this.loaderTimer != null){
+            clearTimeout(this.loaderTimer);
+            this.loaderTimer = null;
+        }
+
         return new Promise((resolve, reject)=>{
 
             if (this.loader == null)
@@ -110,7 +131,7 @@ export class ReceiveShipmentEnterTab {
                 this.loader = null;
                 resolve();
             }).catch((err)=>{
-                reject(err);
+                resolve();
             });
         });
     }
@@ -123,10 +144,12 @@ export class ReceiveShipmentEnterTab {
             itemId = this.enteredData.item;
         }
 
-        if (this.loader == null) {
-            this.loader = this.loadingCtrl.create({content: "Loading..."});
-            this.loader.present();
+        if (itemId == "") {
+            this.utils.showAlert("Error", "Please enter an item");
+            return;
         }
+
+        this.showLoaderDelayed("Loading...");
 
         this.cache.getItemById(itemId).then((item:any)=> {
 
@@ -180,8 +203,6 @@ export class ReceiveShipmentEnterTab {
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
                 this.utils.showAlert("Error", err.message, {exception: err});
-            }).catch((err)=>{
-                this.utils.showAlert("Error", err.message, {exception: err});
             });
         });
     }
@@ -194,12 +215,25 @@ export class ReceiveShipmentEnterTab {
             locId = this.enteredData.location;
         }
 
-        if (this.loader == null) {
-            this.loader = this.loadingCtrl.create({content: "Loading..."});
-            this.loader.present();
+        if (locId == "") {
+            this.utils.showAlert("Error", "Please enter a location");
+            return;
         }
 
-        this.cache.getBinById(locId).then((bin)=> {
+        this.showLoaderDelayed("Loading...");
+
+        this.cache.getBinById(locId).then((bin:any)=> {
+
+            // check if receipts are allowed for this location
+            if (!bin.ReceiptsAllowed.value){
+
+                this.enteredData.location = "";
+                this.utils.playFailedSound(isScan);
+                this.dismissLoader().then(()=>{
+                    this.utils.showAlert("Error", "Receipts are not allowed for location "+bin.Description.value+" ("+bin.LocationID+")");
+                });
+                return;
+            }
 
             if (this.enteredData.item != "") {
                 this.showQty = true;
@@ -316,6 +350,8 @@ export class ReceiveShipmentEnterTab {
             this.setLocation(barcodeText, true);
 
         }).catch((err) => {
+
+            this.showLoaderDelayed("Loading...");
 
             this.cache.getItemById(barcodeText).then((item:any)=> {
 

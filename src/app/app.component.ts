@@ -65,7 +65,7 @@ export class MyApp {
                 }).catch((err) => {
                     loader.dismiss();
                     context.navCtrl.setRoot(SetupPage);
-                    this.utils.processApiError("Error", "Connection failed: "+err.message, err);
+                    this.utils.processApiError("Error", "Connection failed: "+err.message, err, this.navCtrl);
                 });
 
             }

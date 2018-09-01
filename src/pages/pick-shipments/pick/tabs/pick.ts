@@ -38,6 +38,9 @@ export class PickTab {
     showLot = false;
     showQty = false;
 
+    loader = null;
+    loaderTimer = null; // Use this to prevent loader popping up for cached items/locations
+
     constructor(public navCtrl:NavController,
                 public navParams:NavParams,
                 public pickProvider:PickProvider,
@@ -102,6 +105,41 @@ export class PickTab {
         this.events.unsubscribe('picks:confirm');
         this.events.unsubscribe('picks:cancel');
         this.events.unsubscribe('picks:open');
+    }
+
+    public showLoaderDelayed(message){
+
+        if (this.loader == null && this.loaderTimer == null){
+
+            this.loaderTimer = setTimeout(()=>{
+                this.loader = this.loadingCtrl.create({content: message});
+                this.loader.present();
+            }, 700);
+
+        } else if (this.loader != null){
+            this.loader.data.content = message;
+        }
+    }
+
+    private dismissLoader() {
+
+        if (this.loaderTimer != null){
+            clearTimeout(this.loaderTimer);
+            this.loaderTimer = null;
+        }
+
+        return new Promise((resolve, reject)=>{
+
+            if (this.loader == null)
+                return resolve();
+
+            this.loader.dismiss().then(()=>{
+                this.loader = null;
+                resolve();
+            }).catch((err)=>{
+                resolve();
+            });
+        });
     }
 
     openPicklistItem(indexes){
@@ -222,7 +260,27 @@ export class PickTab {
             this.enteredData.location = locId;
         }
 
-        this.cache.getBinById(this.enteredData.location).then((bin)=>{
+        if (this.enteredData.location == "") {
+            this.utils.showAlert("Error", "Please enter a location");
+            return;
+        }
+
+        this.showLoaderDelayed("Loading...");
+
+        this.cache.getBinById(this.enteredData.location).then((bin:any)=>{
+
+            // check if sales are allowed from this location
+            if (!bin.SalesAllowed.value){
+
+                this.enteredData.location = "";
+                this.utils.playFailedSound(isScan);
+                this.dismissLoader().then(()=>{
+                    this.utils.showAlert("Error", "Sales are not allowed from location "+bin.Description.value+" ("+bin.LocationID+")");
+                });
+                return;
+            }
+
+            this.dismissLoader();
 
             var curItem = this.getSuggestedAllocation();
 
@@ -253,7 +311,10 @@ export class PickTab {
 
         }).catch((err)=>{
             this.enteredData.location = "";
-            this.utils.showAlert("Error", err.message, {exception: err});
+            this.utils.playFailedSound(isScan);
+            this.dismissLoader().then(()=>{
+                this.utils.showAlert("Error", err.message, {exception: err});
+            });
         });
 
     }
@@ -263,6 +324,13 @@ export class PickTab {
         if (itemId) {
             this.enteredData.item = itemId;
         }
+
+        if (this.enteredData.item == "") {
+            this.utils.showAlert("Error", "Please enter an item");
+            return;
+        }
+
+        this.showLoaderDelayed("Loading...");
 
         this.cache.getItemById(this.enteredData.item).then((item:any)=> {
 
@@ -276,13 +344,17 @@ export class PickTab {
                     this.enteredData.item = "";
                     this.enteredData.qty = 0;
                     this.utils.playFailedSound(isScan);
-                    this.utils.showAlert("Error", "The item does not exist on the picklist or has already been picked.");
+                    this.dismissLoader().then(()=> {
+                        this.utils.showAlert("Error", "The item does not exist on the picklist or has already been picked.");
+                    });
                     return;
                 }
 
                 this.currentLocationIndex = allocIndexes[0];
                 this.currentItemIndex = allocIndexes[1];
             }
+
+            this.dismissLoader();
 
             this.showQty = true;
             this.enteredData.qty = 1;
@@ -304,7 +376,10 @@ export class PickTab {
 
         }).catch((err)=> {
             this.enteredData.item = "";
-            this.utils.showAlert("Error", err.message, {exception: err});
+            this.utils.playFailedSound(isScan);
+            this.dismissLoader().then(()=>{
+                this.utils.showAlert("Error", err.message, {exception: err});
+            });
         });
     }
 
@@ -490,6 +565,8 @@ export class PickTab {
             });
             return;
         }
+
+        this.showLoaderDelayed("Loading...");
 
         this.cache.getBinById(barcodeText).then((bin:any)=> {
 

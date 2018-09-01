@@ -5,6 +5,8 @@ import { PickProvider } from '../../providers/app/pick';
 import { PickShipmentsListPage } from "./list/pick-shipments-list";
 import { PickShipmentsPickPage } from "./pick/pick-shipments-pick";
 import { UtilsProvider } from "../../providers/core/utils";
+import {AlertController} from "ionic-angular/index";
+import {PreferencesProvider} from "../../providers/core/preferences";
 
 @Component({
     selector: 'page-pick-shipments',
@@ -14,12 +16,16 @@ export class PickShipmentsPage {
 
     shipmentNbr = "";
 
+    loader = null;
+
     constructor(public navCtrl:NavController,
                 private barcodeScanner:BarcodeScanner,
                 public pickProvider:PickProvider,
                 public modalCtrl:ModalController,
                 public loadingCtrl:LoadingController,
-                public utils:UtilsProvider) {
+                public alertCtrl:AlertController,
+                public utils:UtilsProvider,
+                public prefs:PreferencesProvider) {
 
     }
 
@@ -69,8 +75,78 @@ export class PickShipmentsPage {
             return;
         }
 
-        //noinspection TypeScriptValidateTypes
-        this.navCtrl.push(PickShipmentsPickPage);
+        this.loader = this.loadingCtrl.create({content: "Loading..."});
+        this.loader.present();
+
+        this.pickProvider.refreshStatus().then((res)=>{
+
+            if (this.pickProvider.currentShipment.PickStatus.value == "Assigned" && this.pickProvider.currentShipment.PickDevice.value != this.prefs.getPreference('device')){
+
+                let alert = this.alertCtrl.create({
+                    title: "Shipment Assigned",
+                    message: "This shipment is already assigned to device "+this.pickProvider.currentShipment.PickDevice.value+". Would you like to release it and assign it to this device?",
+                    buttons: [
+                        {
+                            text: "No",
+                            role: "cancel"
+                        },
+                        {
+                            text: "Yes",
+                            handler: ()=> {
+                                this.assignDeviceAndStartPick();
+                            }
+                        }
+                    ]
+                });
+
+                this.dismissLoader().then(()=>{
+                    alert.present();
+                });
+            } else {
+                this.dismissLoader();
+                //noinspection TypeScriptValidateTypes
+                this.navCtrl.push(PickShipmentsPickPage);
+            }
+        }).catch((err)=>{
+            this.dismissLoader().then(()=>{
+                this.utils.processApiError("Error", err.message, err, this.navCtrl);
+            })
+        });
+
+    }
+
+    private assignDeviceAndStartPick(){
+
+        if (this.loader == null) {
+            this.loader = this.loadingCtrl.create({content: "Loading..."});
+            this.loader.present();
+        }
+
+        this.pickProvider.assignShipment().then((res)=>{
+            this.dismissLoader();
+            //noinspection TypeScriptValidateTypes
+            this.navCtrl.push(PickShipmentsPickPage);
+        }).catch((err)=> {
+            this.dismissLoader().then(()=>{
+                this.utils.processApiError("Error", err.message, err, this.navCtrl);
+            })
+        });
+    }
+
+    private dismissLoader() {
+
+        return new Promise((resolve, reject)=>{
+
+            if (this.loader == null)
+                return resolve();
+
+            this.loader.dismiss().then(()=>{
+                this.loader = null;
+                resolve();
+            }).catch((err)=>{
+                resolve();
+            });
+        });
     }
 
 }
