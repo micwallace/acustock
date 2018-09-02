@@ -129,7 +129,13 @@ export class PickProvider {
         });
     }
 
-    generateSourceList(){
+    /**
+     * Loop through the current shipment items and create a two level index of current allocations,
+     * keyed by line number and split (allocation) line number. If the item contains an unallocated quantity,
+     * an additional allocation keyed UNALLOCATED is created. This is because we want to display any unallocated
+     * quantities on the picklist.
+     */
+    private generateSourceList(){
 
         this.sourceIndex = {};
 
@@ -216,12 +222,19 @@ export class PickProvider {
 
     }
 
+    /**
+     * Loops through currently pending picks (allocations) and strips or modifies the sourceIndex to remove
+     * the pending quantities. The result is a source index that reflects what is remaining after taking into account
+     * pending picks. It adds items to the modified index to keep track of existing allocations that have had their
+     * quantity reduced or have been deleted. This data is used later when confirming picks.
+     * Picks are stripped
+     */
     private processPendingAllocations(){
 
         console.log("Triming source index for allocations");
         this.modifiedAllocations = {};
 
-        var srcAlloc, diff, pendingQty;
+        var srcAlloc, diff, pendingQtyLeft, maxConsumedQty;
 
         for (var x in this.pendingPicks) {
 
@@ -238,67 +251,85 @@ export class PickProvider {
                 console.log(JSON.stringify(alloc));
 
                 // Consume the original allocation first if available, and then the rest until remaining pending qty is 0.
-                pendingQty = alloc.PendingQty;
+                pendingQtyLeft = alloc.PendingQty;
 
                 if (alloc.hasOwnProperty("SplitLineNbr") && this.sourceIndex[x].Allocations.hasOwnProperty(alloc.SplitLineNbr.value)) {
 
                     srcAlloc = this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value];
 
-                    if (pendingQty < srcAlloc.RemainingQty) {
+                    if (pendingQtyLeft < srcAlloc.RemainingQty) {
 
-                        diff = srcAlloc.RemainingQty - pendingQty;
+                        diff = srcAlloc.RemainingQty - pendingQtyLeft;
 
                         this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value].RemainingQty = diff;
+                        // TODO: Fix calculation in UI and enable
                         //this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value].Qty.value = srcAlloc.Qty.value - pendingQty;
 
                         this.addModifiedAllocation(this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value]);
 
-                        console.log("Stage 1: Reduced remaining qty of current allocation " + pendingQty + " (remaining " + diff + ")");
+                        console.log("Stage 1: Reduced remaining qty of current allocation " + pendingQtyLeft + " (remaining " + diff + ")");
 
-                        pendingQty -= pendingQty;
+                        pendingQtyLeft -= pendingQtyLeft;
 
                     } else {
 
+                        maxConsumedQty = Math.min(srcAlloc.RemainingQty, pendingQtyLeft);
+
+                        // If the allocation has already been partially picked, adjust it's quantity and add it to the modified allocations.
+                        // Otherwise simply remove the remaining quantity from the source allocation index since the allocation has been fully picked
+                        if (maxConsumedQty < srcAlloc.Qty.value){
+                            this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value].Qty.value = srcAlloc.Qty.value - maxConsumedQty;
+                            this.addModifiedAllocation(this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value]);
+                        }
+
                         delete this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value];
 
-                        pendingQty -= Math.min(srcAlloc.RemainingQty, pendingQty);
+                        pendingQtyLeft -= maxConsumedQty;
 
-                        console.log("Stage 1: Deleted current allocation " + Math.min(srcAlloc.RemainingQty, pendingQty) + " (remaining " + pendingQty + ")");
+                        console.log("Stage 1: Deleted current allocation " + maxConsumedQty + " (remaining " + pendingQtyLeft + ")");
                     }
                 }
 
-                if (pendingQty > 0) {
-
+                if (pendingQtyLeft > 0) {
+                    // TODO: Strip unallocated quantity first
                     for (var y in this.sourceIndex[x].Allocations) {
 
                         srcAlloc = this.sourceIndex[x].Allocations[y];
 
-                        if (pendingQty < srcAlloc.RemainingQty){
+                        if (pendingQtyLeft < srcAlloc.RemainingQty){
 
-                            diff = srcAlloc.RemainingQty - pendingQty;
+                            diff = srcAlloc.RemainingQty - pendingQtyLeft;
 
                             this.sourceIndex[x].Allocations[y].RemainingQty = diff;
-                            this.sourceIndex[x].Allocations[y].Qty.value = srcAlloc.Qty.value - pendingQty;
+                            this.sourceIndex[x].Allocations[y].Qty.value = srcAlloc.Qty.value - pendingQtyLeft;
 
                             this.addModifiedAllocation(this.sourceIndex[x].Allocations[y]);
 
-                            console.log("Stage 2: Reduced remaining qty of other allocations "+ pendingQty + " (remaining "+ diff +")");
+                            console.log("Stage 2: Reduced remaining qty of other allocations "+ pendingQtyLeft + " (remaining "+ diff +")");
 
-                            pendingQty -= diff;
+                            pendingQtyLeft -= diff;
 
                         } else {
 
-                            this.sourceIndex[x].Allocations[y]["delete"] = true;
+                            maxConsumedQty = Math.min(srcAlloc.RemainingQty, pendingQtyLeft);
+
+                            // If the allocation has already been partially picked, adjust it's quantity, otherwise mark as deleted, then add it to the modified allocations.
+                            if (maxConsumedQty < srcAlloc.Qty.value){
+                                this.sourceIndex[x].Allocations[y].Qty.value = srcAlloc.Qty.value - maxConsumedQty;
+                            } else {
+                                this.sourceIndex[x].Allocations[y]["delete"] = true;
+                            }
+
                             this.addModifiedAllocation(this.sourceIndex[x].Allocations[y]);
 
                             delete this.sourceIndex[x].Allocations[y];
 
-                            pendingQty -= Math.min(srcAlloc.RemainingQty, pendingQty);
+                            pendingQtyLeft -= maxConsumedQty;
 
-                            console.log("Stage 2: Deleted other allocation "+ Math.min(srcAlloc.RemainingQty, pendingQty) + " (remaining "+pendingQty+")");
+                            console.log("Stage 2: Deleted other allocation "+ maxConsumedQty + " (remaining "+pendingQtyLeft+")");
                         }
 
-                        if (pendingQty <= 0)
+                        if (pendingQtyLeft <= 0)
                             break;
                     }
 
@@ -327,6 +358,10 @@ export class PickProvider {
         this.modifiedAllocations[alloc.LineNbr.value].Allocations[alloc.SplitLineNbr.value] = alloc;
     }
 
+    /**
+     * Generates a pick list from the current sourceIndex. The pick list is grouped by location and then sorted based
+     * on the pre-generated bin sequence.
+     */
     private generatePickList() {
 
         var pickList = {};
@@ -501,11 +536,15 @@ export class PickProvider {
 
         var pendingAlloc = this.getPendingAllocation(sugAlloc.LineNbr.value, sugAlloc.SplitLineNbr.value);
 
-        if (pendingAlloc != null && pendingAlloc.LocationID != data.location){
+        // Add a new allocation if the suggested one has been partially picked or currently pending with a different location
+        console.log("Current picked qty/location: "+sugAlloc.PickedQty.value+" / "+sugAlloc.LocationID.value);
+
+        if ((sugAlloc.PickedQty.value > 0 && sugAlloc.LocationID.value != data.location) ||
+            (pendingAlloc != null && pendingAlloc.LocationID != data.location)){
 
             delete sugAlloc.SplitLineNbr;
             sugAlloc.LocationID.value = data.location;
-            sugAlloc.RemainingQty = data.qty;
+            sugAlloc.PickedQty.value = 0;
             sugAlloc.PendingQty = data.qty;
             sugAlloc.Qty.value = data.qty;
             sugAlloc.id = PickProvider.getUniqueId();
@@ -653,6 +692,9 @@ export class PickProvider {
     }
 
     public clearSavedPicks() {
+
+        this.pendingPicks = {};
+
         var picks = JSON.parse(localStorage.getItem("unconfirmed_picks"));
 
         if (!picks)
@@ -669,10 +711,13 @@ export class PickProvider {
 
         return new Promise((resolve, reject) => {
 
-            var data = {
+            var data:any = {
                 ShipmentNbr: this.currentShipment.ShipmentNbr,
                 Details: []
             };
+
+            if (["Open", "Assigned", "Partially Picked", "Picked"].indexOf(this.currentShipment.PickStatus.value) > -1)
+                data.PickStatus = {value: (this.unpickedQty > 0 ? "Partially Picked" : "Picked")};
 
             for (var i in this.pendingPicks) {
 
@@ -749,7 +794,6 @@ export class PickProvider {
 
                 this.currentShipment = res;
 
-                this.pendingPicks = {};
                 this.clearSavedPicks();
 
                 this.generateSourceList();

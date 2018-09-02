@@ -493,7 +493,7 @@ export class PickTab {
 
             let alert = this.alertCtrl.create({
                 title: "Cancel picks",
-                message: "Yo mah dude, are you sure you want to can all pending picks?",
+                message: "Yo bro, are you sure you want to can all pending picks?",
                 buttons: [
                     {
                         text: "Cancel",

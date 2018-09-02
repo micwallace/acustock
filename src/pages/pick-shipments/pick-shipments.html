@@ -33,6 +33,22 @@
         <ion-grid *ngIf="pickProvider.currentShipment">
             <ion-row>
                 <ion-col>
+                    <label>Status:</label>
+                </ion-col>
+                <ion-col>
+                    {{pickProvider.currentShipment.Status?.value}}
+                </ion-col>
+            </ion-row>
+            <ion-row>
+                <ion-col>
+                    <label>Pick Status:</label>
+                </ion-col>
+                <ion-col>
+                    {{pickProvider.currentShipment.PickStatus?.value}}
+                </ion-col>
+            </ion-row>
+            <ion-row>
+                <ion-col>
                     <label>Total Items:</label>
                 </ion-col>
                 <ion-col>

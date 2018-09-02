@@ -3,7 +3,7 @@
     <name>AcuStock</name>
     <description>Mobile stock management for Acumatica</description>
     <author email="michael@wallaceit.com.au" href="http://wallaceit.com.au/">Michael Wallace</author>
-    <content original-src="index.html" src="http://192.168.1.15:8100" />
+    <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />

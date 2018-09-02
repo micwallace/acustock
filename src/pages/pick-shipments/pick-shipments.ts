@@ -70,6 +70,12 @@ export class PickShipmentsPage {
     }
 
     openPickDialog() {
+
+        if (this.pickProvider.currentShipment.Status.value != "Open"){
+            this.utils.showAlert("Error", "This shipment cannot be picked because it's status is not Open.");
+            return;
+        }
+
         if (this.pickProvider.unpickedQty == 0) {
             this.utils.showAlert("Error", "There are no items left to pick.");
             return;
