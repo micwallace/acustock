@@ -14,11 +14,12 @@ import { BinTransferPage } from "../pages/bin-transfer/bin-transfer";
 import { ReceivePage } from "../pages/receive/receive";
 import { UtilsProvider } from "../providers/core/utils";
 import { LoginPage } from "../pages/login/login";
+import { AdjustmentPage } from "../pages/adjustment/adjustment";
 
 @Component({
     templateUrl: 'app.html'
 })
-export class MyApp {
+export class AcuStock {
     @ViewChild(Nav) navCtrl:Nav;
     rootPage:any = LoginPage;
 
@@ -103,6 +104,11 @@ export class MyApp {
     goToBinLookup(params) {
         if (!params) params = {};
         this.navCtrl.setRoot(BinLookupPage);
+    }
+
+    goToAdjustment(params) {
+        if (!params) params = {};
+        this.navCtrl.setRoot(AdjustmentPage);
     }
 
     showPreferences() {

@@ -262,7 +262,7 @@ export class PickProvider {
                         diff = srcAlloc.RemainingQty - pendingQtyLeft;
 
                         this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value].RemainingQty = diff;
-                        // TODO: Fix calculation in UI and enable
+                        // TODO: Fix calculation in UI and enable? Is it needed?
                         //this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value].Qty.value = srcAlloc.Qty.value - pendingQty;
 
                         this.addModifiedAllocation(this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value]);

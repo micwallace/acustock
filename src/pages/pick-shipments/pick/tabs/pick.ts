@@ -533,10 +533,11 @@ export class PickTab {
         loader.present();
 
         this.pickProvider.confirmPicks().then((res:any)=>{
-            loader.dismissAll();
+            loader.dismiss();
+            this.cache.flushItemLocationCache();
             this.events.publish('closeModal');
         }).catch((err)=> {
-            loader.dismissAll();
+            loader.dismiss();
             this.utils.processApiError("Error", err.message, err, this.navCtrl);
         });
     }

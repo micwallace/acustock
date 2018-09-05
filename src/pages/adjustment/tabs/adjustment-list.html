@@ -1,0 +1,59 @@
+<!--
+  Generated template for the PickShipmentsListPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+    <ion-navbar>
+        <button ion-button menuToggle>
+            <ion-icon name="menu"></ion-icon>
+        </button>
+        <ion-title>Uncommitted Adjustments</ion-title>
+    </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+    <ion-grid>
+        <ion-row class="table-header">
+            <ion-col col-6>Item / Location</ion-col>
+            <ion-col col-6 text-right>Physical / Book Qty</ion-col>
+        </ion-row>
+        <ion-list class="item-list">
+            <ion-item no-margin no-padding tappable class="list-item" *ngFor="let key of objectKeys(adjustmentProvider.pendingItems)" (click)="editItem(adjustmentProvider.pendingItems[key].LocationID, adjustmentProvider.pendingItems[key].InventoryID);">
+                <ion-row class="item-group-header" no-margin>
+                    <ion-col col-6>
+                        <strong>{{adjustmentProvider.pendingItems[key].InventoryID}}</strong>
+                    </ion-col>
+                    <ion-col col-6 class="column-right">
+                        <span class="qty-btn-space">{{adjustmentProvider.pendingItems[key].PhysicalQty}}/{{adjustmentProvider.pendingItems[key].BookQty}}</span>
+                        <button ion-button icon-only small no-margin
+                                (click)="deleteItem(adjustmentProvider.pendingItems[key].LocationID, adjustmentProvider.pendingItems[key].InventoryID); $event.stopPropagation();">
+                            <ion-icon name="trash"></ion-icon>
+                        </button>
+                    </ion-col>
+                </ion-row>
+                <ion-row class="item-group-header" no-margin>
+                    <ion-col col-6>
+                        {{adjustmentProvider.pendingItems[key].LocationID}}
+                    </ion-col>
+                    <ion-col col-6 class="column-right">
+                        Variance: {{adjustmentProvider.pendingItems[key].Qty}}
+                    </ion-col>
+                </ion-row>
+            </ion-item>
+        </ion-list>
+    </ion-grid>
+</ion-content>
+<ion-footer no-shadow>
+    <ion-toolbar position="bottom">
+        <ion-row>
+            <ion-col text-right>
+                <button type="button" ion-button (click)="commitAdjustments()">Commit</button>
+            </ion-col>
+        </ion-row>
+    </ion-toolbar>
+</ion-footer>

@@ -1,9 +1,8 @@
 import { Component, ViewChild } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController, Events, Tabs } from 'ionic-angular';
-import { EnterTab } from "./tabs/enter";
-import { TransferListTab } from "./tabs/transfer-list";
-import { TransferHistoryTab } from "./tabs/transfer-history";
-import { TransferProvider } from "../../providers/app/transfer";
+import { AdjustmentEnterTab } from "./tabs/adjustment-enter";
+import { AdjustmentListTab } from "./tabs/adjustment-list";
+import { AdjustmentProvider } from "../../providers/app/adjustment";
 
 /**
  * Generated class for the PickShipmentsPickPage page.
@@ -14,22 +13,21 @@ import { TransferProvider } from "../../providers/app/transfer";
 
 @IonicPage()
 @Component({
-    selector: 'page-bin-transfer',
-    templateUrl: 'bin-transfer.html',
+    selector: 'page-adjustment',
+    templateUrl: 'adjustment.html',
 })
-export class BinTransferPage {
+export class AdjustmentPage {
 
     @ViewChild("tabs") tabs: Tabs;
 
-    tab1Root = EnterTab;
-    tab2Root = TransferListTab;
-    /*tab3Root = TransferHistoryTab;*/
+    tab1Root = AdjustmentEnterTab;
+    tab2Root = AdjustmentListTab;
 
     constructor(public navCtrl:NavController,
                 public navParams:NavParams,
                 public viewCtrl:ViewController,
                 public events:Events,
-                public transferProvider:TransferProvider) {
+                public transferProvider:AdjustmentProvider) {
 
     }
 

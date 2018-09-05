@@ -10,7 +10,7 @@
         <button ion-button menuToggle>
             <ion-icon name="menu"></ion-icon>
         </button>
-        <ion-title>Enter Transfers</ion-title>
+        <ion-title>Enter Adjustments</ion-title>
 
     </ion-navbar>
 
@@ -26,22 +26,13 @@
         <ion-row>
             <ion-col>
                 <ion-item no-padding>
-                    <ion-label color="primary">From Bin:</ion-label>
+                    <ion-label color="primary">Bin:</ion-label>
                     <ion-input id="location" #location type="text" [(ngModel)]="enteredData.location"
                                (keyup.enter)="setLocation(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
         <ion-row>
-            <ion-col>
-                <ion-item no-padding>
-                    <ion-label color="primary">To Bin:</ion-label>
-                    <ion-input id="to-location" #tolocation type="text" [(ngModel)]="enteredData.toLocation"
-                               (keyup.enter)="setToLocation(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
-                </ion-item>
-            </ion-col>
-        </ion-row>
-        <ion-row *ngIf="showItem">
             <ion-col>
                 <ion-item no-padding>
                     <ion-label color="primary">Item:</ion-label>
@@ -55,8 +46,24 @@
                 <ion-item no-padding>
                     <ion-label color="primary">Quantity:</ion-label>
                     <ion-input id="qty" #qty type="number" min="0" [(ngModel)]="enteredData.qty"
-                               (keyup.enter)="addTransferItem(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
+                               (keyup.enter)="nextItem(); $event.stopPropagation();" (keypress)="this.utils.limitKeyNumber($event); $event.stopPropagation();"></ion-input>
                 </ion-item>
+            </ion-col>
+        </ion-row>
+        <ion-row *ngIf="showQty">
+            <ion-col col-6>
+                <ion-row>
+                    <ion-col col-6>Book Quantity:</ion-col>
+                    <ion-col col-6>{{enteredData.bookQty}}</ion-col>
+                </ion-row>
+                <ion-row>
+                    <ion-col col-6>Variance:</ion-col>
+                    <ion-col col-6>{{(enteredData.qty - enteredData.bookQty)}}</ion-col>
+                </ion-row>
+            </ion-col>
+            <ion-col col-6 text-right>
+                <button type="button" ion-button small (click)="nextItem()">OK</button>
+                <button type="button" ion-button small (click)="resetForm()">Cancel</button>
             </ion-col>
         </ion-row>
     </ion-grid>
@@ -65,14 +72,11 @@
     <ion-toolbar position="bottom">
         <ion-row>
             <ion-col>
-                <button type="button" ion-button (click)="nextFromBin()">Next</button>
+                <button type="button" ion-button (click)="nextLocation()">Next Bin</button>
             </ion-col>
             <ion-col text-right>
-                <button type="button" ion-button (click)="commitTransfers()">Commit Transfers</button>
+                <button type="button" ion-button (click)="commitAdjustments()">Commit</button>
             </ion-col>
         </ion-row>
     </ion-toolbar>
 </ion-footer>
-
-
-

@@ -22,6 +22,9 @@ export class CacheProvider {
 
     warehouseList = null;
 
+    locationItems = {};
+    itemLocations = {};
+
     constructor(public api:Api, public prefs:PreferencesProvider, public toastCtrl:ToastController) {
         console.log('Hello CacheProvider Provider');
     }
@@ -220,6 +223,73 @@ export class CacheProvider {
         for (let bin of this.binList) {
             this.binIndex[bin.LocationID.value] = bin;
         }
+    }
+
+    public getLocationItems(locationId){
+        return new Promise((resolve, reject)=>{
+
+            if (this.locationItems.hasOwnProperty(locationId))
+                return resolve(this.locationItems[locationId]);
+
+            this.api.getLocationContents(locationId, this.prefs.getPreference('warehouse')).then((itemList:any)=> {
+
+                // Index current items for easier validation
+                this.locationItems[locationId] = {};
+
+                for (let item of itemList) {
+                    this.locationItems[locationId][item.InventoryID.value] = item;
+                }
+
+                resolve(this.locationItems[locationId]);
+
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
+    public getItemLocations(itemId){
+        return new Promise((resolve, reject)=>{
+
+            if (this.itemLocations.hasOwnProperty(itemId))
+                return resolve(this.itemLocations[itemId]);
+
+            this.api.getItemWarehouseLocations(itemId, this.prefs.getPreference('warehouse')).then((locationList:any)=> {
+
+                console.log("Loading item locations: " + itemId);
+
+                // Index current items for easier validation
+                this.itemLocations[itemId] = {};
+
+                for (let item of locationList) {
+                    this.itemLocations[itemId][item.Location.value] = item;
+                }
+
+                resolve(this.itemLocations[itemId]);
+
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
+    public preloadItemLocations(itemIds:Array<string>, curIndex=0){
+
+        this.getItemLocations(itemIds[curIndex]).then(()=>{
+
+            curIndex++;
+
+            if (curIndex < itemIds.length)
+                this.preloadItemLocations(itemIds, curIndex);
+
+        }).catch((err)=>{
+            console.log("Item locations preload failed");
+        });
+    }
+
+    public flushItemLocationCache(){
+        this.itemLocations = {};
+        this.locationItems = {};
     }
 
     public initialLoad() {

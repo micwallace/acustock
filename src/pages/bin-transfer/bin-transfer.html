@@ -1,6 +1,6 @@
 <ion-tabs #tabs>
     <ion-tab [root]="tab1Root" [rootParams]="data" tabTitle="Enter" tabIcon="cube"></ion-tab>
     <ion-tab [root]="tab2Root" [rootParams]="data" tabTitle="Uncommitted" tabIcon="list-box" [tabBadge]="transferProvider.pendingQty"></ion-tab>
-    <ion-tab [root]="tab3Root" [rootParams]="data" tabTitle="History" tabIcon="checkmark-circle"></ion-tab>
+    <!--<ion-tab [root]="tab3Root" [rootParams]="data" tabTitle="History" tabIcon="checkmark-circle"></ion-tab>-->
     <barcode-listener (scan)='onBarcodeScan($event)'></barcode-listener>
 </ion-tabs>

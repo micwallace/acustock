@@ -199,6 +199,18 @@ export class Api {
         return this.postActionAndGetResult("Transfer/Release", {entity: {ReferenceNbr: {value: transferId}}});
     }
 
+    putAdjustment(data) {
+        return this.put("Adjustment", data, {});
+    }
+
+    deleteAdjustment(transferId:string) {
+        return this.delete("Adjustment/" + transferId);
+    }
+
+    releaseAdjustment(transferId:string) {
+        return this.postActionAndGetResult("Adjustment/ReleaseAdjustment", {entity: {ReferenceNbr: {value: transferId}}});
+    }
+
     getCount(referenceNbr) {
         return this.get("PhysicalInventoryReview/" + referenceNbr + "?$expand=Details");
     }
@@ -221,7 +233,7 @@ export class Api {
                     return resolve(true);
 
                 var url = new URL(this.url);
-                url.pathname = res.headers.location;
+                url.pathname = this.useNativeHttp() ? res.headers.location : res.headers.get('Location');
 
                 setTimeout(()=> {
                     this.getLongRunningOpResult(url.toString(), resolve, reject, 1);
@@ -239,7 +251,7 @@ export class Api {
             req = this.http.get(url, {}, null);
         } else {
             req = new Promise((resolve, reject)=>{
-                this.jsHttp.post(url, this.jsReqOptions).toPromise().then((res)=>{
+                this.jsHttp.get(url, this.jsReqOptions).toPromise().then((res)=>{
                     resolve(res);
                 }).catch((err)=>{
                     reject(err);
@@ -259,8 +271,9 @@ export class Api {
                 this.getLongRunningOpResult(url, resolve, reject, count);
             }, 4000);
 
+        }, (err)=>{
+            reject(this.processApiError(err));
         }).catch((err)=> {
-            err.message = err.error;
             reject(err);
         });
     }
@@ -450,7 +463,7 @@ export class Api {
         } else {
             // CORS errors return status 0, give the user a hint.
             if (err.status == 0 && err.statusText == "")
-                err.statusText = "Unidentifiable error. This may be a CORS related issue. Check that the server is returning the correct CORS headers in response to a HEAD request.";
+                err.statusText = "Unidentifiable error. This may be a network or CORS related issue.";
 
             err.message = (err.hasOwnProperty("status") ? err.status+" " : "") + (err.hasOwnProperty("statusText") ? err.statusText+" " : "")
                 + (err.hasOwnProperty("error") ? err.error : "")

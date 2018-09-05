@@ -21,7 +21,7 @@ export class TransferProvider {
     constructor(public api:Api, public cache:CacheProvider, public loadingCtrl:LoadingController, public prefs:PreferencesProvider) {
         console.log('Hello TransferProvider Provider');
         this.loadPending();
-        this.loadHistory();
+        //this.loadHistory();
     }
 
     private loadPending() {
@@ -36,7 +36,7 @@ export class TransferProvider {
         localStorage.setItem("unconfirmed_transfers", JSON.stringify(this.pendingItems));
     }
 
-    private loadHistory() {
+    /*private loadHistory() {
 
         var history = JSON.parse(localStorage.getItem("transfer_history"));
         if (history)
@@ -46,7 +46,7 @@ export class TransferProvider {
     private addHistory(transferObject) {
         this.transferHistory.unshift(transferObject);
         localStorage.setItem("transfer_history", JSON.stringify(this.transferHistory))
-    }
+    }*/
 
     public calcTotalPendingQty() {
         this.pendingQty = 0;
@@ -178,7 +178,7 @@ export class TransferProvider {
                     this.savePending();
 
                     // add tranfer to history
-                    this.addHistory(res);
+                    //this.addHistory(res);
 
                     resolve();
 

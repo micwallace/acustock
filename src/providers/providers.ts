@@ -6,6 +6,7 @@ import { LocationAutocompleteService } from './ui/bin-autocomplete';
 import { PickProvider } from './app/pick';
 import { TransferProvider } from './app/transfer';
 import { CountProvider } from './app/count';
+import { AdjustmentProvider } from './app/adjustment';
 import { PreferencesProvider } from './core/preferences';
 
 export {
@@ -16,5 +17,6 @@ export {
     BarcodeListenerComponent,
     PickProvider,
     PreferencesProvider,
-    CountProvider
+    CountProvider,
+    AdjustmentProvider
 };

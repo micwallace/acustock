@@ -1,7 +1,7 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
-import { MyApp } from './app.component';
+import { AcuStock } from './app.component';
 
 import { LoginPageModule } from '../pages/login/login.module';
 import { PickShipmentsPage } from '../pages/pick-shipments/pick-shipments';
@@ -29,16 +29,14 @@ import { UnpickedListTab } from "../pages/pick-shipments/pick/tabs/unpicked-list
 import { PreferencesPage } from "../pages/preferences/preferences";
 import { BinTransferPage } from "../pages/bin-transfer/bin-transfer";
 import { TransferProvider } from "../providers/app/transfer";
-import { EnterTab } from "../pages/bin-transfer/tabs/enter";
+import { EnterTabModule } from "../pages/bin-transfer/tabs/enter.module";
 import { TransferListTab } from "../pages/bin-transfer/tabs/transfer-list";
-import { TransferHistoryTab } from "../pages/bin-transfer/tabs/transfer-history";
 import { ReceiveProvider } from '../providers/app/receive';
 import { ReceivePage } from "../pages/receive/receive";
 import { ReceiveShipmentPage } from "../pages/receive/shipment/receive-shipment";
 import { ReceiveShipmentListTab } from "../pages/receive/shipment/tabs/list";
 import { ReceiveShipmentPendingTab } from "../pages/receive/shipment/tabs/pending";
 import { ReceiveShipmentEnterTab } from "../pages/receive/shipment/tabs/shipment-enter";
-
 import { CountPage } from '../pages/count/count';
 import { CountEntryPage } from '../pages/count/entry/count-entry';
 import { CountEntryEnterTab } from '../pages/count/entry/tabs/count-enter';
@@ -46,14 +44,16 @@ import { CountEntryListTab } from '../pages/count/entry/tabs/count-list';
 import { CountEntryPendingTab } from '../pages/count/entry/tabs/pending-list';
 import { CountProvider } from "../providers/app/count";
 import { UtilsProvider } from "../providers/core/utils";
+import { AdjustmentPage } from "../pages/adjustment/adjustment";
+import { AdjustmentEnterTab } from "../pages/adjustment/tabs/adjustment-enter";
+import { AdjustmentListTab } from "../pages/adjustment/tabs/adjustment-list";
+import {AdjustmentProvider} from "../providers/app/adjustment";
 
 @NgModule({
     declarations: [
-        MyApp,
+        AcuStock,
         BinTransferPage,
-        EnterTab,
         TransferListTab,
-        TransferHistoryTab,
         PickShipmentsPage,
         PickShipmentsListPage,
         PickShipmentsPickPage,
@@ -73,6 +73,10 @@ import { UtilsProvider } from "../providers/core/utils";
         CountEntryEnterTab,
         CountEntryListTab,
         CountEntryPendingTab,
+        AdjustmentPage,
+        AdjustmentEnterTab,
+        AdjustmentListTab,
+        TransferListTab,
         PreferencesPage,
         BarcodeListenerComponent,
     ],
@@ -80,17 +84,16 @@ import { UtilsProvider } from "../providers/core/utils";
         BrowserModule,
         HttpModule,
         AutoCompleteModule,
-        IonicModule.forRoot(MyApp),
+        IonicModule.forRoot(AcuStock),
         LoginPageModule,
-        SetupPageModule
+        SetupPageModule,
+        EnterTabModule
     ],
     bootstrap: [IonicApp],
     entryComponents: [
-        MyApp,
+        AcuStock,
         BinTransferPage,
-        EnterTab,
         TransferListTab,
-        TransferHistoryTab,
         PickShipmentsPage,
         PickShipmentsListPage,
         PickShipmentsPickPage,
@@ -110,6 +113,9 @@ import { UtilsProvider } from "../providers/core/utils";
         CountEntryEnterTab,
         CountEntryListTab,
         CountEntryPendingTab,
+        AdjustmentPage,
+        AdjustmentEnterTab,
+        AdjustmentListTab,
         PreferencesPage
     ],
     providers: [
@@ -129,6 +135,7 @@ import { UtilsProvider } from "../providers/core/utils";
         PreferencesProvider,
         UtilsProvider,
         ReceiveProvider,
+        AdjustmentProvider,
         Vibration,
         EmailComposer
     ]
