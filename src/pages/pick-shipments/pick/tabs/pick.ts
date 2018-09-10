@@ -29,7 +29,7 @@ export class PickTab {
 
     serialTracked = false;
 
-    enteredData = {
+    enteredData:any = {
         location: "",
         item: "",
         qty: 0
@@ -40,6 +40,8 @@ export class PickTab {
 
     loader = null;
     loaderTimer = null; // Use this to prevent loader popping up for cached items/locations
+
+    itemAvailability = {};
 
     constructor(public navCtrl:NavController,
                 public navParams:NavParams,
@@ -195,7 +197,16 @@ export class PickTab {
     }
 
     getSuggestedPickQty() {
-        return Math.min((this.getSuggestedAllocation().RemainingQty - this.getCurrentAllocPickedQty()), this.getTotalRemainingQty());
+        var alloc = this.getSuggestedAllocation();
+        // If the location doesn't match the suggested, use the total remaining for that item, or the available
+        if (this.enteredData.location !== alloc.LocationID.value){
+            var available = this.itemAvailability.hasOwnProperty(this.enteredData.location) ?
+                                this.itemAvailability[this.enteredData.location].QtyAvailable.value : 0;
+
+            return Math.min(available, this.getTotalRemainingQty());
+        }
+
+        return this.getSuggestedAllocation().RemainingQty;
     }
 
     getTotalRemainingQty() {
@@ -294,13 +305,19 @@ export class PickTab {
                 }
             }
 
-            // prompt to overrride if it's not the suggested location
-            if ((this.enteredData.item == "" || this.verifyLocation(isScan)) && isScan){
-                this.utils.playScanSuccessSound();
-
-                if (callback != null)
-                    callback();
+            // if the item is already set, verify location item availability and prompt for bin override.
+            if (this.enteredData.item == ""){
+                if (isScan)
+                    this.utils.playScanSuccessSound();
+            } else {
+                if (!this.verifyLocation(isScan)){
+                    //this.enteredData.location = "";
+                    return;
+                }
             }
+
+            if (callback != null)
+                callback();
 
             if (locId)
                 return;
@@ -354,25 +371,39 @@ export class PickTab {
                 this.currentItemIndex = allocIndexes[1];
             }
 
-            this.dismissLoader();
+            this.pickProvider.getItemAvailabilty(item.InventoryID.value).then((res)=>{
 
-            this.showQty = true;
-            this.enteredData.qty = 1;
-            this.enteredData.item = item.InventoryID.value;
+                this.itemAvailability = res;
 
-            if (this.verifyLocation(isScan) && isScan){
-                this.utils.playScanSuccessSound();
+                this.dismissLoader();
 
-                if (callback != null)
-                    callback();
-            }
+                if (this.verifyLocation(isScan)){
 
-            if (itemId)
-                return;
+                    this.showQty = true;
+                    this.enteredData.qty = 1;
+                    this.enteredData.item = item.InventoryID.value;
 
-            setTimeout(()=> {
-                try { this.qtyInput.setFocus(); }catch(e){}
-            }, 500);
+                    if (callback != null)
+                        callback();
+
+                    if (itemId)
+                        return;
+
+                    setTimeout(()=> {
+                        try { this.qtyInput.setFocus(); }catch(e){}
+                    }, 500);
+
+                } /*else {
+                    this.enteredData.item = "";
+                }*/
+
+            }).catch((err)=>{
+                this.enteredData.item = "";
+                this.utils.playFailedSound(isScan);
+                this.dismissLoader().then(()=>{
+                    this.utils.showAlert("Error", "Failed to load item availability: "+err.message, {exception: err});
+                });
+            });
 
         }).catch((err)=> {
             this.enteredData.item = "";
@@ -385,8 +416,20 @@ export class PickTab {
 
     private verifyLocation(isScan=false){
 
-        var curBin = this.getSuggestedAllocation().LocationID.value;
         var enteredBin = this.enteredData.location;
+
+        // Validate bin has available qty
+        var onhandQty = this.itemAvailability.hasOwnProperty(enteredBin) ? this.itemAvailability[enteredBin].QtyOnHand.value : 0;
+
+        if (onhandQty == 0){
+            this.utils.playFailedSound(isScan);
+            this.utils.showAlert("Error", "There is no stock available for the current item and location. Please choose a different location or add an adjustment first.");
+            return false;
+        }
+
+        var curBin = this.getSuggestedAllocation().LocationID.value;
+
+        // If the bin is not the suggested bin, prompt for override
         if (curBin != enteredBin) {
 
             this.utils.playPromptSound(isScan);
@@ -405,7 +448,6 @@ export class PickTab {
                     {
                         text: "Yes",
                         handler: ()=> {
-                            // TODO: Validate bin & available qty
                         }
                     }
                 ]
@@ -413,7 +455,53 @@ export class PickTab {
 
             alert.present();
 
+            return true;
+        }
+
+        if (isScan)
+            this.utils.playScanSuccessSound();
+
+        return true;
+    }
+
+    private verifyAvailability(addQty=0){
+
+        var validateQty = parseFloat(this.enteredData.qty) + addQty;
+
+        if (validateQty > this.getTotalRemainingQty()) {
+            this.utils.showAlert("Error", "The entered quantity exceeds the quantity needed for this item.");
             return false;
+        }
+
+        var curAlloc = this.getSuggestedAllocation();
+
+        // check availability
+        var availability = this.itemAvailability.hasOwnProperty(this.enteredData.location) ? this.itemAvailability[this.enteredData.location] : 0;
+
+        if (availability == null){
+
+            this.utils.showAlert("Error", "There is no stock available for the current item and location. Please choose a different location or add an adjustment first.");
+            return false;
+        } else {
+
+            // Make sure there is enough available and on-hand stock for the unallocated quantity
+            var onhandQty =  availability.QtyOnHand.value;
+            var availableQty = availability.QtyAvailable.value;
+            var allocatedQty = curAlloc.LocationID.value == this.enteredData.location ? curAlloc.Qty.value : 0;
+            var unallocatedQty = validateQty - allocatedQty;
+
+            if (unallocatedQty > 0){
+
+                if (unallocatedQty > onhandQty){
+                    this.utils.showAlert("Error", "There is is only " + onhandQty + " on-hand units for the current location. Please alter quantity, choose a different location or add an adjustment first.");
+                    return false;
+                }
+
+                if (unallocatedQty > availableQty){
+                    this.utils.showAlert("Error", "There is is only " + availableQty + " available units for the current location. Please alter quantity, choose a different location or add an adjustment first.");
+                    return false;
+                }
+            }
         }
 
         return true;
@@ -443,6 +531,11 @@ export class PickTab {
         if (this.enteredData.qty > this.getTotalRemainingQty()) {
             this.utils.playFailedSound(true);
             this.utils.showAlert("Error", "The entered quantity exceeds the quantity needed for this item.");
+            return false;
+        }
+
+        if (!this.verifyAvailability()){
+            this.utils.playFailedSound(true);
             return false;
         }
 
@@ -538,7 +631,7 @@ export class PickTab {
             this.events.publish('closeModal');
         }).catch((err)=> {
             loader.dismiss();
-            this.utils.processApiError("Error", err.message, err, this.navCtrl);
+            this.utils.processApiError("Error", err.message, err, this.navCtrl, this.pickProvider.getErrorReportingData());
         });
     }
 
@@ -595,9 +688,8 @@ export class PickTab {
                     // If the item is the same as the last item, validate & increment quantity.
                     if (item.InventoryID.value == this.enteredData.item) {
 
-                        if (this.getTotalRemainingQty() - (this.enteredData.qty + 1) < 0){
+                        if (!this.verifyAvailability(1)){
                             this.utils.playFailedSound(true);
-                            this.utils.showAlert("Error", "You've already picked the quantity required for this item.");
                             return;
                         }
 

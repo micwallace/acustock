@@ -16,7 +16,9 @@ export class TransferProvider {
     public pendingItems = {};
     public pendingQty = 0;
 
-    public transferHistory = [];
+    //public transferHistory = [];
+
+    private lastRequest:any = "";
 
     constructor(public api:Api, public cache:CacheProvider, public loadingCtrl:LoadingController, public prefs:PreferencesProvider) {
         console.log('Hello TransferProvider Provider');
@@ -202,5 +204,9 @@ export class TransferProvider {
             });
 
         });
+    }
+
+    public getErrorReportingData(){
+        return {provider: "transfer", pendingItems: this.pendingItems, lastRequest: this.lastRequest};
     }
 }

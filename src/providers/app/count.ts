@@ -29,6 +29,8 @@ export class CountProvider {
 
     private savedCounts = null;
 
+    private lastRequest:any = "";
+
     constructor(public api:Api, public prefs:PreferencesProvider) {
         console.log('Hello CountProvider Provider');
     }
@@ -248,6 +250,8 @@ export class CountProvider {
                 data.Details.push(line);
             }
 
+            this.lastRequest = data;
+
             this.api.putCount(data).then((res)=>{
 
                 this.physicalCount = res;
@@ -263,5 +267,9 @@ export class CountProvider {
                 reject(err);
             });
         });
+    }
+
+    public getErrorReportingData(){
+        return {provider: "count", pendingItems: this.pendingCounts, lastRequest: this.lastRequest};
     }
 }

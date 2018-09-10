@@ -31,6 +31,8 @@ export class PickProvider {
 
     public pendingQty = 0;
 
+    private lastRequest:any = "";
+
     constructor(public api:Api, public cache:CacheProvider, public loadingCtrl:LoadingController, public prefs:PreferencesProvider) {
         console.log('Hello PickProvider Provider');
     }
@@ -78,6 +80,8 @@ export class PickProvider {
                     this.savedPicks = null;
                 }
 
+                this.precacheAvailability();
+
                 resolve(true);
 
             }).catch((err) => {
@@ -91,6 +95,30 @@ export class PickProvider {
             });
         });
 
+    }
+
+    public precacheAvailability(){
+
+        var inventoryIds = [];
+
+        for (var i in this.sourceIndex){
+            if (inventoryIds.indexOf(this.sourceIndex[i].InventoryID.value) === -1)
+                inventoryIds.push(this.sourceIndex[i].InventoryID.value);
+        }
+
+        this.cache.preloadItemLocations(inventoryIds);
+    }
+
+    public getItemAvailabilty(itemId){
+
+        return new Promise((resolve, reject)=> {
+
+            this.cache.getItemLocations(itemId).then((res)=>{
+                resolve(res);
+            }).catch((err)=>{
+               reject(err);
+            });
+        });
     }
 
     public refreshStatus(){
@@ -728,7 +756,7 @@ export class PickProvider {
 
                 var alloc:any;
 
-                var modified = this.modifiedAllocations.hasOwnProperty(i) ? this.modifiedAllocations[i] : {};
+                var modified = this.modifiedAllocations.hasOwnProperty(i) ? this.modifiedAllocations[i].Allocations : {};
 
                 console.log(JSON.stringify(modified));
 
@@ -750,9 +778,9 @@ export class PickProvider {
                     if (pendingAlloc.hasOwnProperty("SplitLineNbr")) {
                         alloc.SplitLineNbr = pendingAlloc.SplitLineNbr;
 
-                        if (modified.Allocations.hasOwnProperty(pendingAlloc.SplitLineNbr.value)) {
-                            alloc.Qty.value = modified.Allocations[pendingAlloc.SplitLineNbr.value].Qty.value;
-                            delete modified.Allocations[pendingAlloc.SplitLineNbr.value];
+                        if (modified.hasOwnProperty(pendingAlloc.SplitLineNbr.value)) {
+                            alloc.Qty.value = modified[pendingAlloc.SplitLineNbr.value].Qty.value;
+                            delete modified[pendingAlloc.SplitLineNbr.value];
 
                             item.Allocations.push(alloc);
                             continue;
@@ -765,9 +793,9 @@ export class PickProvider {
                     allocs.push(alloc);
                 }
 
-                for (var y in modified.Allocations){
+                for (var y in modified){
 
-                    var modAlloc = modified.Allocations[y];
+                    var modAlloc = modified[y];
 
                     alloc = {
                         LineNbr: {value: i},
@@ -790,6 +818,8 @@ export class PickProvider {
             console.log("Submitting Picks");
             console.log(JSON.stringify(data));
 
+            this.lastRequest = data;
+
             this.api.putShipment(data).then((res:any)=> {
 
                 this.currentShipment = res;
@@ -809,5 +839,7 @@ export class PickProvider {
 
     }
 
-
+    public getErrorReportingData(){
+        return {provider: "pick", pendingItems: this.pendingPicks, lastRequest: this.lastRequest};
+    }
 }

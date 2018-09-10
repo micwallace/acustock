@@ -81,7 +81,7 @@ export class PickShipmentsPage {
             return;
         }
 
-        this.loader = this.loadingCtrl.create({content: "Loading..."});
+        this.loader = this.loadingCtrl.create({content: "Checking assignment..."});
         this.loader.present();
 
         this.pickProvider.refreshStatus().then((res)=>{
@@ -124,14 +124,17 @@ export class PickShipmentsPage {
     private assignDeviceAndStartPick(){
 
         if (this.loader == null) {
-            this.loader = this.loadingCtrl.create({content: "Loading..."});
+            this.loader = this.loadingCtrl.create({content: "Assigning shipment..."});
             this.loader.present();
+        } else {
+            this.loader.data.content = "Assigning shipment...";
         }
 
         this.pickProvider.assignShipment().then((res)=>{
             this.dismissLoader();
             //noinspection TypeScriptValidateTypes
             this.navCtrl.push(PickShipmentsPickPage);
+            this.pickProvider.precacheAvailability();
         }).catch((err)=> {
             this.dismissLoader().then(()=>{
                 this.utils.processApiError("Error", err.message, err, this.navCtrl);

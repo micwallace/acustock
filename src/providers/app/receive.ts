@@ -31,6 +31,8 @@ export class ReceiveProvider {
 
     public totalQty = 0;
 
+    private lastRequest:any = "";
+
     constructor(public api:Api, public prefs:PreferencesProvider) {
         console.log('Hello ReceiveProvider Provider');
     }
@@ -406,6 +408,8 @@ export class ReceiveProvider {
 
                 data = this.getShipmentUpdateObject();
 
+                this.lastRequest = data;
+
                 this.api.putShipment(data).then((res:any)=> {
 
                     loader.data.content = "Confirming Shipment...";
@@ -435,6 +439,8 @@ export class ReceiveProvider {
             if (this.type == "purchase" || this.transferShipmentRef != null){
                 // Add purchase receipt document
                 data = this.getPurchaseReceiptObject();
+
+                this.lastRequest = data;
 
                 this.api.putPurchaseReceipt(data).then((res:any)=>{
 
@@ -468,6 +474,8 @@ export class ReceiveProvider {
                 // Add IN receipt document, which does not require a reference to a transfer order & shipment
 
                 data = this.getReceiptObject();
+
+                this.lastRequest = data;
 
                 this.api.putReceipt(data).then((res:any)=> {
 
@@ -693,6 +701,10 @@ export class ReceiveProvider {
                 reject(err);
             });
         });
+    }
+
+    public getErrorReportingData(){
+        return {provider: "receive", pendingItems: this.pendingItems, lastRequest: this.lastRequest};
     }
 
 }

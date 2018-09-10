@@ -266,7 +266,7 @@ export class AdjustmentEnterTab {
         }).catch((err)=> {
             this.dismissLoader();
             this.utils.playFailedSound();
-            this.utils.processApiError("Error", err.message, err, this.navCtrl);
+            this.utils.processApiError("Error", err.message, err, this.navCtrl, this.adjustmentProvider.getErrorReportingData());
         });
     }
 

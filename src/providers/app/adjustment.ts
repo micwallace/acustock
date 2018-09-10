@@ -18,6 +18,7 @@ export class AdjustmentProvider {
     public pendingNumItems = 0;
     public pendingVariance = 0;
 
+    private lastRequest:any = "";
     //public AdjustmentHistory = [];
 
     constructor(public api:Api, public cache:CacheProvider, public loadingCtrl:LoadingController, public prefs:PreferencesProvider) {
@@ -148,6 +149,7 @@ export class AdjustmentProvider {
             }
 
             console.log(JSON.stringify(adjustment));
+            this.lastRequest = adjustment;
 
             this.api.putAdjustment(adjustment).then((res:any)=> {
 
@@ -187,5 +189,9 @@ export class AdjustmentProvider {
             });
 
         });
+    }
+
+    public getErrorReportingData(){
+        return {provider: "adjustment", pendingItems: this.pendingItems, lastRequest: this.lastRequest};
     }
 }

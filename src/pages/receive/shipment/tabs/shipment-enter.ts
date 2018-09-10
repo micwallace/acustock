@@ -333,11 +333,12 @@ export class ReceiveShipmentEnterTab {
 
         this.receiveProvider.confirmReceipts(this.loader).then(()=>{
             this.dismissLoader();
+            this.cache.flushItemLocationCache();
             this.events.publish("closeReceiveScreen");
         }).catch((err)=>{
             this.dismissLoader();
             this.utils.playFailedSound(false);
-            this.utils.processApiError("Error", err.message, err, this.navCtrl);
+            this.utils.processApiError("Error", err.message, err, this.navCtrl, this.receiveProvider.getErrorReportingData());
         });
     }
 

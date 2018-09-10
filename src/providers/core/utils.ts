@@ -23,29 +23,29 @@ export class UtilsProvider {
                 public emailComposer:EmailComposer) {
     }
 
-    public processApiError(title, message, err, navCtrl:NavController=null){
+    public processApiError(title, message, exception, navCtrl:NavController=null, additionalData=null){
 
-        if (err.hasOwnProperty('status')){
+        if (exception.hasOwnProperty('status')){
             // Check for login error and show login screen
-            if (err.status == 401) {
+            if (exception.status == 401) {
                 if (navCtrl != null)
                     navCtrl.setRoot('LoginPage');
                 // If the error is
-                this.showAlert('Login Failed', err.authFailed ? err.responseData.exceptionMessage : "Your session expired, please login again.");
+                this.showAlert('Login Failed', exception.authFailed ? exception.responseData.exceptionMessage : "Your session expired, please login again.");
                 return;
             // Check for connection failure; show setup screen
-            } else if (err.status < 1){
+            } else if (exception.status < 1){
                 if (navCtrl != null)
                     navCtrl.setRoot('SetupPage');
-                this.showAlert('Connection Failed', 'Error connecting to Acumatica: '+err.message, err);
+                this.showAlert('Connection Failed', 'Error connecting to Acumatica: '+exception.message, exception);
                 return;
             }
         }
 
-        this.showAlert(title, message, err);
+        this.showAlert(title, message, exception, additionalData);
     }
 
-    public showAlert(title, message, debugData = null){
+    public showAlert(title, message, exception = null, additionalData=null){
 
         let alert = this.alertCtrl.create({
             title: title,
@@ -58,11 +58,11 @@ export class UtilsProvider {
             ]
         });
 
-        if (debugData != null)
+        if (exception != null)
             alert.addButton({
                 text: 'Email Diagnostics',
                 handler: () => {
-                    this.sendDebugData(debugData);
+                    this.sendDebugData(exception, additionalData);
                 }
             });
 
@@ -71,16 +71,18 @@ export class UtilsProvider {
         return alert;
     }
 
-    public sendDebugData(debugData){
+    public sendDebugData(exception, additionalData){
+
+        var errorData = {exception: exception, additionalData: additionalData};
 
         this.emailComposer.isAvailable().then(() =>{
 
             let email = {
                 attachments: [
-                    'base64:error-information.json//' + btoa(JSON.stringify(debugData))
+                    'base64:error-information.json//' + btoa(JSON.stringify(errorData))
                 ],
                 subject: 'AcuShip Error Report',
-                body: (debugData.hasOwnProperty('exception') ? 'Error Summary: ' + debugData.exception.message + '<br/>' : '') + 'Additional Information:',
+                body: (exception.hasOwnProperty('exception') ? 'Error Summary: ' + exception.exception.message + '<br/>' : '') + 'Additional Information:',
                 isHtml: true
             };
 

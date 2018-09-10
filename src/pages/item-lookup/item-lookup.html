@@ -13,10 +13,6 @@
         <ion-title>Item Lookup</ion-title>
     </ion-navbar>
 
-</ion-header>
-
-
-<ion-content padding>
     <ion-item no-lines>
         <ion-label>
             Enter or scan Item ID:
@@ -25,33 +21,31 @@
             <ion-icon name="barcode"></ion-icon>
         </button>
     </ion-item>
+    <div style="padding: 5px 15px;">
+        <ng-template #listItem let-attrs="attrs">
+            <span [innerHTML]="attrs.data.InventoryID.value | boldprefix:attrs.keyword"></span><br/>
+            <small *ngIf="attrs.data.AlternateID" [innerHTML]="attrs.data.AlternateID | boldprefix:attrs.keyword"></small>
+        </ng-template>
+        <ion-auto-complete id="item-select" [(ngModel)]="selectedItem" [dataProvider]="itemAutocompleteService"
+                           [template]="listItem" (itemSelected)="loadItemLocations($event)"></ion-auto-complete>
+    </div>
+</ion-header>
 
-    <ng-template #listItem let-attrs="attrs">
-        <span [innerHTML]="attrs.data.InventoryID.value | boldprefix:attrs.keyword"></span><br/>
-        <small *ngIf="attrs.data.AlternateID" [innerHTML]="attrs.data.AlternateID | boldprefix:attrs.keyword"></small>
-    </ng-template>
-    <!--<ion-item>-->
-    <ion-auto-complete id="item-select" [(ngModel)]="selectedItem" [dataProvider]="itemAutocompleteService"
-                       [template]="listItem"
-                       (itemSelected)="loadItemLocations($event)"></ion-auto-complete>
-    <!--</ion-item>-->
-    <ion-scroll style="height: calc(100% - 100px);" scrollY="true">
-        <ion-list>
-            <ion-item no-padding tappable *ngFor="let location of itemLocations"
-                      (click)="openDetailsModal($event, location)">
-                <ion-label>{{location.Location.value}}</ion-label>
-                <div class="item-note" item-end style="width: 120px;">
+<ion-content padding>
+    <ion-list class="item-list">
+        <ion-item class="list-item" no-padding tappable *ngFor="let location of itemLocations" (click)="openDetailsModal($event, location)">
+            <ion-row>
+                <ion-col col-8><strong>{{location.Location.value}}</strong></ion-col>
+                <ion-col col-4 class="column-right">
                     <ion-row>
-                        <ion-col col-8>Available:</ion-col>
-                        <ion-col col-4>{{location.QtyAvailable.value}}</ion-col>
+                        On Hand: {{location.QtyOnHand.value}}
                     </ion-row>
                     <ion-row>
-                        <ion-col col-8>On Hand:</ion-col>
-                        <ion-col col-4>{{location.QtyOnHand.value}}</ion-col>
+                        Available: {{location.QtyAvailable.value}}
                     </ion-row>
-                </div>
-            </ion-item>
-        </ion-list>
-    </ion-scroll>
+                </ion-col>
+            </ion-row>
+        </ion-item>
+    </ion-list>
     <barcode-listener (scan)='onBarcodeScan($event)'></barcode-listener>
 </ion-content>
