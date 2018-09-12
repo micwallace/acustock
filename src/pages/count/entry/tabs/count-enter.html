@@ -27,7 +27,7 @@
                 <ion-item no-padding>
                     <ion-label color="primary">Location:</ion-label>
                     <ion-input id="location" #location type="text" [(ngModel)]="enteredData.location"
-                               (keyup.enter)="setLocation(); $event.stopPropagation();" (keypress)="$event.stopPropagation();" autofocus autocorrect="on"></ion-input>
+                               (change)="setLocation();" (keypress)="$event.stopPropagation();" autofocus autocorrect="on"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -36,7 +36,7 @@
                 <ion-item no-padding>
                     <ion-label color="primary">Item:</ion-label>
                     <ion-input id="item" #item type="text" [(ngModel)]="enteredData.item"
-                               (keydown.enter)="setItem(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
+                               (change)="setItem();" (keypress)="$event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -45,8 +45,8 @@
             <ion-col>
                 <ion-item no-padding>
                     <ion-label color="primary">Quantity:</ion-label>
-                    <ion-input id="qty" #qty type="number" min="0" [(ngModel)]="enteredData.qty"
-                               (keyup.enter)="addCountItem(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
+                    <ion-input id="qty" #qty type="number" min="0" [(ngModel)]="enteredData.qty" (focus)="$event.target.select();"
+                               (keydown.enter)="addCountItem(); $event.stopPropagation();" (keypress)="this.utils.limitKeyNumber($event); $event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>

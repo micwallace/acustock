@@ -153,12 +153,11 @@ export class PickTab {
 
         if (!item) return;
 
-        this.setLocation(item.LocationID.value);
-        this.setItem(item.InventoryID.value);
+        var context = this;
 
-        setTimeout(()=> {
-            try { this.qtyInput.setFocus(); }catch(e){}
-        }, 500);
+        this.setLocation(item.LocationID.value, false, function(){
+            context.setItem(item.InventoryID.value);
+        });
     }
 
     getSuggestedLocation() {
@@ -282,7 +281,7 @@ export class PickTab {
 
             // check if sales are allowed from this location
             if (!bin.SalesAllowed.value){
-
+                this.showQty = false;
                 this.enteredData.location = "";
                 this.utils.playFailedSound(isScan);
                 this.dismissLoader().then(()=>{
@@ -311,7 +310,8 @@ export class PickTab {
                     this.utils.playScanSuccessSound();
             } else {
                 if (!this.verifyLocation(isScan)){
-                    //this.enteredData.location = "";
+                    this.showQty = false;
+                    this.enteredData.location = "";
                     return;
                 }
             }
@@ -327,6 +327,7 @@ export class PickTab {
             });
 
         }).catch((err)=>{
+            this.showQty = false;
             this.enteredData.location = "";
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=>{
@@ -358,6 +359,7 @@ export class PickTab {
                 var allocIndexes = this.pickProvider.getBestFitAllocation(item.InventoryID.value, this.enteredData.location);
 
                 if (allocIndexes == null){
+                    this.showQty = false;
                     this.enteredData.item = "";
                     this.enteredData.qty = 0;
                     this.utils.playFailedSound(isScan);
@@ -393,11 +395,10 @@ export class PickTab {
                         try { this.qtyInput.setFocus(); }catch(e){}
                     }, 500);
 
-                } /*else {
-                    this.enteredData.item = "";
-                }*/
+                }
 
             }).catch((err)=>{
+                this.showQty = false;
                 this.enteredData.item = "";
                 this.utils.playFailedSound(isScan);
                 this.dismissLoader().then(()=>{
@@ -406,6 +407,7 @@ export class PickTab {
             });
 
         }).catch((err)=> {
+            this.showQty = false;
             this.enteredData.item = "";
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=>{

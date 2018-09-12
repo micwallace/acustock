@@ -99,16 +99,16 @@ export class Api {
         return this.http.post(this.url + '/entity/auth/login', null, {});
     }
 
-    getItemBySku(itemId) {
+    getItem(itemId) {
         return this.get('StockItem/'+itemId+'?$expand=CrossReferences,WarehouseDetails');
-    }
-
-    getItemByBarcode(barcode) {
-        return this.get("StockItem?$expand=CrossReferences,WarehouseDetails&filter=CrossReferences/AlternateID eq '"+barcode+"'");
     }
 
     getItemList(paramStr = "$expand=CrossReferences,WarehouseDetails") {
         return this.get('StockItem?'+paramStr);
+    }
+
+    itemLookup(itemId, paramStr = "$expand=Results"){
+        return this.put("StockItemLookup?"+paramStr, {ItemID: {value: itemId}});
     }
 
     getWarehouseList() {

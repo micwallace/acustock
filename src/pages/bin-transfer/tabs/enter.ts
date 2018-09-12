@@ -132,7 +132,7 @@ export class EnterTab {
 
             // check if transfers are allowed from this location
             if (!bin.TransfersAllowed.value){
-
+                this.showQty = false;
                 this.enteredData.location = "";
                 this.utils.playFailedSound(isScan);
                 this.dismissLoader().then(()=>{
@@ -157,6 +157,7 @@ export class EnterTab {
                     this.utils.playScanSuccessSound();
 
             }).catch((err) => {
+                this.showQty = false;
                 this.enteredData.location = "";
                 this.utils.playFailedSound(isScan);
                 this.dismissLoader().then(()=> {
@@ -165,6 +166,7 @@ export class EnterTab {
             });
 
         }).catch((err) => {
+            this.showQty = false;
             this.enteredData.location = "";
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
@@ -189,6 +191,7 @@ export class EnterTab {
         }
 
         if (this.enteredData.location == locId) {
+            this.showQty = false;
             this.enteredData.location = "";
             this.utils.showAlert("Error", "From and to location must be different");
             return;
@@ -211,6 +214,7 @@ export class EnterTab {
                 this.utils.playScanSuccessSound();
 
         }).catch((err) => {
+            this.showQty = false;
             this.enteredData.toLocation = "";
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
@@ -242,6 +246,7 @@ export class EnterTab {
             if (!this.currentLocationItems.hasOwnProperty(item.InventoryID.value)) {
                 this.utils.playFailedSound(isScan);
                 this.utils.showAlert("Error", "There is no quantity on-hand to transfer for the item and location combination.");
+                this.showQty = false;
                 this.enteredData.item = "";
                 return;
             }
@@ -262,6 +267,7 @@ export class EnterTab {
                 this.utils.playScanSuccessSound();
 
         }).catch((err) => {
+            this.showQty = false;
             this.enteredData.item = "";
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {

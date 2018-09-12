@@ -15,6 +15,7 @@ import { ReceivePage } from "../pages/receive/receive";
 import { UtilsProvider } from "../providers/core/utils";
 import { LoginPage } from "../pages/login/login";
 import { AdjustmentPage } from "../pages/adjustment/adjustment";
+import { AboutPage } from "../pages/about/about";
 
 @Component({
     templateUrl: 'app.html'
@@ -113,6 +114,10 @@ export class AcuStock {
 
     showPreferences() {
         this.navCtrl.push(PreferencesPage);
+    }
+
+    showAbout() {
+        this.navCtrl.push(AboutPage);
     }
 
 }

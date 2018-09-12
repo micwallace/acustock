@@ -28,7 +28,7 @@
                 <ion-item no-padding>
                     <ion-label color="primary">From Bin:</ion-label>
                     <ion-input id="location" #location type="text" [(ngModel)]="enteredData.location"
-                               (keyup.enter)="setLocation(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
+                               (change)="setLocation();" (keypress)="$event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -37,7 +37,7 @@
                 <ion-item no-padding>
                     <ion-label color="primary">To Bin:</ion-label>
                     <ion-input id="to-location" #tolocation type="text" [(ngModel)]="enteredData.toLocation"
-                               (keyup.enter)="setToLocation(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
+                               (change)="setToLocation();" (keypress)="$event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -46,7 +46,7 @@
                 <ion-item no-padding>
                     <ion-label color="primary">Item:</ion-label>
                     <ion-input id="item" #item type="text" [(ngModel)]="enteredData.item"
-                               (keyup.enter)="setItem(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
+                               (change)="setItem();" (keypress)="$event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -54,8 +54,8 @@
             <ion-col>
                 <ion-item no-padding>
                     <ion-label color="primary">Quantity:</ion-label>
-                    <ion-input id="qty" #qty type="number" min="0" [(ngModel)]="enteredData.qty"
-                               (keyup.enter)="addTransferItem(); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
+                    <ion-input id="qty" #qty type="number" min="0" [(ngModel)]="enteredData.qty" (focus)="$event.target.select();"
+                               (keydown.enter)="addTransferItem(); $event.stopPropagation();" (keypress)="this.utils.limitKeyNumber($event); $event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>

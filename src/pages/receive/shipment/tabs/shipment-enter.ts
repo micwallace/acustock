@@ -151,13 +151,15 @@ export class ReceiveShipmentEnterTab {
 
         this.showLoaderDelayed("Loading...");
 
+        this.currentSourceLine = null;
+
         this.cache.getItemById(itemId).then((item:any)=> {
 
             // validate item against source document
             var line = this.receiveProvider.getSourceLineByInventoryId(item.InventoryID.value);
 
             if (line == null){
-                this.currentSourceLine = null;
+                this.showQty = false;
                 this.enteredData.item = "";
                 this.enteredData.qty = 0;
                 this.utils.playFailedSound(isScan);
@@ -199,6 +201,7 @@ export class ReceiveShipmentEnterTab {
             this.dismissLoader();
 
         }).catch((err) => {
+            this.showQty = false;
             this.enteredData.item = "";
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
@@ -226,7 +229,7 @@ export class ReceiveShipmentEnterTab {
 
             // check if receipts are allowed for this location
             if (!bin.ReceiptsAllowed.value){
-
+                this.showQty = false;
                 this.enteredData.location = "";
                 this.utils.playFailedSound(isScan);
                 this.dismissLoader().then(()=>{
@@ -245,6 +248,7 @@ export class ReceiveShipmentEnterTab {
             this.dismissLoader();
 
         }).catch((err) => {
+            this.showQty = false;
             this.enteredData.location = "";
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {

@@ -114,6 +114,8 @@ export class CountEntryEnterTab {
         this.loader = this.loadingCtrl.create({content: "Loading..."});
         this.loader.present();
 
+        this.showQty = false;
+
         this.cache.getBinById(locId).then((bin)=> {
 
             this.showItem = true;
@@ -191,7 +193,7 @@ export class CountEntryEnterTab {
                                             this.utils.playScanSuccessSound();
 
                                     }).catch((err)=>{
-
+                                        this.showQty = false;
                                         this.enteredData.item = "";
                                         this.dismissLoader().then(()=>{
                                             this.utils.processApiError("Error", err.message, err, this.navCtrl);
@@ -224,6 +226,7 @@ export class CountEntryEnterTab {
                 this.utils.playScanSuccessSound();
 
         }).catch((err) => {
+            this.showQty = false;
             this.enteredData.item = "";
             this.dismissLoader().then(()=> {
                 this.utils.showAlert("Error", err.message);

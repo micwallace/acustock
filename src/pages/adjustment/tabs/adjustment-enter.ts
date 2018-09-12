@@ -139,9 +139,6 @@ export class AdjustmentEnterTab {
 
                 this.currentLocationItems = itemIndex;
 
-                //document.getElementById("item").focus();
-                this.showQty = false;
-
                 if (this.enteredData.item != "")
                     this.loadItem();
 
@@ -153,6 +150,7 @@ export class AdjustmentEnterTab {
                 this.itemInput.setFocus();
 
             }).catch((err) => {
+                this.showQty = false;
                 this.enteredData.location = "";
                 this.utils.playFailedSound(isScan);
                 this.dismissLoader().then(()=> {
@@ -161,6 +159,7 @@ export class AdjustmentEnterTab {
             });
 
         }).catch((err) => {
+            this.showQty = false;
             this.enteredData.location = "";
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
@@ -203,6 +202,7 @@ export class AdjustmentEnterTab {
             });
 
         }).catch((err) => {
+            this.showQty = false;
             this.enteredData.item = "";
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {

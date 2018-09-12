@@ -48,6 +48,7 @@ import { AdjustmentPage } from "../pages/adjustment/adjustment";
 import { AdjustmentEnterTab } from "../pages/adjustment/tabs/adjustment-enter";
 import { AdjustmentListTab } from "../pages/adjustment/tabs/adjustment-list";
 import {AdjustmentProvider} from "../providers/app/adjustment";
+import { AboutPage } from "../pages/about/about";
 
 @NgModule({
     declarations: [
@@ -79,6 +80,7 @@ import {AdjustmentProvider} from "../providers/app/adjustment";
         TransferListTab,
         PreferencesPage,
         BarcodeListenerComponent,
+        AboutPage
     ],
     imports: [
         BrowserModule,
@@ -116,7 +118,8 @@ import {AdjustmentProvider} from "../providers/app/adjustment";
         AdjustmentPage,
         AdjustmentEnterTab,
         AdjustmentListTab,
-        PreferencesPage
+        PreferencesPage,
+        AboutPage
     ],
     providers: [
         StatusBar,

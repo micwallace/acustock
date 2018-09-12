@@ -2,40 +2,44 @@
     <ion-header>
         <ion-toolbar>
             <ion-title>
+                <img style="width: 35px; vertical-align:middle; padding-right: 5px" src="../assets/imgs/logo.png" />
                 AcuStock
             </ion-title>
         </ion-toolbar>
-        <div class="menu-info">
-            <span>{{prefs.getPreference('connection_username')}}</span><br/>
-            <span>{{prefs.getPreference('connection_company')}}</span><br/>
-            <span>{{prefs.getPreference('warehouse')}}</span><br/>
+        <div class="menu-info" style="padding: 5px 0;">
+            <span>User: {{prefs.getPreference('connection_username')}}</span><br/>
+            <span>Warehouse: {{prefs.getPreference('connection_company')}}</span><br/>
+            <span>Company: {{prefs.getPreference('warehouse')}}</span><br/>
         </div>
     </ion-header>
     <ion-content id="side-menu21">
-        <ion-list id="menu-list1">
-            <ion-item color="none" menuClose="" on-click="goToPickShipments()" id="menu-list-item2">
+        <ion-list id="menu-list1" style="padding-top: 4px;">
+            <ion-item color="none" tappable menuClose="" on-click="goToPickShipments()" id="menu-list-item2">
                 Pick Shipments
             </ion-item>
-            <ion-item color="none" menuClose="" on-click="goToTransfer()" id="menu-list-item3">
+            <ion-item color="none" tappable menuClose="" on-click="goToTransfer()" id="menu-list-item3">
                 Transfer
             </ion-item>
-            <ion-item color="none" menuClose="" on-click="goToReceive()" id="menu-list-item4">
+            <ion-item color="none" tappable menuClose="" on-click="goToReceive()" id="menu-list-item4">
                 Receive
             </ion-item>
-            <ion-item color="none" menuClose="" on-click="goToItemLookup()" id="menu-list-item5">
+            <ion-item color="none" tappable menuClose="" on-click="goToItemLookup()" id="menu-list-item5">
                 Item Lookup
             </ion-item>
-            <ion-item color="none" menuClose="" on-click="goToBinLookup()" id="menu-list-item6">
+            <ion-item color="none" tappable menuClose="" on-click="goToBinLookup()" id="menu-list-item6">
                 Bin Lookup
             </ion-item>
-            <ion-item color="none" menuClose="" on-click="goToAdjustment()" id="menu-list-item7">
+            <ion-item color="none" tappable menuClose="" on-click="goToAdjustment()" id="menu-list-item7">
                 Adjustment
             </ion-item>
-            <ion-item color="none" menuClose="" on-click="goToCount()" id="menu-list-item8">
+            <ion-item color="none" tappable menuClose="" on-click="goToCount()" id="menu-list-item8">
                 Physical Count
             </ion-item>
-            <ion-item color="none" menuClose="" on-click="showPreferences()" id="menu-list-item9">
+            <ion-item color="none" tappable menuClose="" on-click="showPreferences()" id="menu-list-item9">
                 Settings
+            </ion-item>
+            <ion-item color="none" tappable menuClose="" on-click="showAbout()" id="menu-list-item10">
+                About
             </ion-item>
             <!--<ion-item color="none" menuClose="" id="menu-list-item10">
               Logout

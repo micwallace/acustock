@@ -12,11 +12,13 @@ import { ToastController } from "ionic-angular";
 @Injectable()
 export class CacheProvider {
 
-    itemList = null;
+    itemList = [];
     binList = null;
 
     binIndex = null;
     itemIndex = {};
+
+    itemCachePrimed = false;
 
     binPickSequence = [];
 
@@ -94,35 +96,38 @@ export class CacheProvider {
                 }
             }
 
-            //if (this.prefs.getPreference("cache_prime_items") != "none")
-                //reject({message: "The item with ID " + id + " was not found."});
+            if (this.itemCachePrimed)
+                reject({message: "The item with ID " + id + " was not found."});
 
-            this.api.getItemBySku(id).then((item:any)=> {
+            this.api.itemLookup(id).then((res:any)=> {
 
-                this.itemList.push(item);
-                this.itemIndex[id] = item;
-                resolve(item);
-
-            }).catch((err)=> {
-
-                if (err.status == 404) {
-                    this.api.getItemByBarcode(id).then((itemList:any)=> {
-
-                        if (itemList.length > 0) {
-                            this.itemList.push(itemList[0]);
-                            this.itemIndex[id] = itemList[0];
-                            resolve(itemList[0]);
-                        } else {
-                            reject({message: "The item with ID " + id + " was not found."});
-                        }
-                    }).catch((err)=> {
-                        reject(err);
-                    });
+                if (res.Results.length == 0){
+                    reject({message: "An item with ID " + id + " was not found."});
                     return;
                 }
 
+                var inventoryId = res.Results[0].InventoryID.value;
+
+                this.api.getItem(inventoryId).then((item:any)=> {
+
+                    this.itemList.push(item);
+                    this.itemIndex[id] = item;
+                    resolve(item);
+
+                }).catch((err)=> {
+
+                    if (err.status == 404) {
+                        reject({message: "Item lookup succeeded but failed to load the item data."});
+                        return;
+                    }
+
+                    reject(err);
+                })
+
+            }).catch((err)=> {
                 reject(err);
-            })
+            });
+
         });
     }
 
@@ -353,6 +358,7 @@ export class CacheProvider {
             if (cachePref == "full") {
                 this.api.getItemList().then((itemList) => {
                     this.itemList = itemList;
+                    this.itemCachePrimed = true;
                     resolve();
                 }).catch((err) => {
                     reject(err);
@@ -372,6 +378,7 @@ export class CacheProvider {
 
             if (itemList.length < limit){
                 resolve();
+                this.itemCachePrimed = true;
                 console.log("Item batch load "+skip+" to "+(skip+itemList.length)+" completed");
             } else {
                 console.log("Item batch load "+skip+" to "+(skip+limit)+" completed");
