@@ -1,6 +1,6 @@
 {
-  "name": "Ionic",
-  "short_name": "Ionic",
+  "name": "AcuStock",
+  "short_name": "AcuStock",
   "start_url": "index.html",
   "display": "standalone",
   "icons": [

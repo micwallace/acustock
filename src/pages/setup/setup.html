@@ -1,4 +1,22 @@
 <!--
+  ~ This file is part of AcuStock
+  ~ Copyright (c) 2018 Michael B Wallace
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!--
   Generated template for the SetupPage page.
 
   See http://ionicframework.com/docs/components/#navigation for more info on
@@ -14,6 +32,7 @@
 
 
 <ion-content padding text-center>
+    <img style="width: 100px; text-align: center" src="../../assets/imgs/logo.png" />
     <h2>Welcome to AcuStock</h2>
     <p>To get started you must install the AcuShip customisation in Acumatica.
         Once completed you can configure your devices manually or using QR code.
@@ -28,10 +47,13 @@
     </button>
     <button ion-button (click)="testConnection()">
         Test Connection
-    </button>
+    </button><br/>
     <button ion-button (click)="scanBarcode()">
-        <ion-icon name="barcode"></ion-icon>
+        <ion-icon name="barcode" style="margin-right: 5px;"></ion-icon>
         Scan with Camera
+    </button>
+    <button ion-button (click)="showAbout()">
+        About AcuStock
     </button>
     <!--<barcode-listener (scan)='onBarcodeScan($event)'></barcode-listener>-->
 </ion-content>

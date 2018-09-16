@@ -8,6 +8,7 @@ import { PreferencesPage } from "../preferences/preferences";
 import { UtilsProvider } from "../../providers/core/utils";
 import { CacheProvider } from "../../providers/core/cache";
 import {AlertController} from "ionic-angular/index";
+import { AboutPage } from "../about/about";
 
 /**
  * Generated class for the SetupPage page.
@@ -48,9 +49,14 @@ export class SetupPage {
             }
 
             this.testConnection();
+            this.events.unsubscribe('preferencesSaved');
         });
 
         this.navCtrl.push(PreferencesPage);
+    }
+
+    showAbout(){
+        this.navCtrl.push(AboutPage);
     }
 
     public scanBarcode() {
