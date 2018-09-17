@@ -28,14 +28,13 @@ import { BinLookupPage } from '../pages/bin-lookup/bin-lookup';
 import { SetupPageModule } from '../pages/setup/setup.module';
 
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
-import { AppPreferences } from '@ionic-native/app-preferences';
 import { Vibration } from '@ionic-native/vibration';
 import { EmailComposer } from '@ionic-native/email-composer';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { AutoCompleteModule } from 'ionic2-auto-complete';
 
-import { Api, CacheProvider, BarcodeListenerComponent, ItemAutocompleteService, LocationAutocompleteService, PickProvider, PreferencesProvider } from '../providers/providers';
+import { Api, CacheProvider, ItemAutocompleteService, LocationAutocompleteService, PickProvider, PreferencesProvider } from '../providers/providers';
 import { HTTP } from '@ionic-native/http';
 import { HttpModule } from '@angular/http'
 import { ItemLookupDetailsPage } from "../pages/item-lookup-details/item-lookup-details";
@@ -67,6 +66,7 @@ import { AdjustmentEnterTab } from "../pages/adjustment/tabs/adjustment-enter";
 import { AdjustmentListTab } from "../pages/adjustment/tabs/adjustment-list";
 import {AdjustmentProvider} from "../providers/app/adjustment";
 import { AboutPage } from "../pages/about/about";
+import { BarcodeListenerComponentModule } from "../providers/ui/barcode-listener/barcode-listener.module";
 
 @NgModule({
     declarations: [
@@ -97,7 +97,6 @@ import { AboutPage } from "../pages/about/about";
         AdjustmentListTab,
         TransferListTab,
         PreferencesPage,
-        BarcodeListenerComponent,
         AboutPage
     ],
     imports: [
@@ -107,7 +106,8 @@ import { AboutPage } from "../pages/about/about";
         IonicModule.forRoot(AcuStock),
         LoginPageModule,
         SetupPageModule,
-        EnterTabModule
+        EnterTabModule,
+        BarcodeListenerComponentModule
     ],
     bootstrap: [IonicApp],
     entryComponents: [
@@ -143,7 +143,6 @@ import { AboutPage } from "../pages/about/about";
         StatusBar,
         SplashScreen,
         {provide: ErrorHandler, useClass: IonicErrorHandler},
-        AppPreferences,
         BarcodeScanner,
         Api,
         HTTP,

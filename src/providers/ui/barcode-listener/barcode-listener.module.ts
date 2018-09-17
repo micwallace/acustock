@@ -18,17 +18,18 @@
 
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
-import { SetupPage } from './setup';
-import { BarcodeListenerComponentModule } from "../../providers/ui/barcode-listener/barcode-listener.module";
+import { SetupPage } from './../../../pages/setup/setup';
+import { BarcodeListenerComponent } from "../../providers";
 
 @NgModule({
     declarations: [
-        SetupPage,
+        BarcodeListenerComponent
     ],
     imports: [
-        IonicPageModule.forChild(SetupPage),
-        BarcodeListenerComponentModule
+    ],
+    exports: [
+        BarcodeListenerComponent
     ]
 })
-export class SetupPageModule {
+export class BarcodeListenerComponentModule {
 }

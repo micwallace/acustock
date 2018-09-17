@@ -42,18 +42,12 @@
     </p>
     <strong>Set connection preferences or scan a configuration barcode</strong>
     <br/><br/>
-    <button ion-button (click)="showPreferences()">
-        Go To Settings
-    </button>
-    <button ion-button (click)="testConnection()">
-        Test Connection
-    </button><br/>
-    <button ion-button (click)="scanBarcode()">
+    <button ion-button small (click)="showPreferences()">Go To Settings</button>
+    <button ion-button small (click)="testConnection()">Test Connection</button><br/>
+    <button ion-button small (click)="scanBarcode()">
         <ion-icon name="barcode" style="margin-right: 5px;"></ion-icon>
         Scan with Camera
     </button>
-    <button ion-button (click)="showAbout()">
-        About AcuStock
-    </button>
-    <!--<barcode-listener (scan)='onBarcodeScan($event)'></barcode-listener>-->
+    <button ion-button small (click)="showAbout()">About AcuStock</button>
+    <barcode-listener (scan)='onBarcodeScan($event)'></barcode-listener>
 </ion-content>
