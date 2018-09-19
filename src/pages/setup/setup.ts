@@ -43,7 +43,7 @@ export class SetupPage {
 
     showPreferences() {
         this.events.subscribe('preferencesSaved', ()=> {
-            if (this.prefs.getPreference('url') == "") {
+            if (!this.prefs.isSetupComplete() || this.prefs.getPreference("connection_password") == "") {
                 this.utils.showAlert("Error", "Please configure connection preferences to continue");
                 return;
             }
@@ -84,9 +84,9 @@ export class SetupPage {
 
             if (values) {
                 for (var i in values) {
-                    if (this.prefs.defaults.hasOwnProperty("connection_" + i)) {
+                    if (this.prefs.preferences.hasOwnProperty("connection_" + i)) {
                         this.prefs.setPreference("connection_" + i, values[i]);
-                    } else if (this.prefs.defaults.hasOwnProperty(i)) {
+                    } else if (this.prefs.preferences.hasOwnProperty(i)) {
                         this.prefs.setPreference(i, values[i]);
                     }
                 }

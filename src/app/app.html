@@ -19,19 +19,19 @@
 <ion-menu [content]="mainContent">
     <ion-header>
         <ion-toolbar>
-            <ion-title>
-                <img style="width: 35px; vertical-align:middle; padding-right: 5px" src="../assets/imgs/logo.png" />
+            <img class="menu-logo" src="../assets/imgs/logo.png" />
+            <ion-title class="menu-title">
                 AcuStock
             </ion-title>
         </ion-toolbar>
-        <div class="menu-info" style="padding: 5px 0;">
+        <div class="menu-info">
             <span>User: {{prefs.getPreference('connection_username')}}</span><br/>
-            <span>Warehouse: {{prefs.getPreference('connection_company')}}</span><br/>
-            <span>Company: {{prefs.getPreference('warehouse')}}</span><br/>
+            <span>Company: {{prefs.getPreference('connection_company')}}</span><br/>
+            <span>Warehouse: {{prefs.getPreference('warehouse')}}</span><br/>
         </div>
     </ion-header>
-    <ion-content id="side-menu21">
-        <ion-list id="menu-list1" style="padding-top: 4px;">
+    <ion-content>
+        <ion-list class="menu-list">
             <ion-item color="none" tappable menuClose="" on-click="goToPickShipments()" id="menu-list-item2">
                 Pick Shipments
             </ion-item>

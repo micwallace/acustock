@@ -91,6 +91,7 @@
     </plugin>
     <plugin name="cordova-plugin-vibration" spec="^3.1.0" />
     <plugin name="cordova-plugin-email-composer" spec="^0.8.15" />
+    <preference name="SplashScreenDelay" value="3000" />
     <engine name="android" spec="~7.0.0" />
     <engine name="browser" spec="~5.0.4" />
 </widget>

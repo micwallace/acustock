@@ -17,7 +17,7 @@
  */
 
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Events, AlertController  } from 'ionic-angular';
+import { IonicPage, Events, AlertController } from 'ionic-angular';
 import { PickProvider } from '../../../../providers/providers';
 
 /**
@@ -36,9 +36,7 @@ export class PickListTab {
 
     objectKeys:any = Object.keys;
 
-    constructor(public navCtrl:NavController,
-                public navParams:NavParams,
-                public pickProvider:PickProvider,
+    constructor(public pickProvider:PickProvider,
                 public alertCtrl:AlertController,
                 public events:Events) {
 

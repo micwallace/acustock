@@ -35,7 +35,7 @@
         <ion-label>
             Enter or scan location ID
         </ion-label>
-        <button ion-button icon-only item-right (click)="scanBarcode()">
+        <button ion-button icon-only item-right (click)="scanBarcode();">
             <ion-icon name="barcode"></ion-icon>
         </button>
     </ion-item>
@@ -44,21 +44,24 @@
             <span [innerHTML]="attrs.data.LocationID.value | boldprefix:attrs.keyword"></span>
         </ng-template>
         <ion-auto-complete [(ngModel)]="selectedLocation" [dataProvider]="binAutocompleteService"
-                           [template]="listItem" (itemSelected)="loadBinContents($event)"></ion-auto-complete>
+                           [template]="listItem" (itemSelected)="loadBinContents($event);" (keydown.enter)="loadItemByBarcode($event.target.value);"></ion-auto-complete>
     </div>
 </ion-header>
 
 <ion-content padding>
+    <ion-row class="table-header">
+        <ion-col col-7>Item</ion-col>
+        <ion-col col-5 text-right>On-Hand / Available</ion-col>
+    </ion-row>
     <ion-list class="item-list">
-        <ion-item class="list-item" no-padding tappable *ngFor="let item of binContents" (click)="openDetailsModal($event, item)">
+        <ion-item class="list-item" no-padding tappable *ngFor="let item of binContents" (click)="openDetailsModal($event, item);">
             <ion-row>
-                <ion-col col-8><strong>{{item.InventoryID.value}}</strong></ion-col>
-                <ion-col col-4 class="column-right">
-                        On Hand: {{item.QtyOnHand.value}}<br/>
-                        Available: {{item.QtyAvailable.value}}
+                <ion-col col-7><strong>{{item.InventoryID.value}}</strong></ion-col>
+                <ion-col col-5 class="column-right">
+                    {{item.QtyOnHand.value}} / {{item.QtyAvailable.value}}
                 </ion-col>
             </ion-row>
         </ion-item>
     </ion-list>
-    <barcode-listener (scan)='loadItemByBarcode($event)'></barcode-listener>
+    <barcode-listener (scan)='loadItemByBarcode($event);'></barcode-listener>
 </ion-content>

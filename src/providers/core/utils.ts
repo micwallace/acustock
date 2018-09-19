@@ -18,11 +18,11 @@
 
 import { Injectable } from '@angular/core';
 import { PreferencesProvider } from "./preferences";
-import { App, ToastController, AlertController, NavController } from "ionic-angular";
+import { App, AlertController, NavController } from "ionic-angular";
 import { Vibration } from '@ionic-native/vibration';
 import { EmailComposer } from '@ionic-native/email-composer';
-import { LoginPage } from "../../pages/login/login";
-import { SetupPage } from "../../pages/setup/setup";
+//import { LoginPage } from "../../pages/login/login";
+//import { SetupPage } from "../../pages/setup/setup";
 
 /*
  Generated class for the CacheProvider provider.
@@ -33,9 +33,7 @@ import { SetupPage } from "../../pages/setup/setup";
 @Injectable()
 export class UtilsProvider {
 
-    constructor(private app:App,
-                public prefs:PreferencesProvider,
-                public toastCtrl:ToastController,
+    constructor(public prefs:PreferencesProvider,
                 public vibration:Vibration,
                 public alertCtrl: AlertController,
                 public emailComposer:EmailComposer) {

@@ -36,5 +36,6 @@ export {
     PickProvider,
     PreferencesProvider,
     CountProvider,
-    AdjustmentProvider
+    AdjustmentProvider,
+    TransferProvider
 };

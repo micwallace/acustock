@@ -23,31 +23,40 @@
         </ion-title>
     </ion-navbar>
 </ion-header>
-<ion-content padding id="page5">
-    <form id="login-form1">
+<ion-content padding>
+    <div text-center>
+        <img style="width: 90px; margin-bottom: 10px;" src="../../assets/imgs/logo.png" />
+    </div>
+    <form >
         <div *ngIf="message != null">
             <strong>{{message}}</strong>
         </div>
-        <ion-list id="login-list3">
-            <ion-item id="login-input1">
+        <ion-list>
+            <ion-item>
                 <ion-label>
                     Username
                 </ion-label>
                 <ion-input name="username" type="text" placeholder="" [(ngModel)]="username"></ion-input>
             </ion-item>
-            <ion-item id="login-input2">
+            <ion-item>
                 <ion-label>
                     Password
                 </ion-label>
-                <ion-input name="password" type="password" placeholder="" [(ngModel)]="password"></ion-input>
+                <ion-input name="password" type="password" placeholder="" [(ngModel)]="password" (keydown.enter)="login();"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label>
+                    Remember Password
+                </ion-label>
+                <ion-toggle name="remember_password" [(ngModel)]="cache.prefs.preferences['remember_password']"></ion-toggle>
             </ion-item>
         </ion-list>
         <div class="spacer" style="height:40px;"></div>
-        <button id="login-button" ion-button color="stable" block (click)="login();">
+        <button id="login-button" ion-button block (click)="login();">
             Log in
         </button>
         <div class="spacer" style="height:10px;"></div>
-        <button id="setup-button" ion-button color="stable" block (click)="goToSetup();">
+        <button id="setup-button" ion-button block (click)="goToSetup();">
             Go to Setup
         </button>
     </form>

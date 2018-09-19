@@ -20,7 +20,6 @@ import { HTTP } from '@ionic-native/http';
 import { Http, Headers, RequestOptions } from '@angular/http'
 import { Injectable } from '@angular/core';
 import { PreferencesProvider } from "./preferences";
-import { LoginPage } from "../../pages/login/login";
 import { Platform } from "ionic-angular";
 
 /**
@@ -68,7 +67,7 @@ export class Api {
 
         return new Promise((resolve, reject) => {
 
-            if (!this.prefs.isSetupComplete() || this.prefs.getPreference('connection_password')==""){
+            if (!this.prefs.isSetupComplete()){
                 reject({message: "Please enter all required settings."});
                 return;
             }
@@ -76,6 +75,14 @@ export class Api {
             this.updateSettings(username, password);
 
             this.login().then((res) => {
+
+                // persist password if it's correct
+                if (this.prefs.getPreference("remember_password")){
+                    this.prefs.setPreference("connection_password", this.password, true);
+                } else {
+                    this.prefs.setPreference("connection_password", "", true);
+                }
+
                 resolve();
             }).catch((err)=> {
                 reject(err);

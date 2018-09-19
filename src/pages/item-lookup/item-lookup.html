@@ -35,7 +35,7 @@
         <ion-label>
             Enter or scan Item ID:
         </ion-label>
-        <button ion-button icon-only item-right (click)="scanBarcode()">
+        <button ion-button icon-only item-right (click)="scanBarcode();">
             <ion-icon name="barcode"></ion-icon>
         </button>
     </ion-item>
@@ -45,25 +45,24 @@
             <small *ngIf="attrs.data.AlternateID" [innerHTML]="attrs.data.AlternateID | boldprefix:attrs.keyword"></small>
         </ng-template>
         <ion-auto-complete id="item-select" [(ngModel)]="selectedItem" [dataProvider]="itemAutocompleteService"
-                           [template]="listItem" (itemSelected)="loadItemLocations($event)"></ion-auto-complete>
+                           [template]="listItem" (itemSelected)="loadItemLocations($event);" (keydown.enter)="loadItemByBarcode($event.target.value);"></ion-auto-complete>
     </div>
 </ion-header>
 
 <ion-content padding>
+    <ion-row class="table-header">
+        <ion-col col-7>Location</ion-col>
+        <ion-col col-5 text-right>On-Hand / Available</ion-col>
+    </ion-row>
     <ion-list class="item-list">
-        <ion-item class="list-item" no-padding tappable *ngFor="let location of itemLocations" (click)="openDetailsModal($event, location)">
+        <ion-item class="list-item" no-padding tappable *ngFor="let location of itemLocations" (click)="openDetailsModal($event, location);">
             <ion-row>
-                <ion-col col-8><strong>{{location.Location.value}}</strong></ion-col>
-                <ion-col col-4 class="column-right">
-                    <ion-row>
-                        On Hand: {{location.QtyOnHand.value}}
-                    </ion-row>
-                    <ion-row>
-                        Available: {{location.QtyAvailable.value}}
-                    </ion-row>
+                <ion-col col-7><strong>{{location.Location.value}}</strong></ion-col>
+                <ion-col col-5 class="column-right">
+                    {{location.QtyOnHand.value}} / {{location.QtyAvailable.value}}
                 </ion-col>
             </ion-row>
         </ion-item>
     </ion-list>
-    <barcode-listener (scan)='onBarcodeScan($event)'></barcode-listener>
+    <barcode-listener (scan)='loadItemByBarcode($event);'></barcode-listener>
 </ion-content>

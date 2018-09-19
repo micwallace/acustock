@@ -17,5 +17,10 @@
  */
 
 page-preferences {
-
+  .preference-group {
+    margin-bottom: 15px;
+  }
+  .preference-header .label {
+    font-size: 1.6rem;
+  }
 }

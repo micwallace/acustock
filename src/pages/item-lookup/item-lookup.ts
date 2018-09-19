@@ -79,33 +79,22 @@ export class ItemLookupPage {
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
                 this.utils.processApiError("Error", err.message, err, this.navCtrl);
-            }).catch((err)=>{
-                this.utils.processApiError("Error", err.message, err, this.navCtrl);
             });
         });
     }
 
     public scanBarcode() {
+
         this.barcodeScanner.scan().then((barcodeData) => {
+
             if (barcodeData.cancelled)
                 return;
-
-            //this.searchbar.setValue(barcodeData.text);
 
             this.loadItemByBarcode(barcodeData.text);
 
         }, (err) => {
-            // An error occurred
             this.utils.showAlert("Error", "Error accessing barcode device: " + err);
         });
-    }
-
-    onBarcodeScan(barcodeText) {
-        console.log(barcodeText);
-
-        //this.searchbar.setValue(barcodeText);
-
-        this.loadItemByBarcode(barcodeText);
     }
 
     loadItemByBarcode(barcodeText) {
@@ -117,14 +106,12 @@ export class ItemLookupPage {
 
             this.selectedItem = item;
             this.loadItemLocations(item);
-            this.dismissLoader();
 
         }).catch((err) => {
 
+            this.selectedItem = null;
             this.utils.playFailedSound(true);
             this.dismissLoader().then(()=> {
-                this.utils.showAlert("Error", err.message, {exception: err});
-            }).catch((err)=>{
                 this.utils.showAlert("Error", err.message, {exception: err});
             });
         });
@@ -140,15 +127,15 @@ export class ItemLookupPage {
                 this.loader = null;
                 resolve();
             }).catch((err)=>{
-                reject(err);
+                resolve(err); // always continue
             });
         });
     }
 
     openDetailsModal(event, item) {
 
-        let loader = this.loadingCtrl.create({content: "Loading..."});
-        loader.present();
+        this.loader = this.loadingCtrl.create({content: "Loading..."});
+        this.loader.present();
 
         this.api.getItemLotSerialInfo(item.InventoryID.value, item.Warehouse.value, item.Location.value).then((res) => {
 
@@ -156,11 +143,11 @@ export class ItemLookupPage {
 
             let modal = this.modalCtrl.create(ItemLookupDetailsPage, {data: item});
             modal.present();
-            loader.dismiss();
+            this.dismissLoader();
 
         }).catch((err) => {
 
-            loader.dismiss().then(()=> {
+            this.dismissLoader().then(()=> {
                 this.utils.processApiError("Error", err.message, err, this.navCtrl);
             });
         });

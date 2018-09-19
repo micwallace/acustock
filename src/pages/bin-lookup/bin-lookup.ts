@@ -74,24 +74,24 @@ export class BinLookupPage {
             this.dismissLoader();
 
         }).catch((err) => {
+
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
-                this.utils.processApiError("Error", err.message, err, this.navCtrl);
-            }).catch((err)=>{
                 this.utils.processApiError("Error", err.message, err, this.navCtrl);
             });
         });
     }
 
     public scanBarcode() {
+
         this.barcodeScanner.scan().then((barcodeData) => {
+
             if (barcodeData.cancelled)
                 return;
 
             this.loadItemByBarcode(barcodeData.text);
 
         }, (err) => {
-            // An error occurred
             this.utils.playFailedSound(true);
             this.utils.showAlert("Error", "Error accessing barcode device: " + err, {exception: err});
         });
@@ -106,14 +106,12 @@ export class BinLookupPage {
 
             this.selectedLocation = bin;
             this.loadBinContents(bin, true);
-            this.dismissLoader();
 
         }).catch((err) => {
 
+            this.selectedLocation = null;
             this.utils.playFailedSound(true);
             this.dismissLoader().then(()=> {
-                this.utils.processApiError("Error", err.message, err, this.navCtrl);
-            }).catch((err)=>{
                 this.utils.processApiError("Error", err.message, err, this.navCtrl);
             });
         });
@@ -129,7 +127,7 @@ export class BinLookupPage {
                 this.loader = null;
                 resolve();
             }).catch((err)=>{
-                reject(err);
+                resolve(err); // always continue
             });
         });
     }

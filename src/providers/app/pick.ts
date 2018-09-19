@@ -273,7 +273,9 @@ export class PickProvider {
      * the pending quantities. The result is a source index that reflects what is remaining after taking into account
      * pending picks. It adds items to the modified index to keep track of existing allocations that have had their
      * quantity reduced or have been deleted. This data is used later when confirming picks.
-     * Picks are stripped
+     *
+     * If the pick is an existing allocation, it's quantity is reduced or deleted first, then the remaining allocations
+     * are reduced or deleted until the picks pending qty is exhausted.
      */
     private processPendingAllocations(){
 
@@ -308,7 +310,8 @@ export class PickProvider {
                         diff = srcAlloc.RemainingQty - pendingQtyLeft;
 
                         this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value].RemainingQty = diff;
-                        // TODO: Fix calculation in UI and enable? Is it needed?
+
+                        // This isn't needed at the moment
                         //this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value].Qty.value = srcAlloc.Qty.value - pendingQty;
 
                         this.addModifiedAllocation(this.sourceIndex[x].Allocations[alloc.SplitLineNbr.value]);
@@ -786,10 +789,12 @@ export class PickProvider {
 
                     var pendingAlloc = this.pendingPicks[i].Allocations[x];
 
+                    var pickedQty = pendingAlloc.PickedQty.value + pendingAlloc.PendingQty;
+
                     alloc = {
                         LineNbr: {value: i},
-                        Qty: pendingAlloc.Qty,
-                        PickedQty: {value: pendingAlloc.PickedQty.value + pendingAlloc.PendingQty},
+                        Qty: {value: (pendingAlloc.Qty.value < pickedQty ? pickedQty : pendingAlloc.Qty.value)}, // If the allocation is over-picked, also increase the allocation qty
+                        PickedQty: {value: pickedQty},
                         LocationID: pendingAlloc.LocationID
                     };
 
@@ -797,16 +802,20 @@ export class PickProvider {
                         alloc.SplitLineNbr = pendingAlloc.SplitLineNbr;
 
                         if (modified.hasOwnProperty(pendingAlloc.SplitLineNbr.value)) {
-                            alloc.Qty.value = modified[pendingAlloc.SplitLineNbr.value].Qty.value;
-                            delete modified[pendingAlloc.SplitLineNbr.value];
 
-                            item.Allocations.push(alloc);
-                            continue;
+                            // Skip modifying qty for allocations that are fully picked since it causes an error for
+                            // allocations that are over-picked as it reverts the qty adjustment above, causing picked qty to exceed qty
+                            // Eventually this could be fixed in the process pending allocations function but this is the easiest fix for now.
+                            if (alloc.Qty.value > alloc.PickedQty.value) {
+                                alloc.Qty.value = modified[pendingAlloc.SplitLineNbr.value].Qty.value;
+                                item.Allocations.push(alloc);
+                                delete modified[pendingAlloc.SplitLineNbr.value];
+                                continue;
+                            } else {
+                                delete modified[pendingAlloc.SplitLineNbr.value];
+                            }
                         }
                     }
-
-                    if (alloc.Qty.value < alloc.PickedQty.value)
-                        alloc.Qty.value = alloc.PickedQty.value;
 
                     allocs.push(alloc);
                 }

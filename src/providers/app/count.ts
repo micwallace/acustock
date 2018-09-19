@@ -57,9 +57,17 @@ export class CountProvider {
 
         return new Promise((resolve, reject)=> {
 
-            this.api.getCount(referenceNbr).then((res)=>{
+            this.api.getCount(referenceNbr).then((res:any)=>{
 
                 console.log(JSON.stringify(res));
+
+                var curWarehouse = this.prefs.getPreference('warehouse');
+                var warehouse = res.WarehouseID.value;
+
+                if (warehouse !== curWarehouse) {
+                    reject({message:"Physical Count #" + referenceNbr + " was found but belongs to warehouse " + warehouse + ", not the currently selected warehouse which is " + curWarehouse});
+                    return;
+                }
 
                 this.physicalCount = res;
                 this.generateIndex();

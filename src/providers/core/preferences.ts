@@ -53,6 +53,13 @@ export class PreferencesProvider {
                     def_value: ""
                 },
                 {
+                    key: "remember_password",
+                    title: "Remember password",
+                    type: "toggle",
+                    placeholder: "",
+                    def_value: true
+                },
+                {
                     key: "connection_company",
                     title: "Company ID",
                     type: "text",
@@ -126,7 +133,7 @@ export class PreferencesProvider {
                 }
             ]
         },
-        {
+        /*{
             title: "Debug",
             preferences: [
                 {
@@ -136,7 +143,7 @@ export class PreferencesProvider {
                     def_value: false
                 }
             ]
-        }
+        }*/
     ];
 
     public static successSounds = [
@@ -161,8 +168,6 @@ export class PreferencesProvider {
         { label: "Alert 7", value: "alert-7" }
     ];
 
-    defaults = {};
-
     preferences = {};
 
     constructor() {
@@ -170,10 +175,11 @@ export class PreferencesProvider {
 
         this.loadPreferences();
 
-        // index defaults
+        // load defaults
         for (let group of this.schema) {
             for (let pref of group.preferences) {
-                this.defaults[pref.key] = pref.def_value;
+                if (!this.preferences.hasOwnProperty(pref.key))
+                    this.preferences[pref.key] = pref.def_value;
             }
         }
     }
@@ -183,7 +189,7 @@ export class PreferencesProvider {
     }
 
     setPreference(key, value, save = false) {
-        if (this.defaults.hasOwnProperty(key))
+        if (this.preferences.hasOwnProperty(key))
             this.preferences[key] = value;
 
         if (save)
@@ -195,8 +201,9 @@ export class PreferencesProvider {
     }
 
     getPreference(key) {
-        if (!this.preferences.hasOwnProperty(key))
-            return this.defaults[key];
+        if (!this.preferences.hasOwnProperty(key)) {
+            return null;
+        }
 
         return this.preferences[key];
     }

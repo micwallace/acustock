@@ -32,9 +32,25 @@
 // automatically applied to the <body> element in the app.
 @import "../../node_modules/ionic2-auto-complete/auto-complete";
 
+.menu-logo {
+  width: 32px;
+  vertical-align:middle;
+  margin-left: 12px;
+}
+
+.menu-title {
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .menu-info {
   margin: 5px 15px;
   font-size: 11px;
+  padding: 5px 0;
+}
+
+.menu-list {
+  padding-top: 4px;
 }
 
 .table-header {
@@ -102,4 +118,22 @@
 
 ion-auto-complete {
   width: 100% !important;
+}
+
+.item-md.item-input.ng-valid.item-input-has-value:not(.input-has-focus):not(.item-input-has-focus) .item-inner,
+  .item-md.item-input.ng-valid.input-has-value:not(.input-has-focus):not(.item-input-has-focus) .item-inner {
+
+  border-bottom: 1px solid #dedede;
+  -webkit-box-shadow: unset;
+  box-shadow: unset;
+
+}
+
+.list-md .item-input.ng-valid.item-input-has-value:not(.input-has-focus):not(.item-input-has-focus):last-child,
+.list-md .item-input.ng-valid.input-has-value:not(.input-has-focus):not(.item-input-has-focus):last-child {
+
+  border-bottom: 1px solid #dedede;
+  -webkit-box-shadow: unset;
+  box-shadow: unset;
+
 }

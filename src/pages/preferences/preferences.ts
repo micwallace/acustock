@@ -50,9 +50,6 @@ export class PreferencesPage {
     ionViewWillLeave() {
         this.prefs.savePreferences();
 
-        if (this.prefs.getPreference('warehouse') !== this.currentWarehouse)
-            this.cache.generateBinList();
-
         setTimeout(()=> {
             this.events.publish('preferencesSaved');
         }, 200);
@@ -78,11 +75,29 @@ export class PreferencesPage {
         return options;
     }
 
+    onOptionChange(key){
+
+        switch (key){
+            case "warehouse":
+                this.cache.generateBinList();
+                break;
+            case "remember_password":
+                // ignore for first time setup by checking warehouse
+                if (this.preferences.getPreference('warehouse') && this.preferences.getPreference("remember_password") === false) {
+                    this.preferences.setPreference("connection_password", "", true);
+                }
+                break;
+            case "connection_password":
+                if (this.preferences.getPreference('warehouse') && this.preferences.getPreference("connection_password") !== "") {
+                    this.preferences.setPreference("remember_password", true, true);
+                }
+                break;
+        }
+    }
+
     onSelectOptionClick(key, value){
         if (["success_sound", "alert_sound", "prompt_sound"].indexOf(key) > -1){
             UtilsProvider.playSound(value);
-        } else if (key == "warehouse"){
-            this.cache.generateBinList();
         }
     }
 

@@ -22,7 +22,7 @@ import { Api } from "../../providers/core/api";
 import { CacheProvider } from "../../providers/core/cache";
 import { PickShipmentsPage } from "../pick-shipments/pick-shipments";
 import { UtilsProvider } from "../../providers/core/utils";
-import {SetupPage} from "../setup/setup";
+import { SetupPage } from "../setup/setup";
 
 @IonicPage()
 @Component({
@@ -52,6 +52,10 @@ export class LoginPage {
 
     login() {
 
+        if (this.username == "" || this.password == ""){
+            this.utils.showAlert("Error", "Please enter username and password");
+        }
+
         let loader = this.loadingCtrl.create({content: "Logging in..."});
         loader.present();
 
@@ -64,9 +68,8 @@ export class LoginPage {
             console.log("Login succeeded, loading initial data...");
             this.cache.initialLoad();
 
+            // Password is persisted in api.ts
             this.cache.prefs.setPreference("connection_username", this.username);
-            // TODO: Optional remember password
-            this.cache.prefs.setPreference("connection_password", this.password);
 
         }).catch((err) => {
             loader.dismiss();

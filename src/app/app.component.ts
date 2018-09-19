@@ -17,7 +17,7 @@
  */
 
 import { Component, ViewChild } from '@angular/core';
-import { Platform, Nav, LoadingController, ToastController } from 'ionic-angular';
+import { Platform, Nav, LoadingController } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 

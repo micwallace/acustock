@@ -33,8 +33,8 @@
 
 <ion-content no-padding>
     <ion-list>
-        <ion-item-group *ngFor="let group of preferences.schema">
-                <ion-item-divider>
+        <ion-item-group class="preference-group" *ngFor="let group of preferences.schema">
+                <ion-item-divider class="preference-header">
                     <ion-icon name="settings"></ion-icon>
                     <ion-label>{{group.title}}</ion-label>
                 </ion-item-divider>
@@ -42,15 +42,19 @@
                     <ion-label color="primary">{{pref.title}}</ion-label>
 
                     <ion-input *ngIf="['text', 'password', 'url', 'number'].indexOf(pref.type) > -1"
-                               placeholder="{{pref.placeholder}}" type="{{pref.type}}" [value]="pref.def_value"
-                               [(ngModel)]="preferences.preferences[pref.key]"></ion-input>
+                               placeholder="{{pref.placeholder}}" type="{{pref.type}}"
+                               [(ngModel)]="preferences.preferences[pref.key]"
+                                (ionChange)="onOptionChange(pref.key);">
+                    </ion-input>
 
-                    <ion-toggle *ngIf="pref.type == 'toggle'" [checked]="pref.def_value"
-                                [(ngModel)]="preferences.preferences[pref.key]"></ion-toggle>
+                    <ion-toggle *ngIf="pref.type == 'toggle'" checked="pref.def_value"
+                                [(ngModel)]="preferences.preferences[pref.key]"
+                                (ionChange)="onOptionChange(pref.key);"></ion-toggle>
 
-                    <ion-select *ngIf="pref.type == 'select'" [(ngModel)]="preferences.preferences[pref.key]">
+                    <ion-select *ngIf="pref.type == 'select'" [(ngModel)]="preferences.preferences[pref.key]"
+                                (ionChange)="onOptionChange(pref.key);">
                         <ion-option *ngFor="let option of getPreferenceOptions(pref)" [value]="option.value"
-                                    [selected]="option.value == pref.def_value" (ionSelect)="onSelectOptionClick(pref.key, option.value);">
+                                    (ionSelect)="onSelectOptionClick(pref.key, option.value);">
                             {{option.label}}
                         </ion-option>
                     </ion-select>

@@ -18,11 +18,9 @@
 
 import { Component } from '@angular/core';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
-import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, LoadingController } from 'ionic-angular';
 import { CountProvider } from "../../providers/app/count";
 import { CountEntryPage } from "./entry/count-entry";
-import { AlertController } from "ionic-angular/index";
-import { Events } from "ionic-angular/index";
 import { UtilsProvider } from "../../providers/core/utils";
 
 /**
@@ -42,11 +40,9 @@ export class CountPage {
     public referenceNbr = "";
 
     constructor(public navCtrl:NavController,
-                public navParams:NavParams,
                 public barcodeScanner:BarcodeScanner,
                 public loadingCtrl:LoadingController,
                 public countProvider:CountProvider,
-                public alertCtrl: AlertController,
                 public utils:UtilsProvider) {
     }
 
@@ -62,8 +58,6 @@ export class CountPage {
         loader.present();
 
         this.countProvider.loadCount(this.referenceNbr).then((res)=> {
-
-            // TODO: check warehouse
 
             loader.dismiss();
 
