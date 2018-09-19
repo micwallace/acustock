@@ -388,11 +388,13 @@ export class EnterTab {
                     return;
                 }
 
+                this.dismissLoader();
+
                 // If the item is the same as the last item, increment quantity.
                 if (item.InventoryID.value == this.enteredData.item) {
                     this.zone.run(()=> {
                         this.enteredData.qty++;
-                        this.dismissLoader();
+
                         if (this.validateItemQty(null)){
                             this.utils.playScanSuccessSound();
                         } else {
@@ -405,6 +407,7 @@ export class EnterTab {
                     this.setItem(item.InventoryID.value, true);
                 }
             }).catch((err) => {
+                this.dismissLoader();
                 this.utils.showAlert("Error", err.message);
                 this.utils.playFailedSound(true);
             });

@@ -52,7 +52,8 @@ export class CountEntryEnterTab {
     showItem = false;
     showQty = false;
 
-    loader;
+    loader = null;
+    loaderTimer = null;
 
     constructor(private zone:NgZone,
                 public navCtrl:NavController,
@@ -116,9 +117,39 @@ export class CountEntryEnterTab {
         this.locationInput.setFocus();
     }
 
+    public showLoaderDelayed(message){
+
+        if (this.loader == null && this.loaderTimer == null){
+
+            this.loaderTimer = setTimeout(()=>{
+                this.loader = this.loadingCtrl.create({content: message});
+                this.loader.present();
+            }, 700);
+
+        } else if (this.loader != null){
+            this.loader.data.content = message;
+        }
+    }
+
     private dismissLoader() {
-        return this.loader.dismiss();
-        //this.loader = null;
+
+        if (this.loaderTimer != null){
+            clearTimeout(this.loaderTimer);
+            this.loaderTimer = null;
+        }
+
+        return new Promise((resolve, reject)=>{
+
+            if (this.loader == null)
+                return resolve();
+
+            this.loader.dismiss().then(()=>{
+                this.loader = null;
+                resolve();
+            }).catch((err)=>{
+                resolve();
+            });
+        });
     }
 
     setLocation(locId, isScan=false) {
@@ -129,8 +160,7 @@ export class CountEntryEnterTab {
             locId = this.enteredData.location;
         }
 
-        this.loader = this.loadingCtrl.create({content: "Loading..."});
-        this.loader.present();
+        this.showLoaderDelayed("Loading...");
 
         this.showQty = false;
 
@@ -170,8 +200,7 @@ export class CountEntryEnterTab {
 
         this.currentSourceLine = null;
 
-        this.loader = this.loadingCtrl.create({content: "Loading..."});
-        this.loader.present();
+        this.showLoaderDelayed("Loading...");
 
         this.cache.getItemById(itemId).then((item:any)=> {
 
@@ -319,14 +348,20 @@ export class CountEntryEnterTab {
     onBarcodeScan(barcodeText) {
         console.log(barcodeText);
 
+        this.showLoaderDelayed("Loading...");
+
         // If the location and to-location is already set, scanning a bin barcode updates the to-location
         this.cache.getBinById(barcodeText).then((bin)=> {
+
+            this.dismissLoader();
 
             this.setLocation(barcodeText, true);
 
         }).catch((err) => {
 
             this.cache.getItemById(barcodeText).then((item:any)=> {
+
+                this.dismissLoader();
 
                 if (this.enteredData.item == "" || this.enteredData.qty == 0) {
                     this.setItem(item.InventoryID.value, true);
@@ -351,6 +386,7 @@ export class CountEntryEnterTab {
                     this.setItem(item.InventoryID.value, true);
                 }
             }).catch((err) => {
+                this.dismissLoader();
                 this.utils.playFailedSound(true);
                 this.utils.showAlert("Error", err.message);
             });

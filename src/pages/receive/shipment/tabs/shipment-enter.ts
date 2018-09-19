@@ -367,16 +367,20 @@ export class ReceiveShipmentEnterTab {
     onBarcodeScan(barcodeText) {
         console.log(barcodeText);
 
+        this.showLoaderDelayed("Loading...");
+
         // If the location and to-location is already set, scanning a bin barcode updates the to-location
         this.cache.getBinById(barcodeText).then((bin)=> {
+
+            this.dismissLoader();
 
             this.setLocation(barcodeText, true);
 
         }).catch((err) => {
 
-            this.showLoaderDelayed("Loading...");
-
             this.cache.getItemById(barcodeText).then((item:any)=> {
+
+                this.dismissLoader();
 
                 if (this.enteredData.item == "" || this.enteredData.qty == 0) {
                     this.setItem(item.InventoryID.value, true);
@@ -407,6 +411,7 @@ export class ReceiveShipmentEnterTab {
 
                 }
             }).catch((err) => {
+                this.dismissLoader();
                 this.utils.showAlert("Error", err.message);
             });
         });

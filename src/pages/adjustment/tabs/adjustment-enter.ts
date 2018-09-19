@@ -301,6 +301,7 @@ export class AdjustmentEnterTab {
 
         // If the location and to-location is already set, scanning a bin barcode updates the to-location
         this.cache.getBinById(barcodeText).then((bin)=> {
+            this.dismissLoader();
             // check if quantity is set. If it is then save the current entry
             if (this.enteredData.location != "" && this.enteredData.item != "" && this.enteredData.qty > 0) {
                 this.addAdjustmentItem(true);
@@ -310,6 +311,8 @@ export class AdjustmentEnterTab {
         }).catch((err) => {
 
             this.cache.getItemById(barcodeText).then((item:any)=> {
+
+                this.dismissLoader();
 
                 if (this.enteredData.item == "" || this.enteredData.qty == 0) {
                     this.setItem(item.InventoryID.value, true);
@@ -329,6 +332,7 @@ export class AdjustmentEnterTab {
                     this.setItem(item.InventoryID.value, true);
                 }
             }).catch((err) => {
+                this.dismissLoader();
                 this.utils.showAlert("Error", err.message);
                 this.utils.playFailedSound(true);
             });

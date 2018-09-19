@@ -656,12 +656,15 @@ export class PickTab {
     }
 
     startCameraScanner(){
+
+        var context = this;
+
         this.barcodeScanner.scan().then((barcodeData) => {
             if (barcodeData.cancelled)
                 return;
 
             this.onBarcodeScan(barcodeData.text, function(){
-                this.startCameraScanner();
+                context.startCameraScanner();
             });
 
         }, (err) => {
@@ -684,9 +687,11 @@ export class PickTab {
 
         this.cache.getBinById(barcodeText).then((bin:any)=> {
 
+            this.dismissLoader();
+
             this.ngZone.run(()=> {
                 // check if quantity is set. If it is then save the current entry
-                if (this.enteredData.item != "" && this.enteredData.qty > 0) {
+                if (barcodeText != this.enteredData.location && this.enteredData.item != "" && this.enteredData.qty > 0) {
                     if (!this.addPick(true))
                         return;
                 }
@@ -697,6 +702,8 @@ export class PickTab {
         }).catch((err) => {
 
             this.cache.getItemById(barcodeText).then((item:any)=> {
+
+                this.dismissLoader();
 
                 this.ngZone.run(()=> {
 
@@ -733,6 +740,7 @@ export class PickTab {
                 });
 
             }).catch((err) => {
+                this.dismissLoader();
                 this.utils.playFailedSound(true);
                 this.utils.showAlert("Error", err.message);
             });
