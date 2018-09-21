@@ -24,13 +24,6 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { ItemLookupDetailsPage } from '../item-lookup-details/item-lookup-details'
 import { UtilsProvider } from "../../providers/core/utils";
 
-/**
- * Generated class for the BinLookupPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
     selector: 'page-bin-lookup',
@@ -55,10 +48,6 @@ export class BinLookupPage {
                 public modalCtrl:ModalController,
                 public prefs:PreferencesProvider,
                 public utils:UtilsProvider) {
-    }
-
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad BinLookupPage');
     }
 
     loadBinContents(item, isScan=false) {

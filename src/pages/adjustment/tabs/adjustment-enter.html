@@ -37,7 +37,9 @@
 
 <ion-content padding style="position: relative;">
     <div>
-        <h5>Scan Bin</h5>
+        <button type="button" ion-button small icon-only float-right (click)="startCameraScanner()">
+            <ion-icon name="barcode"></ion-icon>
+        </button>
     </div>
 
     <ion-grid no-padding>

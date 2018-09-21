@@ -21,13 +21,6 @@ import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angu
 import { TransferProvider } from '../../../providers/app/transfer'
 import { UtilsProvider } from "../../../providers/core/utils";
 
-/**
- * Generated class for the PickShipmentsListPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
     selector: 'page-bin-transfer',
@@ -42,10 +35,6 @@ export class TransferListTab {
                 public transferProvider:TransferProvider,
                 public alertController:AlertController,
                 public utils:UtilsProvider) {
-    }
-
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad PickShipmentPickPage Tab: Pick List');
     }
 
     openEditDialog(locationKey, itemKey) {

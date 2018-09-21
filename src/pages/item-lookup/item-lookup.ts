@@ -24,13 +24,6 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { ItemLookupDetailsPage } from '../item-lookup-details/item-lookup-details';
 import {UtilsProvider} from "../../providers/core/utils";
 
-/**
- * Generated class for the ItemLookupPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
     selector: 'page-item-lookup',
@@ -46,7 +39,6 @@ export class ItemLookupPage {
     selectedItem = null;
 
     constructor(public navCtrl:NavController,
-                public navParams:NavParams,
                 public itemAutocompleteService:ItemAutocompleteService,
                 public api:Api,
                 public loadingCtrl:LoadingController,
@@ -55,10 +47,6 @@ export class ItemLookupPage {
                 public cache:CacheProvider,
                 public prefs:PreferencesProvider,
                 public utils:UtilsProvider) {
-    }
-
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad ItemLookupPage');
     }
 
     loadItemLocations(item, isScan=false) {

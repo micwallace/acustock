@@ -39,7 +39,7 @@ export class AdjustmentProvider {
     private lastRequest:any = "";
     //public AdjustmentHistory = [];
 
-    constructor(public api:Api, public cache:CacheProvider, public loadingCtrl:LoadingController, public prefs:PreferencesProvider) {
+    constructor(public api:Api, public prefs:PreferencesProvider) {
         console.log('Hello AdjustmentProvider Provider');
         this.loadPending();
         //this.loadHistory();
@@ -138,6 +138,85 @@ export class AdjustmentProvider {
         }
 
         return false;
+    }
+
+    // Remove
+    public validateBookQtys(){
+
+        return new Promise((resolve, reject) => {
+            // get all locations
+            var locations = [];
+
+            for (var i in this.pendingItems) {
+
+                if (!this.pendingItems.hasOwnProperty(i)) continue;
+
+                if (locations.indexOf(this.pendingItems[i].LocationID) === -1)
+                    locations.push(this.pendingItems[i].LocationID);
+            }
+
+            this.loadOnHandQtys(locations).then((bookQtys)=>{
+
+                var removed = [];
+
+                for (var i in this.pendingItems) {
+
+                    var item = this.pendingItems[i];
+
+                    if (bookQtys.hasOwnProperty(item.LocationID) &&
+                        bookQtys[item.LocationID].hasOwnProperty(item.InventoryID)){
+
+                        var bookQty = bookQtys[item.LocationID][item.InventoryID];
+
+                        if (bookQty != item.BookQty){
+
+                            console.log("Book qty different, removing: "+bookQty);
+
+                            removed.push(this.pendingItems[i]);
+
+                            delete this.pendingItems[i];
+                        }
+
+                    }
+                }
+
+                this.savePending();
+
+                resolve(removed);
+
+            }).catch((err)=>{
+                reject(err);
+            });
+        });
+    }
+
+    public loadOnHandQtys(locations){
+        return new Promise((resolve, reject) => {
+            this.recurseLoadOnHandQtys(resolve, reject, locations);
+        });
+    }
+
+    public recurseLoadOnHandQtys(resolve, reject, locations, index=0, availability={}){
+
+        this.api.getLocationContents(locations[index], this.prefs.getPreference('warehouse')).then((res) => {
+
+            availability[locations[index]] = {};
+
+            for (var i in res){
+                availability[locations[index]][res[i].InventoryID.value] = res[i].QtyOnHand.value;
+            }
+
+            index++;
+
+            if (index < locations.length){
+                this.recurseLoadOnHandQtys(resolve, reject, locations, index, res);
+            } else {
+                resolve(availability);
+            }
+
+        }).catch((err)=>{
+            reject(err);
+        });
     }
 
     public commitAdjustment(loadingCtrl:any) {

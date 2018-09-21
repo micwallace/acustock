@@ -20,13 +20,6 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, Events } from 'ionic-angular';
 import { PickProvider } from '../../../../providers/app/pick'
 
-/**
- * Generated class for the PickShipmentsListPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
     selector: 'tabs-unpicked-list',
@@ -39,10 +32,6 @@ export class UnpickedListTab {
                 public pickProvider:PickProvider,
                 public events:Events) {
 
-    }
-
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad PickShipmentPickPage Tab: Unpicked List');
     }
 
     openPickItem(locationIndex, itemIndex) {

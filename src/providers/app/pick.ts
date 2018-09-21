@@ -474,15 +474,6 @@ export class PickProvider {
         this.unpickedQty = this.totalQty - pickedQty;
     }
 
-    /*private getPickedItem(itemId){
-     for (let item of this.pickedItems){
-     if (itemId == item.InventoryID.value){
-     return item;
-     }
-     }
-     return null;
-     }*/
-
     getSuggestedLocation(index) {
 
         if (this.pickList.length == 0 || index >= this.pickList.length)
@@ -571,15 +562,7 @@ export class PickProvider {
 
     public addPick(data, curAlloc) {
 
-        /*if (!this.remainingItems.hasOwnProperty(data.item)) {
-            alert("The item " + data.item + " has no remaining quantity to pick.");
-            return;
-        }
-
-        if (this.remainingItems[data.item] < data.qty) {
-            alert("There is only " + this.remainingItems[data.item] + " units of this item left to pick, the entered qty is " + data.qty);
-            return;
-        }*/
+        // TODO: Move quantity validation into this function
 
         var sugAlloc = JSON.parse(JSON.stringify(curAlloc));
 
@@ -618,7 +601,7 @@ export class PickProvider {
     public updatePick(shipLineNbr, id, qty) {
 
         if (!this.pendingPicks.hasOwnProperty(shipLineNbr))
-            return; // TODO: Exception
+            return;
 
         var index = 0;
 

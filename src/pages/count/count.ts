@@ -23,13 +23,6 @@ import { CountProvider } from "../../providers/app/count";
 import { CountEntryPage } from "./entry/count-entry";
 import { UtilsProvider } from "../../providers/core/utils";
 
-/**
- * Generated class for the ReceivePage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
     selector: 'page-count',
@@ -44,10 +37,6 @@ export class CountPage {
                 public loadingCtrl:LoadingController,
                 public countProvider:CountProvider,
                 public utils:UtilsProvider) {
-    }
-
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad ReceivePage');
     }
 
     loadCount(referenceNbr, isScan=false){

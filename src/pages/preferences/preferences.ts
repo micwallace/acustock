@@ -21,13 +21,6 @@ import { IonicPage, NavController, NavParams, Events } from 'ionic-angular';
 import { PreferencesProvider, CacheProvider } from '../../providers/providers'
 import { UtilsProvider } from "../../providers/core/utils";
 
-/**
- * Generated class for the PreferencesPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
     selector: 'page-preferences',
@@ -41,10 +34,6 @@ export class PreferencesPage {
     constructor(public navCtrl:NavController, public navParams:NavParams, public prefs:PreferencesProvider, public events:Events, public cache:CacheProvider, public utils:UtilsProvider) {
         this.preferences = prefs;
         this.currentWarehouse = prefs.getPreference('warehouse');
-    }
-
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad PreferencesPage');
     }
 
     ionViewWillLeave() {

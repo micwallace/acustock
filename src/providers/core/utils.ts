@@ -18,7 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { PreferencesProvider } from "./preferences";
-import { App, AlertController, NavController } from "ionic-angular";
+import { AlertController, NavController } from "ionic-angular";
 import { Vibration } from '@ionic-native/vibration';
 import { EmailComposer } from '@ionic-native/email-composer';
 //import { LoginPage } from "../../pages/login/login";

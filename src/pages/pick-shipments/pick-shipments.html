@@ -26,7 +26,7 @@
         </ion-title>
     </ion-navbar>
 </ion-header>
-<barcode-listener *ngIf="navCtrl.getActive().name === 'PickShipmentsPage'" (scan)='onBarcodeScan($event)'></barcode-listener>
+<barcode-listener *ngIf="navCtrl.getActive().component.name === 'PickShipmentsPage'" (scan)='onBarcodeScan($event)'></barcode-listener>
 <ion-content padding id="page6">
     <form id="pick-shipments-form1">
         <ion-list id="login-list3">

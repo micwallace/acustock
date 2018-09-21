@@ -20,13 +20,6 @@ import { Component } from '@angular/core';
 import { IonicPage, Events, AlertController } from 'ionic-angular';
 import { PickProvider } from '../../../../providers/providers';
 
-/**
- * Generated class for the PickShipmentsListPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
     selector: 'tabs-pick-list',
@@ -40,10 +33,6 @@ export class PickListTab {
                 public alertCtrl:AlertController,
                 public events:Events) {
 
-    }
-
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad PickShipmentPickPage Tab: Pick List');
     }
 
     editPickItem(item) {

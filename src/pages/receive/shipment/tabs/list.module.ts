@@ -21,9 +21,6 @@ import { IonicPageModule } from 'ionic-angular';
 import { ReceiveShipmentListTab } from './list';
 
 @NgModule({
-    declarations: [
-        ReceiveShipmentListTab,
-    ],
     imports: [
         IonicPageModule.forChild(ReceiveShipmentListTab),
     ],

@@ -21,9 +21,6 @@ import { IonicPageModule } from 'ionic-angular';
 import { CountEntryPage } from './count-entry';
 
 @NgModule({
-    declarations: [
-        CountEntryPage,
-    ],
     imports: [
         IonicPageModule.forChild(CountEntryPage),
     ],

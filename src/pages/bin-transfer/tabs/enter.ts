@@ -22,13 +22,7 @@ import { TransferProvider } from '../../../providers/app/transfer'
 import { CacheProvider } from "../../../providers/core/cache";
 import { LoadingController } from "ionic-angular/index";
 import { UtilsProvider } from "../../../providers/core/utils";
-
-/**
- * Generated class for the PickShipmentsPickPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
+import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 
 @IonicPage()
 @Component({
@@ -66,16 +60,13 @@ export class EnterTab {
                 public events:Events,
                 public alertCtrl:AlertController,
                 public loadingCtrl:LoadingController,
-                public utils:UtilsProvider) {
+                public utils:UtilsProvider,
+                public barcodeScanner:BarcodeScanner) {
 
 
         events.subscribe('barcode:scan', (barcodeText)=>{
             this.onBarcodeScan(barcodeText)
         });
-    }
-
-    ionViewDidLoad() {
-
     }
 
     resetForm() {
@@ -130,7 +121,7 @@ export class EnterTab {
         });
     }
 
-    setLocation(locId, isScan) {
+    setLocation(locId, isScan, callback=null) {
 
         if (locId) {
             this.enteredData.location = locId;
@@ -167,12 +158,17 @@ export class EnterTab {
                 this.enteredData.toLocation = "";
                 this.showItem = false;
                 this.showQty = false;
-                this.toLocationInput.setFocus();
 
                 this.dismissLoader();
 
-                if (isScan)
+                if (isScan) {
                     this.utils.playScanSuccessSound();
+                } else {
+                    this.toLocationInput.setFocus();
+                }
+
+                if (callback != null)
+                    callback();
 
             }).catch((err) => {
                 this.showQty = false;
@@ -194,7 +190,7 @@ export class EnterTab {
 
     }
 
-    setToLocation(locId, isScan) {
+    setToLocation(locId, isScan, callback=null) {
 
 
         if (locId) {
@@ -222,14 +218,19 @@ export class EnterTab {
             this.enteredData.item = "";
             this.showItem = true;
             this.showQty = false;
-            setTimeout(()=> {
-                this.itemInput.setFocus();
-            });
 
             this.dismissLoader();
 
-            if (isScan)
+            if (isScan) {
                 this.utils.playScanSuccessSound();
+            } else {
+                setTimeout(()=> {
+                    this.itemInput.setFocus();
+                });
+            }
+
+            if (callback != null)
+                callback();
 
         }).catch((err) => {
             this.showQty = false;
@@ -241,7 +242,7 @@ export class EnterTab {
         });
     }
 
-    setItem(itemId, isScan=false) {
+    setItem(itemId, isScan=false, callback=null) {
 
         if (itemId) {
             this.enteredData.item = itemId;
@@ -277,12 +278,17 @@ export class EnterTab {
             this.enteredData.item = item.InventoryID.value; // change alternate IDs like barcodes to primary ID
             this.enteredData.qty = 1;
             this.showQty = true;
-            setTimeout(()=> {
-                this.qtyInput.setFocus();
-            });
 
-            if (isScan)
+            if (isScan){
                 this.utils.playScanSuccessSound();
+            } else {
+                setTimeout(()=> {
+                    this.qtyInput.setFocus();
+                });
+            }
+
+            if (callback != null)
+                callback();
 
         }).catch((err) => {
             this.showQty = false;
@@ -356,62 +362,92 @@ export class EnterTab {
         });
     }
 
-    onBarcodeScan(barcodeText) {
+    startCameraScanner(){
+
+        var context = this;
+
+        this.barcodeScanner.scan().then((barcodeData) => {
+            if (barcodeData.cancelled)
+                return;
+
+            this.onBarcodeScan(barcodeData.text, function(){
+                context.startCameraScanner();
+            });
+
+        }, (err) => {
+            // An error occurred
+            this.utils.showAlert("Error", "Error accessing barcode device: " + err, {exception: err});
+        });
+    }
+
+    onBarcodeScan(barcodeText, callback=null) {
+
         console.log(barcodeText);
 
-        if (this.enteredData.location == "") {
-            this.setLocation(barcodeText, true);
-            return;
-        }
+        this.zone.run(()=> {
 
-        if (this.enteredData.toLocation == "") {
-            this.setToLocation(barcodeText, true);
-            return;
-        }
-
-        this.showLoaderDelayed("Loading...");
-
-        // If the location and to-location is already set, scanning a bin barcode updates the to-location
-        this.cache.getBinById(barcodeText).then((bin)=> {
-            // check if quantity is set. If it is then save the current entry
-            if (this.enteredData.item != "" && this.enteredData.qty > 0) {
-                this.addTransferItem();
+            if (this.enteredData.location == "") {
+                this.setLocation(barcodeText, true, callback);
+                return;
             }
 
-            this.setToLocation(barcodeText, true);
-        }).catch((err) => {
+            if (this.enteredData.toLocation == "") {
+                this.setToLocation(barcodeText, true, callback);
+                return;
+            }
 
-            this.cache.getItemById(barcodeText).then((item:any)=> {
+            this.showLoaderDelayed("Loading...");
 
-                if (this.enteredData.item == "" || this.enteredData.qty == 0) {
-                    this.setItem(item.InventoryID.value, true);
-                    return;
+            // If the location and to-location is already set, scanning a bin barcode updates the to-location
+            this.cache.getBinById(barcodeText).then((bin)=> {
+                // check if quantity is set. If it is then save the current entry
+                if (this.enteredData.item != "" && this.enteredData.qty > 0) {
+                    this.addTransferItem();
                 }
 
-                this.dismissLoader();
+                this.setToLocation(barcodeText, true);
 
-                // If the item is the same as the last item, increment quantity.
-                if (item.InventoryID.value == this.enteredData.item) {
-                    this.zone.run(()=> {
+            }).catch((err) => {
+
+                this.cache.getItemById(barcodeText).then((item:any)=> {
+
+                    if (this.enteredData.item == "" || this.enteredData.qty == 0) {
+                        this.setItem(item.InventoryID.value, true, callback);
+                        return;
+                    }
+
+                    this.dismissLoader();
+
+                    // If the item is the same as the last item, increment quantity.
+                    if (item.InventoryID.value == this.enteredData.item) {
+
                         this.enteredData.qty++;
 
-                        if (this.validateItemQty(null)){
+                        if (this.validateItemQty(null)) {
                             this.utils.playScanSuccessSound();
                         } else {
                             this.utils.playFailedSound(true);
+                            return;
                         }
-                    });
-                } else {
-                    this.addTransferItem();
 
-                    this.setItem(item.InventoryID.value, true);
-                }
-            }).catch((err) => {
-                this.dismissLoader();
-                this.utils.showAlert("Error", err.message);
-                this.utils.playFailedSound(true);
+                        if (callback != null)
+                            callback();
+
+                    } else {
+                        this.addTransferItem();
+
+                        this.setItem(item.InventoryID.value, true, callback);
+                    }
+                }).catch((err) => {
+                    this.dismissLoader();
+                    this.utils.showAlert("Error", err.message);
+                    this.utils.playFailedSound(true);
+                });
+
             });
+
         });
+
     }
 
 }

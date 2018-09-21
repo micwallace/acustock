@@ -46,7 +46,7 @@ import { UnpickedListTab } from "../pages/pick-shipments/pick/tabs/unpicked-list
 import { PreferencesPage } from "../pages/preferences/preferences";
 import { BinTransferPage } from "../pages/bin-transfer/bin-transfer";
 import { TransferProvider } from "../providers/app/transfer";
-import { EnterTabModule } from "../pages/bin-transfer/tabs/enter.module";
+import { EnterTab } from "../pages/bin-transfer/tabs/enter";
 import { TransferListTab } from "../pages/bin-transfer/tabs/transfer-list";
 import { ReceiveProvider } from '../providers/app/receive';
 import { ReceivePage } from "../pages/receive/receive";
@@ -73,6 +73,8 @@ import { BarcodeListenerComponentModule } from "../providers/ui/barcode-listener
         AcuStock,
         BinTransferPage,
         TransferListTab,
+        EnterTab,
+        TransferListTab,
         PickShipmentsPage,
         PickShipmentsListPage,
         PickShipmentsPickPage,
@@ -95,7 +97,6 @@ import { BarcodeListenerComponentModule } from "../providers/ui/barcode-listener
         AdjustmentPage,
         AdjustmentEnterTab,
         AdjustmentListTab,
-        TransferListTab,
         PreferencesPage,
         AboutPage
     ],
@@ -106,13 +107,14 @@ import { BarcodeListenerComponentModule } from "../providers/ui/barcode-listener
         IonicModule.forRoot(AcuStock),
         LoginPageModule,
         SetupPageModule,
-        EnterTabModule,
         BarcodeListenerComponentModule
     ],
     bootstrap: [IonicApp],
     entryComponents: [
         AcuStock,
         BinTransferPage,
+        TransferListTab,
+        EnterTab,
         TransferListTab,
         PickShipmentsPage,
         PickShipmentsListPage,

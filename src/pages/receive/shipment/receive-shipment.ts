@@ -23,13 +23,6 @@ import { ReceiveShipmentListTab } from "./tabs/list";
 import { ReceiveShipmentPendingTab } from "./tabs/pending";
 import { ReceiveProvider } from "../../../providers/app/receive";
 
-/**
- * Generated class for the PickShipmentsPickPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
     selector: 'page-bin-transfer',

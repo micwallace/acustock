@@ -20,13 +20,6 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { CountProvider } from '../../../../providers/app/count'
 
-/**
- * Generated class for the PickShipmentsListPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
     selector: 'page-count-pending',
@@ -37,13 +30,11 @@ export class CountEntryPendingTab {
     objectKeys:any = Object.keys;
 
     constructor(public navCtrl:NavController, public navParams:NavParams, public countProvider:CountProvider, public alertCtrl:AlertController) {
-    }
 
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad PickShipmentPickPage Tab: Pick List');
     }
 
     editReceiptItem(line, key, item) {
+        // TODO: finish this
         /*let alertDialog = this.alertCtrl.create({
             title: 'Update Quantity',
             inputs: [

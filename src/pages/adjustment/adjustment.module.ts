@@ -21,9 +21,6 @@ import { IonicPageModule } from 'ionic-angular';
 import { AdjustmentPage } from './adjustment';
 
 @NgModule({
-    declarations: [
-        AdjustmentPage,
-    ],
     imports: [
         IonicPageModule.forChild(AdjustmentPage),
     ],

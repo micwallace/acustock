@@ -21,9 +21,6 @@ import { IonicPageModule } from 'ionic-angular';
 import { ItemLookupPage } from './item-lookup';
 
 @NgModule({
-    declarations: [
-        ItemLookupPage,
-    ],
     imports: [
         IonicPageModule.forChild(ItemLookupPage),
     ],

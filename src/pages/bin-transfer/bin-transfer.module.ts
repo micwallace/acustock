@@ -21,9 +21,6 @@ import { IonicPageModule } from 'ionic-angular';
 import { BinTransferPage } from './bin-transfer';
 
 @NgModule({
-    declarations: [
-        BinTransferPage,
-    ],
     imports: [
         IonicPageModule.forChild(BinTransferPage),
     ],

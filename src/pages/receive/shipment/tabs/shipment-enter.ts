@@ -22,6 +22,7 @@ import { ReceiveProvider } from '../../../../providers/app/receive'
 import { CacheProvider } from "../../../../providers/core/cache";
 import { LoadingController } from "ionic-angular/index";
 import { UtilsProvider } from "../../../../providers/core/utils";
+import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 
 /**
  * Generated class for the PickShipmentsPickPage page.
@@ -65,7 +66,8 @@ export class ReceiveShipmentEnterTab {
                 public alertCtrl:AlertController,
                 public loadingCtrl:LoadingController,
                 public renderer:Renderer,
-                public utils:UtilsProvider) {
+                public utils:UtilsProvider,
+                public barcodeScanner:BarcodeScanner) {
 
     }
 
@@ -154,7 +156,7 @@ export class ReceiveShipmentEnterTab {
         });
     }
 
-    setItem(itemId, isScan=false) {
+    setItem(itemId, isScan=false, callback=null) {
 
         if (itemId) {
             this.enteredData.item = itemId;
@@ -218,6 +220,9 @@ export class ReceiveShipmentEnterTab {
 
             this.dismissLoader();
 
+            if (callback != null)
+                callback();
+
         }).catch((err) => {
             this.showQty = false;
             this.enteredData.item = "";
@@ -228,7 +233,7 @@ export class ReceiveShipmentEnterTab {
         });
     }
 
-    setLocation(locId, isScan=false) {
+    setLocation(locId, isScan=false, callback=null) {
 
         if (locId) {
             this.enteredData.location = locId;
@@ -264,6 +269,9 @@ export class ReceiveShipmentEnterTab {
             if (isScan) this.utils.playScanSuccessSound();
 
             this.dismissLoader();
+
+            if (callback != null)
+                callback();
 
         }).catch((err) => {
             this.showQty = false;
@@ -364,55 +372,80 @@ export class ReceiveShipmentEnterTab {
         });
     }
 
-    onBarcodeScan(barcodeText) {
+    startCameraScanner(){
+
+        var context = this;
+
+        this.barcodeScanner.scan().then((barcodeData) => {
+            if (barcodeData.cancelled)
+                return;
+
+            this.onBarcodeScan(barcodeData.text, function(){
+                context.startCameraScanner();
+            });
+
+        }, (err) => {
+            // An error occurred
+            this.utils.showAlert("Error", "Error accessing barcode device: " + err, {exception: err});
+        });
+    }
+
+    onBarcodeScan(barcodeText, callback=null) {
         console.log(barcodeText);
 
         this.showLoaderDelayed("Loading...");
 
-        // If the location and to-location is already set, scanning a bin barcode updates the to-location
-        this.cache.getBinById(barcodeText).then((bin)=> {
+        this.zone.run(()=> {
 
-            this.dismissLoader();
-
-            this.setLocation(barcodeText, true);
-
-        }).catch((err) => {
-
-            this.cache.getItemById(barcodeText).then((item:any)=> {
+            // If the location and to-location is already set, scanning a bin barcode updates the to-location
+            this.cache.getBinById(barcodeText).then((bin)=> {
 
                 this.dismissLoader();
 
-                if (this.enteredData.item == "" || this.enteredData.qty == 0) {
-                    this.setItem(item.InventoryID.value, true);
-                    return;
-                }
+                this.setLocation(barcodeText, true, callback);
 
-                // If the item is the same as the last item, increment quantity.
-                if (item.InventoryID.value == this.enteredData.item) {
-                    this.zone.run(()=> {
+            }).catch((err) => {
 
-                        if (!this.validateItemQty(this.enteredData.qty + 1)){
+                this.cache.getItemById(barcodeText).then((item:any)=> {
+
+                    this.dismissLoader();
+
+                    if (this.enteredData.item == "" || this.enteredData.qty == 0) {
+                        this.setItem(item.InventoryID.value, true, callback);
+                        return;
+                    }
+
+                    // If the item is the same as the last item, increment quantity.
+                    if (item.InventoryID.value == this.enteredData.item) {
+
+                        if (!this.validateItemQty(this.enteredData.qty + 1)) {
                             this.utils.playFailedSound(true);
                             this.utils.showAlert("Error", "You've already picked the quantity required for this item.");
                             return;
                         }
+
                         this.enteredData.qty++;
+
+                        // If the completed quantity is reached let's automatically add the receipt item
+                        if ((this.getRemainingQty() - this.enteredData.qty) <= 0) {
+                            if (!this.addReceiptItem(true))
+                                return;
+                        }
 
                         this.utils.playScanSuccessSound();
 
-                        // If the completed quantity is reached let's automatically add the receipt item
-                        if ((this.getRemainingQty() - this.enteredData.qty) <= 0){
-                            this.addReceiptItem(true);
-                        }
-                    });
-                } else {
-                    if (this.addReceiptItem(true))
-                        this.setItem(item.InventoryID.value, true);
+                        if (callback != null)
+                            callback();
 
-                }
-            }).catch((err) => {
-                this.dismissLoader();
-                this.utils.showAlert("Error", err.message);
+                    } else {
+                        if (this.addReceiptItem(true))
+                            this.setItem(item.InventoryID.value, true, callback);
+
+                    }
+                }).catch((err) => {
+                    this.dismissLoader();
+                    this.utils.showAlert("Error", err.message);
+                });
             });
         });
     }

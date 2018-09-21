@@ -21,13 +21,6 @@ import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angu
 import { ReceiveProvider } from '../../../../providers/app/receive'
 import { UtilsProvider } from "../../../../providers/core/utils";
 
-/**
- * Generated class for the PickShipmentsListPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
     selector: 'page-receive',
@@ -42,10 +35,7 @@ export class ReceiveShipmentPendingTab {
                 public receiveProvider:ReceiveProvider,
                 public alertCtrl:AlertController,
                 public utils:UtilsProvider) {
-    }
 
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad PickShipmentPickPage Tab: Pick List');
     }
 
     editReceiptItem(line, key, item) {

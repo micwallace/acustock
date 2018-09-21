@@ -23,13 +23,6 @@ import { ReceiveProvider } from "../../providers/app/receive";
 import { ReceiveShipmentPage } from "./shipment/receive-shipment";
 import { UtilsProvider } from "../../providers/core/utils";
 
-/**
- * Generated class for the ReceivePage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
     selector: 'page-receive',
@@ -47,10 +40,7 @@ export class ReceivePage {
                 public receiveProvider:ReceiveProvider,
                 public alertCtrl: AlertController,
                 public utils:UtilsProvider) {
-    }
 
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad ReceivePage');
     }
 
     loadReceipt(referenceNbr, isScan=false){

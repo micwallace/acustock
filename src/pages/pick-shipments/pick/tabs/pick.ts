@@ -23,13 +23,6 @@ import { CacheProvider } from "../../../../providers/core/cache";
 import { UtilsProvider } from "../../../../providers/core/utils";
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 
-/**
- * Generated class for the PickShipmentsPickPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
     selector: 'tabs-pick',
@@ -45,7 +38,7 @@ export class PickTab {
     currentLocationIndex = 0;
     currentItemIndex = 0;
 
-    serialTracked = false;
+    //serialTracked = false;
 
     enteredData:any = {
         location: "",
@@ -53,7 +46,7 @@ export class PickTab {
         qty: 0
     };
 
-    showLot = false;
+    //showLot = false;
     showQty = false;
 
     loader = null;
@@ -674,38 +667,39 @@ export class PickTab {
     }
 
     onBarcodeScan(barcodeText, callback=null){
+
         console.log(barcodeText);
 
-        if (this.enteredData.location == "") {
-            this.ngZone.run(()=> {
-                this.setLocation(barcodeText, true, callback);
-            });
-            return;
-        }
+        this.ngZone.run(()=> {
 
-        this.showLoaderDelayed("Loading...");
+            if (this.enteredData.location == "") {
+                this.ngZone.run(()=> {
+                    this.setLocation(barcodeText, true, callback);
+                });
+                return;
+            }
 
-        this.cache.getBinById(barcodeText).then((bin:any)=> {
+            this.showLoaderDelayed("Loading...");
 
-            this.dismissLoader();
-
-            this.ngZone.run(()=> {
-                // check if quantity is set. If it is then save the current entry
-                if (barcodeText != this.enteredData.location && this.enteredData.item != "" && this.enteredData.qty > 0) {
-                    if (!this.addPick(true))
-                        return;
-                }
-
-                this.setLocation(barcodeText, true, callback);
-            });
-
-        }).catch((err) => {
-
-            this.cache.getItemById(barcodeText).then((item:any)=> {
+            this.cache.getBinById(barcodeText).then((bin:any)=> {
 
                 this.dismissLoader();
 
                 this.ngZone.run(()=> {
+                    // check if quantity is set. If it is then save the current entry
+                    if (barcodeText != this.enteredData.location && this.enteredData.item != "" && this.enteredData.qty > 0) {
+                        if (!this.addPick(true))
+                            return;
+                    }
+
+                    this.setLocation(barcodeText, true, callback);
+                });
+
+            }).catch((err) => {
+
+                this.cache.getItemById(barcodeText).then((item:any)=> {
+
+                    this.dismissLoader();
 
                     if (this.enteredData.item == "" || this.enteredData.qty == 0) {
                         this.setItem(item.InventoryID.value, true, callback);
@@ -715,7 +709,7 @@ export class PickTab {
                     // If the item is the same as the last item, validate & increment quantity.
                     if (item.InventoryID.value == this.enteredData.item) {
 
-                        if (!this.verifyAvailability(1)){
+                        if (!this.verifyAvailability(1)) {
                             this.utils.playFailedSound(true);
                             return;
                         }
@@ -725,7 +719,7 @@ export class PickTab {
                         this.utils.playScanSuccessSound();
 
                         // If the completed quantity is reached let's automatically move to the next suggested pick
-                        if (this.getTotalRemainingQty() - this.enteredData.qty == 0){
+                        if (this.getTotalRemainingQty() - this.enteredData.qty == 0) {
                             return this.addPick(true);
                         }
 
@@ -737,15 +731,16 @@ export class PickTab {
                             this.setItem(item.InventoryID.value, true, callback);
                     }
 
+                }).catch((err) => {
+                    this.dismissLoader();
+                    this.utils.playFailedSound(true);
+                    this.utils.showAlert("Error", err.message);
                 });
 
-            }).catch((err) => {
-                this.dismissLoader();
-                this.utils.playFailedSound(true);
-                this.utils.showAlert("Error", err.message);
             });
 
         });
+
     }
 
 }
