@@ -17,8 +17,9 @@
  */
 
 import { Component } from '@angular/core';
-import { IonicPage, Events, AlertController } from 'ionic-angular';
+import { IonicPage, Events, AlertController, PopoverController } from 'ionic-angular';
 import { PickProvider } from '../../../../providers/providers';
+import { PickPopover } from "../../pick-popover";
 
 @IonicPage()
 @Component({
@@ -31,8 +32,14 @@ export class PickListTab {
 
     constructor(public pickProvider:PickProvider,
                 public alertCtrl:AlertController,
-                public events:Events) {
+                public events:Events,
+                public popoverCtrl:PopoverController) {
 
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(PickPopover);
+        popover.present({ev:event});
     }
 
     editPickItem(item) {

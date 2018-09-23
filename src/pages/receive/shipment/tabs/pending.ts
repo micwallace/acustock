@@ -17,9 +17,10 @@
  */
 
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
+import { IonicPage, Events, AlertController, PopoverController } from 'ionic-angular';
 import { ReceiveProvider } from '../../../../providers/app/receive'
 import { UtilsProvider } from "../../../../providers/core/utils";
+import { ReceivePopover } from "../../receive-popover";
 
 @IonicPage()
 @Component({
@@ -30,12 +31,17 @@ export class ReceiveShipmentPendingTab {
 
     objectKeys:any = Object.keys;
 
-    constructor(public navCtrl:NavController,
-                public navParams:NavParams,
-                public receiveProvider:ReceiveProvider,
+    constructor(public receiveProvider:ReceiveProvider,
                 public alertCtrl:AlertController,
-                public utils:UtilsProvider) {
+                public popoverCtrl:PopoverController,
+                public utils:UtilsProvider,
+                public events:Events) {
 
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(ReceivePopover);
+        popover.present({ev:event});
     }
 
     editReceiptItem(line, key, item) {
@@ -97,6 +103,14 @@ export class ReceiveShipmentPendingTab {
             ]
         });
         alert.present();
+    }
+
+    confirmReceipts(){
+        this.events.publish('receipts:confirm');
+    }
+
+    clearReceipts(){
+        this.events.publish('receipts:clear');
     }
 
 }

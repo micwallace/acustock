@@ -16,7 +16,7 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<ion-menu [content]="mainContent">
+<ion-menu [content]="mainContent" class="{{prefs.preferences['theme']}}">
     <ion-header>
         <ion-toolbar>
             <img class="menu-logo" src="../assets/imgs/logo.png" />
@@ -66,4 +66,4 @@
     </ion-content>
 </ion-menu>
 
-<ion-nav #mainContent [root]="rootPage"></ion-nav>
+<ion-nav #mainContent [root]="rootPage" class="{{prefs.preferences['theme']}}"></ion-nav>

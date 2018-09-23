@@ -18,10 +18,11 @@
 
 import { Component } from '@angular/core';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
-import { IonicPage, NavController, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, LoadingController, PopoverController } from 'ionic-angular';
 import { CountProvider } from "../../providers/app/count";
 import { CountEntryPage } from "./entry/count-entry";
 import { UtilsProvider } from "../../providers/core/utils";
+import { CountPopover } from "./count-popover";
 
 @IonicPage()
 @Component({
@@ -33,10 +34,20 @@ export class CountPage {
     public referenceNbr = "";
 
     constructor(public navCtrl:NavController,
+                public popoverCtrl:PopoverController,
                 public barcodeScanner:BarcodeScanner,
                 public loadingCtrl:LoadingController,
                 public countProvider:CountProvider,
                 public utils:UtilsProvider) {
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(CountPopover);
+        popover.present({ev:event});
+    }
+
+    isActive(){
+        return this.navCtrl.getActive().instance instanceof CountPage;
     }
 
     loadCount(referenceNbr, isScan=false){
@@ -77,6 +88,11 @@ export class CountPage {
     }
 
     startCounting() {
+
+        if (this.countProvider.physicalCount.Status.value != "Counting In Progress"){
+            this.utils.showAlert("Error", "This physical count is not in progress status and cannot be counted.");
+            return;
+        }
 
         //noinspection TypeScriptValidateTypes
         this.navCtrl.push(CountEntryPage);

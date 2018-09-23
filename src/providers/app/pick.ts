@@ -825,8 +825,8 @@ export class PickProvider {
                 data.Details.push(item);
             }
 
-            console.log("Submitting Picks");
-            console.log(JSON.stringify(data));
+            //console.log("Submitting Picks");
+            //console.log(JSON.stringify(data));
 
             this.lastRequest = data;
 

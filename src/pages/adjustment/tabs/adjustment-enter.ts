@@ -17,12 +17,13 @@
  */
 
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController, Events, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, Events, AlertController, PopoverController } from 'ionic-angular';
 import { AdjustmentProvider } from '../../../providers/app/adjustment'
 import { CacheProvider } from "../../../providers/core/cache";
 import { LoadingController } from "ionic-angular/index";
 import { UtilsProvider } from "../../../providers/core/utils";
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
+import {AdjustmentPopover} from "../adjustment-popover";
 
 @IonicPage()
 @Component({
@@ -51,10 +52,9 @@ export class AdjustmentEnterTab {
 
     constructor(private zone:NgZone,
                 public navCtrl:NavController,
-                public navParams:NavParams,
                 public adjustmentProvider:AdjustmentProvider,
                 public cache:CacheProvider,
-                public viewCtrl:ViewController,
+                public popoverCtrl:PopoverController,
                 public events:Events,
                 public alertCtrl:AlertController,
                 public loadingCtrl:LoadingController,
@@ -70,17 +70,21 @@ export class AdjustmentEnterTab {
         this.events.subscribe('adjustments:commit', ()=>{
             this.commitAdjustments();
         });
+        this.events.subscribe('adjustments:clear', ()=>{
+            this.clearAdjustments();
+        });
 
-        // TODO: Remove pending items for which the book quantities have changed.
         if (this.adjustmentProvider.pendingNumItems > 0){
 
             this.showLoaderDelayed("Checking book quantities..");
 
             this.adjustmentProvider.validateBookQtys().then((res)=>{
 
-                if (res > 0){
-                    this.utils.showAlert("Error", "Some pending items were removed from the adjustment because their book quantity had changed.");
-                }
+                this.dismissLoader().then(()=>{
+                    if (res > 0){
+                        this.utils.showAlert("Error", "Some pending items were removed from the adjustment because their book quantity had changed.");
+                    }
+                });
 
             }).catch((err) => {
                 this.dismissLoader().then(()=> {
@@ -93,6 +97,12 @@ export class AdjustmentEnterTab {
     ionViewWillUnload(){
         this.events.unsubscribe('barcode:scan');
         this.events.unsubscribe('adjustments:commit');
+        this.events.unsubscribe('adjustments:clear');
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(AdjustmentPopover);
+        popover.present({ev:event});
     }
 
     resetForm() {
@@ -287,6 +297,30 @@ export class AdjustmentEnterTab {
         this.adjustmentProvider.addPendingItem(this.enteredData.location, this.enteredData.item, this.enteredData.qty, this.enteredData.bookQty);
     }
 
+    clearAdjustments(){
+        if (Object.keys(this.adjustmentProvider.pendingItems).length > 0) {
+
+            let alert = this.alertCtrl.create({
+                title: "Cancel Adjustments",
+                message: "Are you sure you want to clear all pending adjustments?",
+                buttons: [
+                    {
+                        text: "Cancel",
+                        role: "cancel"
+                    },
+                    {
+                        text: "Yes",
+                        handler: ()=> {
+                            this.adjustmentProvider.clearPendingItems();
+                        }
+                    }
+                ]
+            });
+
+            alert.present();
+        }
+    }
+
     commitAdjustments() {
 
         this.nextLocation();
@@ -297,9 +331,10 @@ export class AdjustmentEnterTab {
         this.loader = this.loadingCtrl.create({content: "Submitting Adjustments..."});
         this.loader.present();
 
-        this.adjustmentProvider.commitAdjustment(this.loader).then(()=> {
+        this.adjustmentProvider.commitAdjustment(this.loader).then((res:any)=> {
             this.dismissLoader();
             this.cache.flushItemLocationCache();
+            this.utils.showAlert("Adjustment Successful", "Adjustment #" + res.ReferenceNbr.value + " was successfully created" + (res.released ? " and released" : ""));
         }).catch((err)=> {
             this.dismissLoader();
             this.utils.playFailedSound();

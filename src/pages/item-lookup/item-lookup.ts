@@ -18,11 +18,12 @@
 
 import { Component } from '@angular/core';
 import 'rxjs/add/operator/map'
-import { IonicPage, NavController, NavParams, LoadingController, ModalController } from 'ionic-angular';
+import { IonicPage, NavController, LoadingController, ModalController, PopoverController } from 'ionic-angular';
 import { Api, CacheProvider, ItemAutocompleteService, PreferencesProvider } from '../../providers/providers';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { ItemLookupDetailsPage } from '../item-lookup-details/item-lookup-details';
-import {UtilsProvider} from "../../providers/core/utils";
+import { UtilsProvider } from "../../providers/core/utils";
+import { LookupsPopover } from "../bin-lookup/lookups-popover";
 
 @IonicPage()
 @Component({
@@ -39,6 +40,7 @@ export class ItemLookupPage {
     selectedItem = null;
 
     constructor(public navCtrl:NavController,
+                public popoverCtrl:PopoverController,
                 public itemAutocompleteService:ItemAutocompleteService,
                 public api:Api,
                 public loadingCtrl:LoadingController,
@@ -47,6 +49,11 @@ export class ItemLookupPage {
                 public cache:CacheProvider,
                 public prefs:PreferencesProvider,
                 public utils:UtilsProvider) {
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(LookupsPopover);
+        popover.present({ev:event});
     }
 
     loadItemLocations(item, isScan=false) {

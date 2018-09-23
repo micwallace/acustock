@@ -16,18 +16,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
-import { BarcodeListenerComponent } from "../../providers";
+import { Component } from '@angular/core';
+import { ViewController, NavController } from "ionic-angular";
+import { UserguidePage } from "../about/userguide/userguide";
 
-@NgModule({
-    declarations: [
-        BarcodeListenerComponent
-    ],
-    imports: [
-    ],
-    exports: [
-        BarcodeListenerComponent
-    ]
+@Component({
+    template: `
+    <ion-list no-margin>
+      <button ion-item (click)="openUserguide()">About Counts</button>
+    </ion-list>
+  `
 })
-export class BarcodeListenerComponentModule {
+export class CountPopover {
+
+    constructor(public viewCtrl: ViewController, public navCtrl:NavController) {}
+
+    dismiss() {
+        this.viewCtrl.dismiss();
+    }
+
+    openUserguide(){
+        this.navCtrl.push(UserguidePage, {active: 'counts'});
+        this.dismiss();
+    }
 }

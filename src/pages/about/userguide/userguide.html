@@ -1,0 +1,93 @@
+<!--
+  ~ This file is part of AcuStock
+  ~ Copyright (c) 2018 Michael B Wallace
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<ion-header>
+
+    <ion-navbar>
+        <ion-title>User Guide</ion-title>
+    </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+    <div style="padding: 10px;">
+        <div text-center>
+            <img style="width: 80px; text-align: center;" src="../../assets/imgs/logo.png" />
+            <h6>Version: {{appVersion}}</h6>
+        </div>
+    </div>
+    <div class="accordion-container" style="padding: 10px;">
+        <accordion-list id="picking"
+                        title="Picking"
+                        textColor="#FFF"
+                        hasMargin="true"
+                        headerColor="#488aff"
+                        [expanded]="expand === 'picking'">
+            <p text-wrap>Info about the picking page</p>
+        </accordion-list>
+        <accordion-list id="transfers"
+                        title="Transfers"
+                        textColor="#FFF"
+                        hasMargin="true"
+                        headerColor="#488aff"
+                        [expanded]="expand === 'transfers'">
+            <p text-wrap>Info about the transfer page</p>
+        </accordion-list>
+        <accordion-list id="receipts"
+                        title="Receipts"
+                        textColor="#FFF"
+                        hasMargin="false"
+                        headerColor="#488aff"
+                        [expanded]="expand === 'receipts'">
+            <p text-wrap>Info about the receive page</p>
+        </accordion-list>
+        <accordion-list id="lookups"
+                        title="Item/Bin Lookup"
+                        textColor="#FFF"
+                        hasMargin="false"
+                        headerColor="#488aff"
+                        [expanded]="expand === 'lookups'">
+            <p text-wrap>Info about the lookup page</p>
+        </accordion-list>
+        <accordion-list id="adjustments"
+                        title="Adjustments"
+                        textColor="#FFF"
+                        hasMargin="false"
+                        headerColor="#488aff"
+                        [expanded]="expand === 'adjustments'">
+            <p text-wrap>Info about the adjustment page</p>
+        </accordion-list>
+        <accordion-list id="counts"
+                        title="Physical Count"
+                        textColor="#FFF"
+                        hasMargin="false"
+                        headerColor="#488aff"
+                        [expanded]="expand === 'counts'">
+            <p text-wrap>Info about the count page</p>
+        </accordion-list>
+        <accordion-list id="setup"
+                        title="Setup"
+                        textColor="#FFF"
+                        hasMargin="false"
+                        headerColor="#488aff"
+                        [expanded]="expand === 'setup'">
+            <p text-wrap>Info about setup barcode</p>
+        </accordion-list>
+    </div>
+</ion-content>

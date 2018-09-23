@@ -16,12 +16,6 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<!--
-  Generated template for the PickShipmentsListPage page.
-
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
 
     <ion-navbar>
@@ -29,6 +23,11 @@
             <ion-icon name="menu"></ion-icon>
         </button>
         <ion-title>Pending Counts</ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="presentPopover($event)">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
     </ion-navbar>
 
 </ion-header>
@@ -41,14 +40,14 @@
             <ion-col col-3 text-right><strong>Qty</strong></ion-col>
         </ion-row>
         <ion-list no-margin no-padding class="item-list">
-            <ion-item no-margin no-padding class="list-item" *ngFor="let key of objectKeys(countProvider.pendingCounts)" (click)="editCountItem(key);">
+            <ion-item no-margin no-padding class="list-item" *ngFor="let key of objectKeys(countProvider.pendingCounts)" (click)="editCountItem(countProvider.pendingCounts[key]);">
                 <ion-row class="item-group-header" no-margin>
                     <ion-col col-3>
                         <strong style="display: block;">{{countProvider.pendingCounts[key].InventoryID.value}}</strong>
                     </ion-col>
                     <ion-col col-9 class="column-right">
                         <button ion-button icon-only small no-margin
-                                (click)="removeCountItem(key); $event.stopPropagation();">
+                                (click)="removeCountItem(countProvider.pendingCounts[key]); $event.stopPropagation();">
                             <ion-icon name="trash"></ion-icon>
                         </button>
                     </ion-col>
@@ -65,7 +64,8 @@
     <ion-toolbar position="bottom">
         <ion-row>
             <ion-col text-right>
-                <button type="button" ion-button (click)="commitCounts()">Commit Counts</button>
+                <button type="button" ion-button small (click)="clearCounts()">Clear</button>
+                <button type="button" ion-button small (click)="commitCounts()">Commit</button>
             </ion-col>
         </ion-row>
     </ion-toolbar>

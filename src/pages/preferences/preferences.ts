@@ -17,9 +17,10 @@
  */
 
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Events } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Events, PopoverController } from 'ionic-angular';
 import { PreferencesProvider, CacheProvider } from '../../providers/providers'
 import { UtilsProvider } from "../../providers/core/utils";
+import { PreferencesPopover } from "./preferences-popover";
 
 @IonicPage()
 @Component({
@@ -31,7 +32,8 @@ export class PreferencesPage {
     preferences;
     currentWarehouse = "";
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public prefs:PreferencesProvider, public events:Events, public cache:CacheProvider, public utils:UtilsProvider) {
+    constructor(public navCtrl:NavController, public navParams:NavParams, public prefs:PreferencesProvider,
+                public events:Events, public cache:CacheProvider, public utils:UtilsProvider, public popoverCtrl:PopoverController) {
         this.preferences = prefs;
         this.currentWarehouse = prefs.getPreference('warehouse');
     }
@@ -42,6 +44,11 @@ export class PreferencesPage {
         setTimeout(()=> {
             this.events.publish('preferencesSaved');
         }, 200);
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(PreferencesPopover);
+        popover.present({ev:event});
     }
 
     getPreferenceOptions(pref) {
@@ -69,6 +76,7 @@ export class PreferencesPage {
         switch (key){
             case "warehouse":
                 this.cache.generateBinList();
+                this.cache.flushItemLocationCache();
                 break;
             case "remember_password":
                 // ignore for first time setup by checking warehouse

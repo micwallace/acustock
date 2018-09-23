@@ -17,8 +17,9 @@
  */
 
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
+import { IonicPage, AlertController, Events, PopoverController } from 'ionic-angular';
 import { CountProvider } from '../../../../providers/app/count'
+import { CountPopover } from "../../count-popover";
 
 @IonicPage()
 @Component({
@@ -29,19 +30,25 @@ export class CountEntryPendingTab {
 
     objectKeys:any = Object.keys;
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public countProvider:CountProvider, public alertCtrl:AlertController) {
+    constructor(public countProvider:CountProvider, public alertCtrl:AlertController,
+                public events:Events, public popoverCtrl:PopoverController) {
 
     }
 
-    editReceiptItem(line, key, item) {
-        // TODO: finish this
-        /*let alertDialog = this.alertCtrl.create({
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(CountPopover);
+        popover.present({ev:event});
+    }
+
+    editCountItem(item) {
+
+        let alertDialog = this.alertCtrl.create({
             title: 'Update Quantity',
             inputs: [
                 {
                     name: 'qty',
                     placeholder: 'Quantity',
-                    value: item.Qty
+                    value: item.BookQty.value
                 }
             ],
             buttons: [
@@ -56,27 +63,21 @@ export class CountEntryPendingTab {
                     handler: data => {
 
                         if (data.qty <= 0)
-                            return this.countProvider.removeReceiptItem(line, key);
+                            return this.countProvider.removeCount(item);
 
-                        var remQty = this.countProvider.getCommittedRemainingQty(line);
 
-                        if (remQty < data.qty){
-                            this.utils.showAlert("Error", "The entered quantity is " + data.qty + " but there is only " + remQty + " left to receive.");
-                            return false;
-                        }
-
-                        this.countProvider.updateReceiptItem(line, key, data.qty);
+                        this.countProvider.setCount(item, data.qty, false);
                     }
                 }
             ]
         });
-        alertDialog.present();*/
+        alertDialog.present();
     }
 
-    removeReceiptItem(line, key) {
-        /*let alert = this.alertCtrl.create({
-            title: 'Remove Receipt',
-            message: 'Are you sure you want to remove this receipt item?',
+    removeReceiptItem(line) {
+        let alert = this.alertCtrl.create({
+            title: 'Remove Count',
+            message: 'Are you sure you want to remove this item?',
             buttons: [
                 {
                     text: 'Cancel',
@@ -87,12 +88,20 @@ export class CountEntryPendingTab {
                 {
                     text: 'OK',
                     handler: () => {
-                        this.countProvider.removeReceiptItem(line, key);
+                        this.countProvider.removeCount(line);
                     }
                 }
             ]
         });
-        alert.present();*/
+        alert.present();
+    }
+
+    commitCounts(){
+        this.events.publish('counts:commit');
+    }
+
+    clearCounts(){
+        this.events.publish('counts:clear');
     }
 
 }

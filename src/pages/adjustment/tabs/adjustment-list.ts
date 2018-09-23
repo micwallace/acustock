@@ -17,9 +17,9 @@
  */
 
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, Events } from 'ionic-angular';
-import { AdjustmentProvider } from '../../../providers/app/adjustment'
-import { UtilsProvider } from "../../../providers/core/utils";
+import { IonicPage, AlertController, Events, PopoverController } from 'ionic-angular';
+import { AdjustmentProvider } from '../../../providers/app/adjustment';
+import { AdjustmentPopover } from "../adjustment-popover";
 
 @IonicPage()
 @Component({
@@ -30,12 +30,15 @@ export class AdjustmentListTab {
 
     objectKeys:any = Object.keys;
 
-    constructor(public navCtrl:NavController,
-                public navParams:NavParams,
-                public adjustmentProvider:AdjustmentProvider,
+    constructor(public adjustmentProvider:AdjustmentProvider,
                 public alertController:AlertController,
-                public utils:UtilsProvider,
+                public popoverCtrl:PopoverController,
                 public events:Events) {
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(AdjustmentPopover);
+        popover.present({ev:event});
     }
 
     editItem(locationId, itemId) {
@@ -79,6 +82,10 @@ export class AdjustmentListTab {
 
     commitAdjustments(){
         this.events.publish('adjustments:commit');
+    }
+
+    clearAdjustments(){
+        this.events.publish('adjustments:clear');
     }
 
 }

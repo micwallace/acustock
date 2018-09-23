@@ -16,12 +16,6 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<!--
-  Generated template for the PickShipmentsPickPage page.
-
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
 
     <ion-navbar>
@@ -29,7 +23,11 @@
             <ion-icon name="menu"></ion-icon>
         </button>
         <ion-title>Enter Transfers</ion-title>
-
+        <ion-buttons end>
+            <button ion-button icon-only (click)="presentPopover($event)">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
     </ion-navbar>
 
 </ion-header>
@@ -100,11 +98,12 @@
 <ion-footer no-shadow>
     <ion-toolbar position="bottom">
         <ion-row>
-            <ion-col>
-                <button type="button" ion-button (click)="nextFromBin()">Next</button>
+            <ion-col col-4>
+                <button type="button" ion-button small (click)="nextFromBin()">Next</button>
             </ion-col>
-            <ion-col text-right>
-                <button type="button" ion-button (click)="commitTransfers()">Commit Transfers</button>
+            <ion-col col-8 text-right>
+                <button type="button" ion-button small (click)="clearTransfers()">Clear</button>
+                <button type="button" ion-button small (click)="commitTransfers()">Commit</button>
             </ion-col>
         </ion-row>
     </ion-toolbar>

@@ -45,11 +45,13 @@ import { PickListTab } from "../pages/pick-shipments/pick/tabs/pick-list";
 import { UnpickedListTab } from "../pages/pick-shipments/pick/tabs/unpicked-list";
 import { PreferencesPage } from "../pages/preferences/preferences";
 import { BinTransferPage } from "../pages/bin-transfer/bin-transfer";
+import { TransferPopover } from "../pages/bin-transfer/transfer-popover";
 import { TransferProvider } from "../providers/app/transfer";
 import { EnterTab } from "../pages/bin-transfer/tabs/enter";
 import { TransferListTab } from "../pages/bin-transfer/tabs/transfer-list";
 import { ReceiveProvider } from '../providers/app/receive';
 import { ReceivePage } from "../pages/receive/receive";
+import { ReceivePopover } from "../pages/receive/receive-popover";
 import { ReceiveShipmentPage } from "../pages/receive/shipment/receive-shipment";
 import { ReceiveShipmentListTab } from "../pages/receive/shipment/tabs/list";
 import { ReceiveShipmentPendingTab } from "../pages/receive/shipment/tabs/pending";
@@ -62,43 +64,58 @@ import { CountEntryPendingTab } from '../pages/count/entry/tabs/pending-list';
 import { CountProvider } from "../providers/app/count";
 import { UtilsProvider } from "../providers/core/utils";
 import { AdjustmentPage } from "../pages/adjustment/adjustment";
+import { AdjustmentPopover } from "../pages/adjustment/adjustment-popover";
 import { AdjustmentEnterTab } from "../pages/adjustment/tabs/adjustment-enter";
 import { AdjustmentListTab } from "../pages/adjustment/tabs/adjustment-list";
-import {AdjustmentProvider} from "../providers/app/adjustment";
+import { AdjustmentProvider } from "../providers/app/adjustment";
 import { AboutPage } from "../pages/about/about";
-import { BarcodeListenerComponentModule } from "../providers/ui/barcode-listener/barcode-listener.module";
+import { BarcodeListenerComponentModule } from "../components/barcode-listener/barcode-listener.module";
+import { UserguidePage } from "../pages/about/userguide/userguide";
+import { AccordionListComponentModule } from "../components/accordion-list/accordion-list.module";
+import { PickPopover } from "../pages/pick-shipments/pick-popover";
+import { LookupsPopover } from "../pages/bin-lookup/lookups-popover";
+import { CountPopover } from "../pages/count/count-popover";
+import { PreferencesPopover } from "../pages/preferences/preferences-popover";
 
 @NgModule({
     declarations: [
         AcuStock,
         BinTransferPage,
+        TransferPopover,
         TransferListTab,
         EnterTab,
         TransferListTab,
         PickShipmentsPage,
+        PickPopover,
         PickShipmentsListPage,
         PickShipmentsPickPage,
         PickTab,
         PickListTab,
         UnpickedListTab,
         ItemLookupPage,
+        LookupsPopover,
         ItemLookupDetailsPage,
         BinLookupPage,
         ReceivePage,
+        ReceivePopover,
         ReceiveShipmentPage,
         ReceiveShipmentListTab,
         ReceiveShipmentPendingTab,
         ReceiveShipmentEnterTab,
         CountPage,
+        CountPopover,
         CountEntryPage,
         CountEntryEnterTab,
         CountEntryListTab,
         CountEntryPendingTab,
         AdjustmentPage,
+        AdjustmentPopover,
         AdjustmentEnterTab,
         AdjustmentListTab,
         PreferencesPage,
-        AboutPage
+        PreferencesPopover,
+        AboutPage,
+        UserguidePage
     ],
     imports: [
         BrowserModule,
@@ -107,39 +124,48 @@ import { BarcodeListenerComponentModule } from "../providers/ui/barcode-listener
         IonicModule.forRoot(AcuStock),
         LoginPageModule,
         SetupPageModule,
-        BarcodeListenerComponentModule
+        BarcodeListenerComponentModule,
+        AccordionListComponentModule
     ],
     bootstrap: [IonicApp],
     entryComponents: [
         AcuStock,
         BinTransferPage,
+        TransferPopover,
         TransferListTab,
         EnterTab,
         TransferListTab,
         PickShipmentsPage,
+        PickPopover,
         PickShipmentsListPage,
         PickShipmentsPickPage,
         PickTab,
         PickListTab,
         UnpickedListTab,
         ItemLookupPage,
+        LookupsPopover,
         ItemLookupDetailsPage,
         BinLookupPage,
         ReceivePage,
+        ReceivePopover,
         ReceiveShipmentPage,
         ReceiveShipmentListTab,
         ReceiveShipmentPendingTab,
         ReceiveShipmentEnterTab,
         CountPage,
+        CountPopover,
         CountEntryPage,
         CountEntryEnterTab,
         CountEntryListTab,
         CountEntryPendingTab,
         AdjustmentPage,
+        AdjustmentPopover,
         AdjustmentEnterTab,
         AdjustmentListTab,
         PreferencesPage,
-        AboutPage
+        PreferencesPopover,
+        AboutPage,
+        UserguidePage
     ],
     providers: [
         StatusBar,

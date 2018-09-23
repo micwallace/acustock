@@ -16,12 +16,6 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<!--
-  Generated template for the PickShipmentsListPage page.
-
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
 
     <ion-navbar>
@@ -29,6 +23,11 @@
             <ion-icon name="menu"></ion-icon>
         </button>
         <ion-title>Items</ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="presentPopover($event)">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
     </ion-navbar>
 
 </ion-header>
@@ -64,7 +63,8 @@
     <ion-toolbar position="bottom">
         <ion-row>
             <ion-col text-right>
-                <button type="button" ion-button small (click)="confirmReceipts()">Confirm Receipt</button>
+                <button type="button" ion-button small (click)="clearReceipts()">Clear</button>
+                <button type="button" ion-button small (click)="confirmReceipts()">Confirm</button>
             </ion-col>
         </ion-row>
     </ion-toolbar>

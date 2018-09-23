@@ -17,11 +17,12 @@
  */
 
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController, Events, AlertController, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ViewController, Events, AlertController, LoadingController, PopoverController } from 'ionic-angular';
 import { PickProvider } from '../../../../providers/providers';
 import { CacheProvider } from "../../../../providers/core/cache";
 import { UtilsProvider } from "../../../../providers/core/utils";
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
+import { PickPopover } from "../../pick-popover";
 
 @IonicPage()
 @Component({
@@ -64,7 +65,8 @@ export class PickTab {
                 public loadingCtrl: LoadingController,
                 private ngZone: NgZone,
                 public utils:UtilsProvider,
-                public barcodeScanner:BarcodeScanner) {
+                public barcodeScanner:BarcodeScanner,
+                public popoverCtrl:PopoverController) {
 
     }
 
@@ -118,6 +120,11 @@ export class PickTab {
         this.events.unsubscribe('picks:confirm');
         this.events.unsubscribe('picks:cancel');
         this.events.unsubscribe('picks:open');
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(PickPopover);
+        popover.present({ev:event});
     }
 
     public showLoaderDelayed(message){
@@ -598,8 +605,8 @@ export class PickTab {
         if (Object.keys(this.pickProvider.pendingPicks).length > 0) {
 
             let alert = this.alertCtrl.create({
-                title: "Cancel picks",
-                message: "Yo bro, are you sure you want to can all pending picks?",
+                title: "Cancel Picks",
+                message: "Are you sure you want to clear all pending picks?",
                 buttons: [
                     {
                         text: "Cancel",
@@ -609,7 +616,6 @@ export class PickTab {
                         text: "Yes",
                         handler: ()=> {
                             this.pickProvider.clearSavedPicks();
-                            this.events.publish('closeModal');
                         }
                     }
                 ]
@@ -620,8 +626,6 @@ export class PickTab {
             return;
 
         }
-
-        this.events.publish('closeModal');
 
     }
 

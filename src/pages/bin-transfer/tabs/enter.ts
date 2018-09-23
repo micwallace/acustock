@@ -17,12 +17,13 @@
  */
 
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController, Events, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, Events, AlertController, PopoverController } from 'ionic-angular';
 import { TransferProvider } from '../../../providers/app/transfer'
 import { CacheProvider } from "../../../providers/core/cache";
 import { LoadingController } from "ionic-angular/index";
 import { UtilsProvider } from "../../../providers/core/utils";
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
+import { TransferPopover } from "../transfer-popover";
 
 @IonicPage()
 @Component({
@@ -53,20 +54,40 @@ export class EnterTab {
 
     constructor(private zone:NgZone,
                 public navCtrl:NavController,
-                public navParams:NavParams,
                 public transferProvider:TransferProvider,
                 public cache:CacheProvider,
-                public viewCtrl:ViewController,
+                public popoverCtrl:PopoverController,
                 public events:Events,
                 public alertCtrl:AlertController,
                 public loadingCtrl:LoadingController,
                 public utils:UtilsProvider,
                 public barcodeScanner:BarcodeScanner) {
 
+    }
 
-        events.subscribe('barcode:scan', (barcodeText)=>{
+    ionViewDidLoad(){
+        this.events.subscribe('barcode:scan', (barcodeText)=>{
             this.onBarcodeScan(barcodeText)
         });
+
+        this.events.subscribe('transfers:commit', ()=>{
+            this.commitTransfers();
+        });
+
+        this.events.subscribe('transfers:clear', ()=>{
+            this.clearTransfers();
+        });
+    }
+
+    ionViewWillUnload(){
+        this.events.unsubscribe('barcode:scan');
+        this.events.unsubscribe('transfers:commit');
+        this.events.unsubscribe('transfers:clear');
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(TransferPopover);
+        popover.present({ev:event});
     }
 
     resetForm() {
@@ -206,7 +227,8 @@ export class EnterTab {
 
         if (this.enteredData.location == locId) {
             this.showQty = false;
-            this.enteredData.location = "";
+            this.enteredData.toLocation = "";
+            this.utils.playFailedSound(isScan);
             this.utils.showAlert("Error", "From and to location must be different");
             return;
         }
@@ -325,14 +347,15 @@ export class EnterTab {
         if (this.enteredData.item != "" && this.enteredData.qty > 0) {
             this.addTransferItem();
         }
-
-        this.enteredData.item = "";
-        this.enteredData.qty = 0;
-        this.showItem = false;
-        this.showQty = false;
     }
 
     addTransferItem() {
+        if (this.enteredData.location == "" || this.enteredData.toLocation == "" ||
+            this.enteredData.item == "" || !(this.enteredData.qty > 0)) {
+            this.utils.showAlert("Error", "Please enter all required fields");
+            return
+        }
+
         // validate values
         if (!this.validateItemQty(null))
             return;
@@ -341,6 +364,35 @@ export class EnterTab {
 
         this.transferProvider.addPendingItem(this.enteredData.location, this.enteredData.toLocation, this.enteredData.item, this.enteredData.qty, srcQty);
 
+        this.enteredData.item = "";
+        this.enteredData.qty = 0;
+        this.showItem = false;
+        this.showQty = false;
+    }
+
+    clearTransfers(){
+
+        if (Object.keys(this.transferProvider.pendingItems).length > 0) {
+
+            let alert = this.alertCtrl.create({
+                title: "Cancel Transfers",
+                message: "Are you sure you want to clear all pending transfers?",
+                buttons: [
+                    {
+                        text: "Cancel",
+                        role: "cancel"
+                    },
+                    {
+                        text: "Yes",
+                        handler: ()=> {
+                            this.transferProvider.clearPendingItems();
+                        }
+                    }
+                ]
+            });
+
+            alert.present();
+        }
     }
 
     commitTransfers() {
@@ -352,9 +404,10 @@ export class EnterTab {
         this.loader = this.loadingCtrl.create({content: "Submitting Transfers..."});
         this.loader.present();
 
-        this.transferProvider.commitTransfer(this.loader).then(()=> {
+        this.transferProvider.commitTransfer(this.loader).then((res:any)=> {
             this.dismissLoader();
             this.cache.flushItemLocationCache();
+            this.utils.showAlert("Transfer Successful", "Transfer #" + res.ReferenceNbr.value + " was successfully created" + (res.released ? " and released" : ""));
         }).catch((err)=> {
             this.dismissLoader();
             this.utils.playFailedSound();
@@ -400,6 +453,9 @@ export class EnterTab {
 
             // If the location and to-location is already set, scanning a bin barcode updates the to-location
             this.cache.getBinById(barcodeText).then((bin)=> {
+
+                this.dismissLoader();
+
                 // check if quantity is set. If it is then save the current entry
                 if (this.enteredData.item != "" && this.enteredData.qty > 0) {
                     this.addTransferItem();

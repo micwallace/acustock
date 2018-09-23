@@ -133,6 +133,44 @@ export class PreferencesProvider {
                 }
             ]
         },
+        {
+            title: "Release Documents",
+            preferences: [
+                {
+                    key: "release_transfers",
+                    title: "Release Transfers",
+                    type: "toggle",
+                    def_value: true
+                },
+                {
+                    key: "release_receipts",
+                    title: "Release Receipts",
+                    type: "toggle",
+                    def_value: true
+                },
+                {
+                    key: "release_adjustments",
+                    title: "Release Adjustments",
+                    type: "toggle",
+                    def_value: true
+                }
+            ]
+        },
+        {
+            title: "Theme",
+            preferences: [
+                {
+                    key: "theme",
+                    title: "Theme",
+                    type: "select",
+                    def_value: "theme-light",
+                    options: [
+                        { label: "Light", value: "theme-light"},
+                        { label: "Dark", value: "theme-dark"},
+                    ]
+                }
+            ]
+        },
         /*{
             title: "Debug",
             preferences: [

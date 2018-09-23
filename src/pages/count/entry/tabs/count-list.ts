@@ -17,8 +17,9 @@
  */
 
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
+import { IonicPage, Events, PopoverController } from 'ionic-angular';
 import { CountProvider } from '../../../../providers/app/count'
+import { CountPopover } from "../../count-popover";
 
 @IonicPage()
 @Component({
@@ -29,8 +30,21 @@ export class CountEntryListTab {
 
     objectKeys:any = Object.keys;
 
-    constructor(public navCtrl:NavController, public navParams:NavParams, public countProvider:CountProvider, public alertController:AlertController) {
+    constructor(public countProvider:CountProvider, public events:Events, public popoverCtrl:PopoverController) {
 
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(CountPopover);
+        popover.present({ev:event});
+    }
+
+    commitCounts(){
+        this.events.publish('counts:commit');
+    }
+
+    clearCounts(){
+        this.events.publish('counts:clear');
     }
 
 }

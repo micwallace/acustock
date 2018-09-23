@@ -452,6 +452,10 @@ export class Api {
     }
 
     private processApiError(err:any){
+
+        if (typeof err === 'string')
+            return {message: err};
+
         // Process the exception and add a user displayed message and other debug info
         try {
             err.responseData =  this.useNativeHttp() ? JSON.parse(err.error) : err.json();

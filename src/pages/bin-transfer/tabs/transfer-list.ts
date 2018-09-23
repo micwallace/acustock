@@ -17,9 +17,10 @@
  */
 
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
+import { IonicPage, AlertController, Events, PopoverController } from 'ionic-angular';
 import { TransferProvider } from '../../../providers/app/transfer'
 import { UtilsProvider } from "../../../providers/core/utils";
+import { TransferPopover } from "../transfer-popover";
 
 @IonicPage()
 @Component({
@@ -30,11 +31,16 @@ export class TransferListTab {
 
     objectKeys:any = Object.keys;
 
-    constructor(public navCtrl:NavController,
-                public navParams:NavParams,
-                public transferProvider:TransferProvider,
+    constructor(public transferProvider:TransferProvider,
                 public alertController:AlertController,
-                public utils:UtilsProvider) {
+                public popoverCtrl:PopoverController,
+                public utils:UtilsProvider,
+                public events:Events) {
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(TransferPopover);
+        popover.present({ev:event});
     }
 
     openEditDialog(locationKey, itemKey) {
@@ -85,6 +91,14 @@ export class TransferListTab {
             return;
 
         this.transferProvider.removePendingItem(locationKey, itemKey);
+    }
+
+    commitTransfers(){
+        this.events.publish('transfers:commit');
+    }
+
+    clearTransfers(){
+        this.events.publish('transfers:clear');
     }
 
 }

@@ -24,9 +24,14 @@
         <ion-title>
             Pick Shipments
         </ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="presentPopover($event)">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
     </ion-navbar>
 </ion-header>
-<barcode-listener *ngIf="navCtrl.getActive().component.name === 'PickShipmentsPage'" (scan)='onBarcodeScan($event)'></barcode-listener>
+<barcode-listener *ngIf="isActive();" (scan)='onBarcodeScan($event)'></barcode-listener>
 <ion-content padding id="page6">
     <form id="pick-shipments-form1">
         <ion-list id="login-list3">

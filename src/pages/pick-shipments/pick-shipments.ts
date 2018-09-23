@@ -17,14 +17,14 @@
  */
 
 import { Component } from '@angular/core';
-import { NavController, ModalController, LoadingController } from 'ionic-angular';
+import { NavController, ModalController, LoadingController, AlertController, PopoverController } from 'ionic-angular';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { PickProvider } from '../../providers/app/pick';
 import { PickShipmentsListPage } from "./list/pick-shipments-list";
 import { PickShipmentsPickPage } from "./pick/pick-shipments-pick";
 import { UtilsProvider } from "../../providers/core/utils";
-import {AlertController} from "ionic-angular/index";
 import {PreferencesProvider} from "../../providers/core/preferences";
+import { PickPopover } from "./pick-popover";
 
 @Component({
     selector: 'page-pick-shipments',
@@ -43,8 +43,18 @@ export class PickShipmentsPage {
                 public loadingCtrl:LoadingController,
                 public alertCtrl:AlertController,
                 public utils:UtilsProvider,
-                public prefs:PreferencesProvider) {
+                public prefs:PreferencesProvider,
+                public popoverCtrl:PopoverController) {
 
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(PickPopover);
+        popover.present({ev:event});
+    }
+
+    isActive(){
+        return this.navCtrl.getActive().instance instanceof PickShipmentsPage;
     }
 
     onBarcodeScan(barcodeData){

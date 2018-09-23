@@ -414,6 +414,8 @@ export class ReceiveProvider {
         localStorage.setItem("unconfirmed_receipts", JSON.stringify(receipts));
 
         this.savedReceipts = null;
+        this.savedReceipts = {};
+        this.calculatePendingQty();
     }
 
     public confirmReceipts(loader) {
@@ -462,9 +464,12 @@ export class ReceiveProvider {
 
                 this.api.putPurchaseReceipt(data).then((res:any)=>{
 
+                    if (!this.prefs.getPreference("release_receipts"))
+                        return resolve(res);
+
                     loader.data.content = "Releasing receipt...";
 
-                    console.log("Purchase receipt #"+res.ReceiptNbr.value);
+                    //console.log("Purchase receipt #"+res.ReceiptNbr.value);
 
                     this.api.releasePurchaseReceipt(res.ReceiptNbr.value).then((releaseRes)=> {
 
@@ -473,6 +478,8 @@ export class ReceiveProvider {
                         loader.data.content = "Reloading document...";
 
                         var sourceId = this.type == "purchase" ? this.sourceDocument.OrderNbr.value : this.transferShipmentRef.ShipmentNbr;
+
+                        res.released = true;
 
                         this.loadReceipt(sourceId, this.type).then((res)=>{
                             resolve(res);
@@ -497,25 +504,30 @@ export class ReceiveProvider {
 
                 this.api.putReceipt(data).then((res:any)=> {
 
-                        loader.data.content = "Releasing receipt...";
+                    if (!this.prefs.getPreference("release_receipts"))
+                        return resolve(res);
 
-                        console.log("Receipt #" + res.ReferenceNbr.value);
+                    loader.data.content = "Releasing receipt...";
 
-                        this.api.releaseReceipt(res.ReferenceNbr.value).then((releaseRes)=> {
+                    console.log("Receipt #" + res.ReferenceNbr.value);
 
-                            this.postConfirmSuccess();
+                    this.api.releaseReceipt(res.ReferenceNbr.value).then((releaseRes)=> {
 
-                            loader.data.content = "Reloading document...";
+                        this.postConfirmSuccess();
 
-                            this.loadReceipt(this.sourceDocument.ReferenceNbr.value, "transfer").then((res)=> {
-                                resolve(res);
-                            }).catch((err)=> {
-                                reject(err);
-                            });
+                        loader.data.content = "Reloading document...";
 
+                        res.released = true;
+
+                        this.loadReceipt(this.sourceDocument.ReferenceNbr.value, "transfer").then((res)=> {
+                            resolve(res);
                         }).catch((err)=> {
                             reject(err);
                         });
+
+                    }).catch((err)=> {
+                        reject(err);
+                    });
 
                 }).catch((err)=> {
                     reject(err);
@@ -526,8 +538,8 @@ export class ReceiveProvider {
     }
 
     private postConfirmSuccess(){
-        //this.clearSavedReceipts();
-        //this.pendingItems = {};
+        this.clearSavedReceipts();
+        this.pendingItems = {};
         this.calculatePendingQty();
     }
 
@@ -589,7 +601,7 @@ export class ReceiveProvider {
             data.Details.push(item);
         }
 
-        console.log(JSON.stringify(data));
+        //console.log(JSON.stringify(data));
 
         return data;
     }
@@ -635,8 +647,8 @@ export class ReceiveProvider {
 
         }
 
-        console.log("Receipt object");
-        console.log(JSON.stringify(data));
+        //console.log("Receipt object");
+        //console.log(JSON.stringify(data));
 
         return data;
 
@@ -699,7 +711,7 @@ export class ReceiveProvider {
             data.Details.push(item);
         }
 
-        console.log(JSON.stringify(data));
+        //console.log(JSON.stringify(data));
 
         return data;
     }

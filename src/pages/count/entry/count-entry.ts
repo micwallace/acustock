@@ -17,7 +17,7 @@
  */
 
 import { Component, ViewChild } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController, Events, Tabs } from 'ionic-angular';
+import { IonicPage, NavController, Events, Tabs } from 'ionic-angular';
 import { CountEntryEnterTab } from "./tabs/count-enter";
 import { CountEntryListTab } from "./tabs/count-list";
 import { CountEntryPendingTab } from "./tabs/pending-list";
@@ -45,8 +45,6 @@ export class CountEntryPage {
     tab3Root = CountEntryListTab;
 
     constructor(public navCtrl:NavController,
-                public navParams:NavParams,
-                public viewCtrl:ViewController,
                 public events:Events,
                 public countProvider:CountProvider,
                 public utils:UtilsProvider) {

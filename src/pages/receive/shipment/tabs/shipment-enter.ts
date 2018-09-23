@@ -16,14 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, ViewChild, NgZone, Renderer } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController, Events, AlertController } from 'ionic-angular';
+import { Component, ViewChild, NgZone, } from '@angular/core';
+import { IonicPage, NavController, Events, AlertController, LoadingController, PopoverController } from 'ionic-angular';
 import { ReceiveProvider } from '../../../../providers/app/receive'
 import { CacheProvider } from "../../../../providers/core/cache";
-import { LoadingController } from "ionic-angular/index";
 import { UtilsProvider } from "../../../../providers/core/utils";
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
-
+import { ReceivePopover } from "../../receive-popover";
 /**
  * Generated class for the PickShipmentsPickPage page.
  *
@@ -58,14 +57,12 @@ export class ReceiveShipmentEnterTab {
 
     constructor(private zone:NgZone,
                 public navCtrl:NavController,
-                public navParams:NavParams,
                 public receiveProvider:ReceiveProvider,
                 public cache:CacheProvider,
-                public viewCtrl:ViewController,
                 public events:Events,
                 public alertCtrl:AlertController,
                 public loadingCtrl:LoadingController,
-                public renderer:Renderer,
+                public popoverCtrl:PopoverController,
                 public utils:UtilsProvider,
                 public barcodeScanner:BarcodeScanner) {
 
@@ -74,6 +71,14 @@ export class ReceiveShipmentEnterTab {
     ionViewDidLoad() {
         this.events.subscribe('barcode:scan', (barcodeText)=>{
             this.onBarcodeScan(barcodeText)
+        });
+
+        this.events.subscribe('receipts:confirm', (barcodeText)=>{
+            this.confirmReceipts();
+        });
+
+        this.events.subscribe('receipts:clear', ()=>{
+            this.clearReceipts();
         });
 
         if (this.receiveProvider.hasSavedReceipts()) {
@@ -106,6 +111,38 @@ export class ReceiveShipmentEnterTab {
 
     ionViewWillUnload(){
         this.events.unsubscribe('barcode:scan');
+        this.events.unsubscribe('receipts:confirm');
+        this.events.unsubscribe('receipts:clear');
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(ReceivePopover);
+        popover.present({ev:event});
+    }
+
+    clearReceipts(){
+
+        if (Object.keys(this.receiveProvider.pendingItems).length > 0) {
+
+            let alert = this.alertCtrl.create({
+                title: "Cancel Receipts",
+                message: "Are you sure you want to clear all pending receipt items?",
+                buttons: [
+                    {
+                        text: "Cancel",
+                        role: "cancel"
+                    },
+                    {
+                        text: "Yes",
+                        handler: ()=> {
+                            this.receiveProvider.clearSavedReceipts();
+                        }
+                    }
+                ]
+            });
+
+            alert.present();
+        }
     }
 
     resetForm(clearLocation=false) {
@@ -361,10 +398,21 @@ export class ReceiveShipmentEnterTab {
         this.loader = this.loadingCtrl.create({content: "Submitting Receipts..."});
         this.loader.present();
 
-        this.receiveProvider.confirmReceipts(this.loader).then(()=>{
+        this.receiveProvider.confirmReceipts(this.loader).then((res:any)=>{
             this.dismissLoader();
             this.cache.flushItemLocationCache();
             this.events.publish("closeReceiveScreen");
+
+            var msg;
+            if (this.receiveProvider.type == "shipment"){
+                msg = "Shipment #"+res.ShipmentNbr.value+" was successfully updated";
+            } else {
+                msg = (this.receiveProvider.transferShipmentRef == null ? "IN" : "PO") + " Receipt #" +
+                    (this.receiveProvider.transferShipmentRef == null ? res.ReceiptNbr.value : res.ReferenceNbr.value) +
+                    " was successfully created" + (res.released ? " and released" : "");
+            }
+
+            this.utils.showAlert("Receipt Successful", msg);
         }).catch((err)=>{
             this.dismissLoader();
             this.utils.playFailedSound(false);

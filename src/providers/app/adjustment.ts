@@ -18,8 +18,6 @@
 
 import { Injectable } from '@angular/core';
 import { Api } from '../core/api'
-import { CacheProvider } from '../core/cache'
-import { LoadingController } from 'ionic-angular';
 import { PreferencesProvider } from "../core/preferences";
 
 /*
@@ -140,7 +138,13 @@ export class AdjustmentProvider {
         return false;
     }
 
-    // Remove
+    public clearPendingItems(){
+        this.pendingItems = {};
+        this.calcTotalQuantities();
+        this.savePending();
+    }
+
+    // Remove adjustments for which the book quantities have changed - this is to prevent stale adjustments from being commited.
     public validateBookQtys(){
 
         return new Promise((resolve, reject) => {
@@ -245,10 +249,13 @@ export class AdjustmentProvider {
                 adjustment.Details.push(line);
             }
 
-            console.log(JSON.stringify(adjustment));
+            //console.log(JSON.stringify(adjustment));
             this.lastRequest = adjustment;
 
             this.api.putAdjustment(adjustment).then((res:any)=> {
+
+                if (!this.prefs.getPreference("release_adjustments"))
+                    return resolve(res);
 
                 var AdjustmentId = res.ReferenceNbr.value;
 
@@ -261,10 +268,9 @@ export class AdjustmentProvider {
                     this.pendingVariance = 0;
                     this.savePending();
 
-                    // add tranfer to history
-                    //this.addHistory(res);
+                    res.released = true;
 
-                    resolve();
+                    resolve(res);
 
                 }).catch((err)=> {
 

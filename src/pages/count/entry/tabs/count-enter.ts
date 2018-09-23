@@ -17,12 +17,13 @@
  */
 
 import { Component, ViewChild, NgZone, Renderer } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController, Events, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, Events, AlertController, PopoverController } from 'ionic-angular';
 import { CountProvider } from '../../../../providers/app/count'
 import { CacheProvider } from "../../../../providers/core/cache";
 import { LoadingController } from "ionic-angular/index";
 import { UtilsProvider } from "../../../../providers/core/utils";
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
+import { CountPopover } from "../../count-popover";
 
 @IonicPage()
 @Component({
@@ -51,22 +52,29 @@ export class CountEntryEnterTab {
 
     constructor(private zone:NgZone,
                 public navCtrl:NavController,
-                public navParams:NavParams,
                 public countProvider:CountProvider,
                 public cache:CacheProvider,
-                public viewCtrl:ViewController,
                 public events:Events,
                 public alertCtrl:AlertController,
                 public loadingCtrl:LoadingController,
                 public renderer:Renderer,
                 public utils:UtilsProvider,
-                public barcodeScanner:BarcodeScanner) {
+                public barcodeScanner:BarcodeScanner,
+                public popoverCtrl:PopoverController) {
 
     }
 
     ionViewDidLoad() {
         this.events.subscribe('barcode:scan', (barcodeText)=>{
             this.onBarcodeScan(barcodeText)
+        });
+
+        this.events.subscribe('counts:commit', (barcodeText)=>{
+            this.commitCounts();
+        });
+
+        this.events.subscribe('counts:clear', (barcodeText)=>{
+            this.clearCounts();
         });
 
         if (this.countProvider.hasSavedCounts()) {
@@ -97,6 +105,38 @@ export class CountEntryEnterTab {
 
     ionViewWillUnload(){
         this.events.unsubscribe('barcode:scan');
+        this.events.unsubscribe('counts:commit');
+        this.events.unsubscribe('counts:clear');
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(CountPopover);
+        popover.present({ev:event});
+    }
+
+    clearCounts(){
+
+        if (Object.keys(this.countProvider.pendingCounts).length > 0) {
+
+            let alert = this.alertCtrl.create({
+                title: "Cancel Counts",
+                message: "Are you sure you want to clear all pending count items?",
+                buttons: [
+                    {
+                        text: "Cancel",
+                        role: "cancel"
+                    },
+                    {
+                        text: "Yes",
+                        handler: ()=> {
+                            this.countProvider.clearSavedCounts();
+                        }
+                    }
+                ]
+            });
+
+            alert.present();
+        }
     }
 
     resetForm() {
@@ -109,7 +149,7 @@ export class CountEntryEnterTab {
         this.showItem = false;
         this.showQty = false;
 
-        this.locationInput.setFocus();
+        //this.locationInput.setFocus();
     }
 
     public showLoaderDelayed(message){

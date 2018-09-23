@@ -17,8 +17,9 @@
  */
 
 import { Component } from '@angular/core';
-import { IonicPage  } from 'ionic-angular';
+import { IonicPage, PopoverController  } from 'ionic-angular';
 import { PickProvider } from '../../../providers/providers';
+import { PickPopover } from "../pick-popover";
 
 @IonicPage()
 @Component({
@@ -27,8 +28,13 @@ import { PickProvider } from '../../../providers/providers';
 })
 export class PickShipmentsListPage {
 
-    constructor(public pickProvider:PickProvider) {
+    constructor(public pickProvider:PickProvider, public popoverCtrl:PopoverController) {
         //console.log(JSON.stringify(this.pickProvider.currentShipment));
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(PickPopover);
+        popover.present({ev:event});
     }
 
 }

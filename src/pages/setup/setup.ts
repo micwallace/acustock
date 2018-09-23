@@ -24,6 +24,8 @@ import { AboutPage } from "../about/about";
 })
 export class SetupPage {
 
+    firsTimeSetup = true;
+
     constructor(public navCtrl:NavController,
                 public navParams:NavParams,
                 public prefs:PreferencesProvider,
@@ -38,7 +40,8 @@ export class SetupPage {
     }
 
     ionViewDidLoad() {
-        console.log('ionViewDidLoad SetupPage');
+        if (typeof this.navParams.get('firstTime') !== 'undefined')
+            this.firsTimeSetup = this.navParams.get('firstTime');
     }
 
     showPreferences() {
@@ -141,7 +144,10 @@ export class SetupPage {
                     text: "OK",
                     handler: (data)=> {
                         this.prefs.setPreference("warehouse", data);
-                        this.promptForDeviceName();
+                        alert.dismiss().then(()=>{
+                            this.promptForDeviceName();
+                        });
+                        return false;
                     }
                 }
             ]
@@ -177,8 +183,16 @@ export class SetupPage {
                     text: "OK",
                     handler: (data)=> {
                         this.prefs.setPreference("device", data.device);
-                        this.navCtrl.setRoot(PickShipmentsPage);
-                        this.cache.initialLoad();
+                        alert.dismiss().then(()=>{
+                            if (this.firsTimeSetup){
+                                console.log("Setting root");
+                                this.navCtrl.setRoot(PickShipmentsPage);
+                            } else {
+                                this.navCtrl.pop();
+                            }
+                            this.cache.initialLoad();
+                        });
+                        return false;
                     }
                 }
             ]

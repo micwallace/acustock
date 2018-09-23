@@ -39,6 +39,7 @@
         <splash density="port-xxhdpi" src="resources/android/splash/drawable-port-xxhdpi-screen.png" />
         <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.png" />
         <preference name="loadUrlTimeoutValue" value="700000" />
+        <preference name="android-manifest/application/activity/@android:windowSoftInputMode" value="adjustPan" />
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />

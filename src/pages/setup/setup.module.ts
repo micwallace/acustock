@@ -19,7 +19,7 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
 import { SetupPage } from './setup';
-import { BarcodeListenerComponentModule } from "../../providers/ui/barcode-listener/barcode-listener.module";
+import { BarcodeListenerComponentModule } from "../../components/barcode-listener/barcode-listener.module";
 
 @NgModule({
     declarations: [

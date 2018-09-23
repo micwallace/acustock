@@ -18,10 +18,11 @@
 
 import { Component } from '@angular/core';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
-import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, AlertController, PopoverController } from 'ionic-angular';
 import { ReceiveProvider } from "../../providers/app/receive";
 import { ReceiveShipmentPage } from "./shipment/receive-shipment";
 import { UtilsProvider } from "../../providers/core/utils";
+import { ReceivePopover } from "./receive-popover";
 
 @IonicPage()
 @Component({
@@ -39,8 +40,18 @@ export class ReceivePage {
                 public loadingCtrl:LoadingController,
                 public receiveProvider:ReceiveProvider,
                 public alertCtrl: AlertController,
-                public utils:UtilsProvider) {
+                public utils:UtilsProvider,
+                public popoverCtrl:PopoverController) {
 
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(ReceivePopover);
+        popover.present({ev:event});
+    }
+
+    isActive(){
+        return this.navCtrl.getActive().instance instanceof ReceivePage;
     }
 
     loadReceipt(referenceNbr, isScan=false){

@@ -51,13 +51,13 @@ export class PickShipmentsPickPage {
 
     }
 
-    ionOnViewDidLoad(){
+    ionViewDidLoad(){
         this.events.subscribe('closeModal', () => {
             this.navCtrl.pop();
         });
     }
 
-    ionOnViewDidUnload(){
+    ionViewWillUnload(){
         this.events.unsubscribe('closeModal');
     }
 

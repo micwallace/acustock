@@ -18,11 +18,12 @@
 
 import { Component } from '@angular/core';
 import 'rxjs/add/operator/map'
-import { IonicPage, NavController, NavParams, LoadingController, ModalController } from 'ionic-angular';
+import { IonicPage, NavController, PopoverController, LoadingController, ModalController } from 'ionic-angular';
 import { Api, CacheProvider, LocationAutocompleteService, PreferencesProvider } from '../../providers/providers';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { ItemLookupDetailsPage } from '../item-lookup-details/item-lookup-details'
 import { UtilsProvider } from "../../providers/core/utils";
+import { LookupsPopover } from "./lookups-popover";
 
 @IonicPage()
 @Component({
@@ -39,7 +40,7 @@ export class BinLookupPage {
     selectedLocation = null;
 
     constructor(public navCtrl:NavController,
-                public navParams:NavParams,
+                public popoverCtrl:PopoverController,
                 public binAutocompleteService:LocationAutocompleteService,
                 public api:Api,
                 public loadingCtrl:LoadingController,
@@ -48,6 +49,11 @@ export class BinLookupPage {
                 public modalCtrl:ModalController,
                 public prefs:PreferencesProvider,
                 public utils:UtilsProvider) {
+    }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(LookupsPopover);
+        popover.present({ev:event});
     }
 
     loadBinContents(item, isScan=false) {

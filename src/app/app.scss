@@ -32,6 +32,8 @@
 // automatically applied to the <body> element in the app.
 @import "../../node_modules/ionic2-auto-complete/auto-complete";
 
+@import '../theme/dark.theme';
+
 .menu-logo {
   width: 32px;
   vertical-align:middle;
@@ -136,4 +138,32 @@ ion-auto-complete {
   -webkit-box-shadow: unset;
   box-shadow: unset;
 
+}
+
+accordion-list {
+  ion-list, ion-list-header {
+    margin: 0 !important;
+  }
+  .accordion-content-inner {
+    padding: 10px;
+  }
+  ion-label {
+    margin: 6px 0 !important;
+    .accordion-header {
+      min-height: 4rem !important;
+      ion-icon {
+        margin: 0 !important;
+      }
+      &.active ion-icon {
+        transform: rotate(90deg);
+        /*transition-duration: 0.5s;*/
+      }
+      .item-inner {
+        margin-left: 10px !important;
+        ion-label {
+          margin: 0 !important;
+        }
+      }
+    }
+  }
 }

@@ -201,7 +201,7 @@ export class CountProvider {
         return this.pendingCounts[key].PendingQty;
     }
 
-    public setCount(countLine, qty){
+    public setCount(countLine, qty, add=true){
 
         var key = countLine.InventoryID.value + "-" + countLine.LocationID.value;
 
@@ -210,10 +210,23 @@ export class CountProvider {
             this.pendingCounts[key].PendingQty = 0;
         }
 
-        this.pendingCounts[key].PendingQty += parseFloat(qty);
+        if (add) {
+            this.pendingCounts[key].PendingQty += parseFloat(qty);
+        } else {
+            this.pendingCounts[key].PendingQty = parseFloat(qty);
+        }
 
         this.calculateTotals();
         this.savePendingCounts();
+    }
+
+    public removeCount(countLine){
+
+        var key = countLine.InventoryID.value + "-" + countLine.LocationID.value;
+
+        if (this.pendingCounts.hasOwnProperty(key)) {
+            delete this.pendingCounts[key];
+        }
     }
 
     public savePendingCounts() {
@@ -235,7 +248,8 @@ export class CountProvider {
     }
 
     public loadSavedCounts() {
-        this.pendingCounts = this.savedCounts;
+        if (this.savedCounts != null)
+            this.pendingCounts = this.savedCounts;
         this.calculateTotals();
     }
 
@@ -250,6 +264,8 @@ export class CountProvider {
         localStorage.setItem("unconfirmed_counts", JSON.stringify(receipts));
 
         this.savedCounts = null;
+        this.pendingCounts = {};
+        this.calculateTotals();
     }
 
     public commitPendingCounts(){

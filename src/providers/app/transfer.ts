@@ -149,6 +149,12 @@ export class TransferProvider {
         return false;
     }
 
+    public clearPendingItems(){
+        this.pendingItems = {};
+        this.calcTotalPendingQty();
+        this.savePending();
+    }
+
     public commitTransfer(loadingCtrl:any) {
 
         return new Promise((resolve, reject) => {
@@ -186,6 +192,9 @@ export class TransferProvider {
 
             this.api.putTransfer(transfer).then((res:any)=> {
 
+                if (!this.prefs.getPreference("release_transfers"))
+                    return resolve(res);
+
                 var transferId = res.ReferenceNbr.value;
 
                 loadingCtrl.data.content = "Releasing Transfers...";
@@ -197,10 +206,9 @@ export class TransferProvider {
                     this.pendingQty = 0;
                     this.savePending();
 
-                    // add tranfer to history
-                    //this.addHistory(res);
+                    res.released = true;
 
-                    resolve();
+                    resolve(res);
 
                 }).catch((err)=> {
 
