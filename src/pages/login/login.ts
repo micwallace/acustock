@@ -63,6 +63,7 @@ export class LoginPage {
 
             loader.dismiss();
 
+            //noinspection TypeScriptValidateTypes
             this.navCtrl.setRoot(PickShipmentsPage);
 
             console.log("Login succeeded, loading initial data...");
@@ -78,6 +79,7 @@ export class LoginPage {
     }
 
     goToSetup(){
+        //noinspection TypeScriptValidateTypes
         this.navCtrl.setRoot(SetupPage);
     }
 

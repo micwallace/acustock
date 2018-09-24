@@ -40,7 +40,8 @@
             <ion-col col-4 text-right>Qty</ion-col>
         </ion-row>
         <ion-list class="item-list">
-            <ion-item no-margin no-padding class="list-group" *ngFor="let key of objectKeys(receiveProvider.sourceIndex)">
+            <ion-item no-margin no-padding tappable class="list-group"
+                      *ngFor="let key of objectKeys(receiveProvider.sourceIndex)" (click)="openReceiptItem(receiveProvider.sourceIndex[key]);">
                 <ion-row class="item-group-header" no-margin>
                     <ion-col col-8><strong>{{receiveProvider.sourceIndex[key].InventoryID}}</strong></ion-col>
                     <ion-col col-4 class="column-right">{{receiveProvider.getReceivedAndPendingQty(key)}} / {{receiveProvider.getTotalQty(key)}}</ion-col>

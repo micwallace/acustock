@@ -19,6 +19,11 @@
 <ion-header>
 
     <ion-navbar>
+        <ion-buttons left>
+            <button navPop ion-button icon-only style="margin-left: 10px;">
+                <ion-icon name="arrow-back"></ion-icon>
+            </button>
+        </ion-buttons>
         <ion-title>Shipment Items</ion-title>
         <ion-buttons end>
             <button ion-button icon-only (click)="presentPopover($event)">

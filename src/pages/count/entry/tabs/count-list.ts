@@ -17,7 +17,7 @@
  */
 
 import { Component } from '@angular/core';
-import { IonicPage, Events, PopoverController } from 'ionic-angular';
+import { IonicPage, Events, PopoverController, NavController } from 'ionic-angular';
 import { CountProvider } from '../../../../providers/app/count'
 import { CountPopover } from "../../count-popover";
 
@@ -30,13 +30,23 @@ export class CountEntryListTab {
 
     objectKeys:any = Object.keys;
 
-    constructor(public countProvider:CountProvider, public events:Events, public popoverCtrl:PopoverController) {
+    constructor(public countProvider:CountProvider, public navCtrl:NavController,
+                public events:Events, public popoverCtrl:PopoverController) {
 
     }
 
     presentPopover(event) {
         let popover = this.popoverCtrl.create(CountPopover);
         popover.present({ev:event});
+    }
+
+    openCountItem(item) {
+
+        this.events.publish('counts:open', item);
+
+        if (this.navCtrl.parent.selectedIndex !== 0) {
+            this.navCtrl.parent.select(0, {});
+        }
     }
 
     commitCounts(){

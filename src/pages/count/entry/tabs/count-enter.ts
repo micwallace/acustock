@@ -69,12 +69,18 @@ export class CountEntryEnterTab {
             this.onBarcodeScan(barcodeText)
         });
 
-        this.events.subscribe('counts:commit', (barcodeText)=>{
+        this.events.subscribe('counts:commit', ()=>{
             this.commitCounts();
         });
 
-        this.events.subscribe('counts:clear', (barcodeText)=>{
+        this.events.subscribe('counts:clear', ()=>{
             this.clearCounts();
+        });
+
+        this.events.subscribe('counts:open', (item)=>{
+            this.enteredData.location = item.LocationID.value;
+            this.enteredData.item = item.InventoryID.value;
+            this.setCountLine().then();
         });
 
         if (this.countProvider.hasSavedCounts()) {
@@ -107,6 +113,7 @@ export class CountEntryEnterTab {
         this.events.unsubscribe('barcode:scan');
         this.events.unsubscribe('counts:commit');
         this.events.unsubscribe('counts:clear');
+        this.events.unsubscribe('counts:open');
     }
 
     presentPopover(event) {
@@ -203,10 +210,10 @@ export class CountEntryEnterTab {
 
             this.showItem = true;
 
-            if (this.enteredData.item != "") {
+            /*if (this.enteredData.item != "") {
                 this.showQty = true;
                 this.enteredData.qty = 1;
-            }
+            }*/
 
             this.dismissLoader();
 
@@ -219,6 +226,7 @@ export class CountEntryEnterTab {
         }).catch((err) => {
 
             this.enteredData.location = "";
+            this.showItem = false;
             this.dismissLoader().then(()=> {
                 this.utils.showAlert("Error", err.message);
             });
@@ -242,79 +250,23 @@ export class CountEntryEnterTab {
 
         this.cache.getItemById(itemId).then((item:any)=> {
 
-            // get count line based on the currently entered data
-            var line = this.countProvider.getCountLine(this.enteredData);
-
-            if (line == null){
-
-                this.dismissLoader().then(()=>{
-                    let alertDialog = this.alertCtrl.create({
-                        title: "Create Count Line",
-                        message: "There is no count line which matches the currently entered item/location. Create a new line?",
-                        buttons: [
-                            {
-                                text: "No",
-                                role: "cancel"
-                            },
-                            {
-                                text: "Yes",
-                                handler: ()=> {
-
-                                    this.loader = this.loadingCtrl.create({content: "Adding line..."});
-                                    this.loader.present();
-
-                                    this.countProvider.addNewCountLine(this.enteredData).then((res)=>{
-
-                                        this.currentSourceLine = res;
-
-                                        if (this.enteredData.location != "") {
-                                            this.showQty = true;
-                                            this.enteredData.qty = 1;
-                                        }
-
-                                        this.dismissLoader();
-
-                                        if (isScan)
-                                            this.utils.playScanSuccessSound();
-
-                                        if (callback != null)
-                                            callback();
-
-                                    }).catch((err)=>{
-                                        this.showQty = false;
-                                        this.enteredData.item = "";
-                                        this.dismissLoader().then(()=>{
-                                            this.utils.processApiError("Error", err.message, err, this.navCtrl);
-                                        });
-
-                                        this.utils.playFailedSound();
-                                    });
-                                }
-                            }
-                        ]
-                    });
-
-                    alertDialog.present();
-
-                    this.utils.playPromptSound(isScan);
-                });
-                return;
-            }
-
-            this.currentSourceLine = line;
-
-            if (this.enteredData.location != "") {
-                this.showQty = true;
-                this.enteredData.qty = 1;
-            }
-
             this.dismissLoader();
 
-            if (isScan)
-                this.utils.playScanSuccessSound();
+            if (this.enteredData.location != "") {
 
-            if (callback != null)
-                callback();
+                this.setCountLine(isScan).then(()=> {
+
+                    if (isScan)
+                        this.utils.playScanSuccessSound();
+
+                    if (callback != null)
+                        callback();
+
+                }).catch((err) => {
+                    this.showQty = false;
+                    this.enteredData.item = "";
+                });
+            }
 
         }).catch((err) => {
             this.showQty = false;
@@ -324,6 +276,64 @@ export class CountEntryEnterTab {
             });
 
             this.utils.playFailedSound(isScan);
+        });
+    }
+
+    setCountLine(isScan = false){
+
+        return new Promise((resolve, reject)=>{
+
+            // get count line based on the currently entered data
+            var line = this.countProvider.getCountLine(this.enteredData);
+
+            if (line != null) {
+                this.currentSourceLine = line;
+                this.showQty = true;
+                this.enteredData.qty = 1;
+                return resolve(line);
+            }
+
+            let alertDialog = this.alertCtrl.create({
+                title: "Create Count Line",
+                message: "There is no count line which matches the currently entered item/location. Create a new line?",
+                buttons: [
+                    {
+                        text: "No",
+                        role: "cancel"
+                    },
+                    {
+                        text: "Yes",
+                        handler: ()=> {
+
+                            this.loader = this.loadingCtrl.create({content: "Adding line..."});
+                            this.loader.present();
+
+                            this.countProvider.addNewCountLine(this.enteredData).then((res)=>{
+
+                                this.currentSourceLine = line;
+                                this.showQty = true;
+                                this.enteredData.qty = 1;
+
+                                this.dismissLoader();
+
+                                resolve(res);
+
+                            }).catch((err)=>{
+
+                                this.dismissLoader().then(()=>{
+                                    this.utils.processApiError("Error", err.message, err, this.navCtrl);
+                                });
+
+                                this.utils.playFailedSound();
+                            });
+                        }
+                    }
+                ]
+            });
+
+            alertDialog.present();
+
+            this.utils.playPromptSound(isScan);
         });
     }
 

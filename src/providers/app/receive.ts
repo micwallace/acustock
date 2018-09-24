@@ -202,6 +202,8 @@ export class ReceiveProvider {
 
         var receipts = JSON.parse(localStorage.getItem("unconfirmed_receipts"));
 
+        console.log("Saved receipts: "+localStorage.getItem("unconfirmed_receipts"));
+
         var id = this.sourceDocument.id;
 
         if (receipts && receipts.hasOwnProperty(id)) {
@@ -390,7 +392,6 @@ export class ReceiveProvider {
 
         localStorage.setItem("unconfirmed_receipts", JSON.stringify(receipts));
 
-        console.log("Picks saved");
         this.calculatePendingQty();
     }
 
@@ -404,6 +405,11 @@ export class ReceiveProvider {
     }
 
     public clearSavedReceipts() {
+
+        this.savedReceipts = null;
+        this.pendingItems = {};
+        this.calculatePendingQty();
+
         var receipts = JSON.parse(localStorage.getItem("unconfirmed_receipts"));
 
         if (!receipts)
@@ -412,10 +418,6 @@ export class ReceiveProvider {
         delete receipts[this.sourceDocument.id];
 
         localStorage.setItem("unconfirmed_receipts", JSON.stringify(receipts));
-
-        this.savedReceipts = null;
-        this.savedReceipts = {};
-        this.calculatePendingQty();
     }
 
     public confirmReceipts(loader) {

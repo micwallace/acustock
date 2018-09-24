@@ -17,7 +17,7 @@
  */
 
 import { Component } from '@angular/core';
-import { ViewController, NavController } from "ionic-angular";
+import { ViewController, NavController, App } from "ionic-angular";
 import { PreferencesProvider } from "../../providers/core/preferences";
 import { UserguidePage } from "../about/userguide/userguide";
 
@@ -27,21 +27,21 @@ import { UserguidePage } from "../about/userguide/userguide";
         <button ion-item (click)="openUserguide()">About Adjustments</button>
       <ion-item>
         <ion-label>Release Adjustments</ion-label>
-        <ion-toggle [(ngModel)]="prefs.preferences['release_adjustments']" (ionChange)="dismiss();"></ion-toggle>
+        <ion-toggle [(ngModel)]="prefs.preferences['release_adjustments']"></ion-toggle>
       </ion-item>
     </ion-list>
   `
 })
 export class AdjustmentPopover {
 
-    constructor(public viewCtrl: ViewController, public navCtrl:NavController, public prefs:PreferencesProvider) {}
+    constructor(public app:App, public viewCtrl: ViewController,
+                public navCtrl:NavController, public prefs:PreferencesProvider) {
 
-    dismiss() {
-        this.viewCtrl.dismiss();
     }
 
     openUserguide(){
-        this.navCtrl.push(UserguidePage, {active: 'adjustments'});
-        this.dismiss();
+        this.viewCtrl.dismiss().then(()=>{
+            this.app.getRootNav().push(UserguidePage, {active: 'adjustments'});
+        });
     }
 }

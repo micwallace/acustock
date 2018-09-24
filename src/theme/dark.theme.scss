@@ -35,7 +35,7 @@
   .onboard {
     border-color: #212121 !important;
   }
-  .toolbar-background {
+  .toolbar-background, .item-group-header {
     background-color: #303030 !important;
   }
   .tab-button {
@@ -56,17 +56,23 @@
     //border-color: white;
   }
   ion-content,
-  .input-wrapper,
-  .item-inner,
-  .item,
+  .item:not(.accordion-header),
   ion-footer,
   ion-item,
-  ion-list,
-  ion-label {
+  ion-list {
     background-color: #3f3f3f !important;
     background: #3f3f3f !important;
     color: white !important;
+    & > .item-inner, & > .input-wrapper, & > ion-label {
+      background-color: #3f3f3f !important;
+      background: #3f3f3f !important;
+    }
   }
+
+  .accordion-content-inner p {
+    color: #000
+  }
+
   ion-list {
     background-color: #100815;
   }

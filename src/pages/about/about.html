@@ -57,6 +57,7 @@
             <li>Sequenced pick suggestions: Scan items in any order or let the scanner route you through the warehouse using an optimal pick sequence.</li>
             <li>Configurable vibration and sound alerts.</li>
             <li>Advanced error reporting and diagnostic info can be sent via email.</li>
+            <li>Easy setup/provisioning via QR codes.</li>
         </ul>
         <h4>Anti-features</h4>
         <ul>
@@ -65,20 +66,20 @@
         <h4>Inspiration</h4>
         <p>AcuStock was born out of frustration (most of my applications are) with another un-named proprietary application which was poorly designed and full of bugs.
             These bugs resulted in wasted time, loss of stock integrity and even when it was working the speed and user experience was far from optimal.
-            After reaching out to the developer I realised that these issues were not going to be fixed in an appropriate
-            amount of time and that there were no viable alternatives to this software.</p>
-        <p>It was then I decided to write something better that the community can take advantage of, in hope that it will
-            lift the quality of other 3rd party solutions and grow the pool of available options.</p>
+            Even after much feedback the developers and vendors were indifferent to these issues. I felt they were not going to be fixed in an appropriate
+            amount of time and also found that there was no viable alternatives to this software.
+            The source code was not available and I was extremely frustrated that I was trapped supporting completely incompetent software which quite frankly should have never made it to production.</p>
+        <p>It was then I decided to write something better and provide a source code license option so nobody needs to feel trapped in incompetent proprietary hell like I have the last few months.</p>
         <h4>License</h4>
         <strong>Copyright (c) 2018 Michael B Wallace</strong>
         <div *ngIf="license == 'arr'">
             <strong>All Rights Reserved</strong>
-            <p>This demonstration version of AcuStock is under a propriety and confidential All Rights Reserved license.
+            <p>This version of AcuStock is under a propriety and confidential All Rights Reserved license.
                 Unauthorized distribution of this application for commercial use, via any medium is strictly prohibited.
                 This program is distributed in the hope that it will be useful,
                 but WITHOUT ANY WARRANTY; without even the implied warranty of
                 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</p>
-            <p>A GPL licensed version of AcuStock is available for a fee. Please contact Michael Wallace &lt;<a href="mailto:michael@wallaceit.com.au">michael@wallaceit.com.au</a>&gt;
+            <p>An open-source GPL licensed version of AcuStock is available for a fee. Please contact Michael Wallace &lt;<a href="mailto:michael@wallaceit.com.au">michael@wallaceit.com.au</a>&gt;
                 if you are interested in purchasing a source code license.</p>
         </div>
         <div *ngIf="license == 'gpl'">

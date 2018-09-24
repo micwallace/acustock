@@ -208,6 +208,8 @@ export class PreferencesProvider {
 
     preferences = {};
 
+    private defaults = {};
+
     constructor() {
         console.log('Hello PreferencesProvider Provider');
 
@@ -218,6 +220,8 @@ export class PreferencesProvider {
             for (let pref of group.preferences) {
                 if (!this.preferences.hasOwnProperty(pref.key))
                     this.preferences[pref.key] = pref.def_value;
+
+                this.defaults[pref.key] = pref.def_value;
             }
         }
     }
@@ -244,6 +248,14 @@ export class PreferencesProvider {
         }
 
         return this.preferences[key];
+    }
+
+    getDefault(key){
+        if (!this.defaults.hasOwnProperty(key)) {
+            return null;
+        }
+
+        return this.defaults[key];
     }
 
     loadPreferences() {

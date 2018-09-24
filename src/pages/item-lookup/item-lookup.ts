@@ -44,7 +44,6 @@ export class ItemLookupPage {
                 public itemAutocompleteService:ItemAutocompleteService,
                 public api:Api,
                 public loadingCtrl:LoadingController,
-                public modalCtrl:ModalController,
                 public barcodeScanner:BarcodeScanner,
                 public cache:CacheProvider,
                 public prefs:PreferencesProvider,
@@ -136,9 +135,9 @@ export class ItemLookupPage {
 
             item.LotSerialDetails = res;
 
-            let modal = this.modalCtrl.create(ItemLookupDetailsPage, {data: item});
-            modal.present();
             this.dismissLoader();
+            //noinspection TypeScriptValidateTypes
+            this.navCtrl.push(ItemLookupDetailsPage, {data: item});
 
         }).catch((err) => {
 

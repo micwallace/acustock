@@ -17,7 +17,7 @@
  */
 
 import { Component } from '@angular/core';
-import { IonicPage, Events, PopoverController } from 'ionic-angular';
+import { IonicPage, Events, PopoverController, NavController } from 'ionic-angular';
 import { ReceiveProvider } from '../../../../providers/app/receive'
 import { ReceivePopover } from "../../receive-popover";
 
@@ -31,6 +31,7 @@ export class ReceiveShipmentListTab {
     objectKeys:any = Object.keys;
 
     constructor(public receiveProvider:ReceiveProvider,
+                public navCtrl:NavController,
                 public popoverCtrl:PopoverController,
                 public events:Events) {
 
@@ -39,6 +40,15 @@ export class ReceiveShipmentListTab {
     presentPopover(event) {
         let popover = this.popoverCtrl.create(ReceivePopover);
         popover.present({ev:event});
+    }
+
+    openReceiptItem(item) {
+
+        this.events.publish('receipts:open', item);
+
+        if (this.navCtrl.parent.selectedIndex !== 0) {
+            this.navCtrl.parent.select(0, {});
+        }
     }
 
     confirmReceipts(){

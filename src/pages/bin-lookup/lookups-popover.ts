@@ -17,7 +17,7 @@
  */
 
 import { Component } from '@angular/core';
-import { ViewController, NavController } from "ionic-angular";
+import { ViewController, NavController, App } from "ionic-angular";
 import { UserguidePage } from "../about/userguide/userguide";
 
 @Component({
@@ -29,14 +29,11 @@ import { UserguidePage } from "../about/userguide/userguide";
 })
 export class LookupsPopover {
 
-    constructor(public viewCtrl: ViewController, public navCtrl:NavController) {}
-
-    dismiss() {
-        this.viewCtrl.dismiss();
-    }
+    constructor(public viewCtrl: ViewController, public navCtrl:NavController, public app:App) {}
 
     openUserguide(){
-        this.navCtrl.push(UserguidePage, {active: 'lookups'});
-        this.dismiss();
+        this.viewCtrl.dismiss().then(()=> {
+            this.app.getRootNav().push(UserguidePage, {active: 'lookups'});
+        });
     }
 }

@@ -17,31 +17,35 @@
  */
 
 import { Component } from '@angular/core';
-import { ViewController, NavController, App } from "ionic-angular";
-import { PreferencesProvider } from "../../providers/core/preferences";
-import {UserguidePage} from "../about/userguide/userguide";
+import { ViewController, NavController } from "ionic-angular";
+import { PreferencesProvider } from "../../../providers/core/preferences";
+import { UtilsProvider } from "../../../providers/core/utils";
 
 @Component({
-    template: `
-    <ion-list no-margin>
-      <button ion-item (click)="openUserguide()">About Receipts</button>
-      <ion-item>
-        <ion-label>Release Receipts</ion-label>
-        <ion-toggle [(ngModel)]="prefs.preferences['release_receipts']"></ion-toggle>
-      </ion-item>
-    </ion-list>
-  `
+    templateUrl: 'qr.html'
 })
-export class ReceivePopover {
+export class QRPage {
+
+    qr = null;
 
     constructor(public viewCtrl: ViewController, public navCtrl:NavController,
-                public app:App, public prefs:PreferencesProvider) {
+                public prefs:PreferencesProvider, public utils:UtilsProvider) {
 
     }
 
-    openUserguide(){
-        this.viewCtrl.dismiss().then(()=> {
-            this.app.getRootNav().push(UserguidePage, {active: 'receipts'});
-        });
+    ionViewDidLoad(){
+        this.qr = JSON.stringify(this.prefs.preferences);
+    }
+
+    dismiss() {
+        this.viewCtrl.dismiss();
+    }
+
+    sendQR(){
+
+    }
+
+    shareQR(){
+
     }
 }

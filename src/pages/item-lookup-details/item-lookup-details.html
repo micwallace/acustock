@@ -19,42 +19,42 @@
 <ion-header>
 
     <ion-navbar>
-        <ion-buttons left>
-            <button navPop ion-button icon-only style="margin-left: 10px;">
-                <ion-icon name="arrow-back"></ion-icon>
-            </button>
-        </ion-buttons>
         <ion-title>Item Location Details</ion-title>
     </ion-navbar>
 
-    <div padding style="padding-bottom: 0;">
-        <h3>Item Details</h3>
-        <table>
-            <tr>
-                <td style="width: 100px;">InventoryID:</td>
-                <td>{{data.InventoryID.value}}</td>
-            </tr>
-            <tr>
-                <td style="vertical-align: top;">Description:</td>
-                <td>{{data.Description.value}}</td>
-            </tr>
-            <tr>
-                <td>Warehouse:</td>
-                <td>{{data.Warehouse.value}}</td>
-            </tr>
-            <tr>
-                <td>Location:</td>
-                <td>{{data.Location.value}}</td>
-            </tr>
-            <tr>
-                <td>Qty On-Hand:</td>
-                <td>{{data.QtyOnHand.value}}</td>
-            </tr>
-            <tr>
-                <td>Qty Available:</td>
-                <td>{{data.QtyAvailable.value}}</td>
-            </tr>
-        </table>
+    <div id="details-container" class="{{detailsCollapsed ? 'collapsed' : ''}}">
+        <div tabbable (click)="toggleCollapsed();">
+            <h3 style="display: inline-block;">Item Details</h3>
+            <ion-icon id="chevron" dark name="ios-arrow-down" style="float:right; margin:"></ion-icon>
+        </div>
+        <div id="details-table">
+            <table>
+                <tr>
+                    <td style="width: 100px;">InventoryID:</td>
+                    <td>{{data.InventoryID.value}}</td>
+                </tr>
+                <tr>
+                    <td style="vertical-align: top;">Description:</td>
+                    <td>{{data.Description.value}}</td>
+                </tr>
+                <tr>
+                    <td>Warehouse:</td>
+                    <td>{{data.Warehouse.value}}</td>
+                </tr>
+                <tr>
+                    <td>Location:</td>
+                    <td>{{data.Location.value}}</td>
+                </tr>
+                <tr>
+                    <td>Qty On-Hand:</td>
+                    <td>{{data.QtyOnHand.value}}</td>
+                </tr>
+                <tr>
+                    <td>Qty Available:</td>
+                    <td>{{data.QtyAvailable.value}}</td>
+                </tr>
+            </table>
+        </div>
         <h5>Serial/Lot Summary</h5>
         <ion-row class="table-header">
             <ion-col col-7>Serial / Lot</ion-col>

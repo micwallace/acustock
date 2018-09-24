@@ -136,9 +136,9 @@ export class BinLookupPage {
 
             item.LotSerialDetails = res;
 
-            let modal = this.modalCtrl.create(ItemLookupDetailsPage, {data: item});
-            modal.present();
             loader.dismiss();
+            //noinspection TypeScriptValidateTypes
+            this.navCtrl.push(ItemLookupDetailsPage, {data: item});
 
         }).catch((err) => {
 

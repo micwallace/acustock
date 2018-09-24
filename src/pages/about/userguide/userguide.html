@@ -28,7 +28,7 @@
 <ion-content>
     <div style="padding: 10px;">
         <div text-center>
-            <img style="width: 80px; text-align: center;" src="../../assets/imgs/logo.png" />
+            <img style="width: 64px; text-align: center;" src="../../../assets/imgs/logo.png" />
             <h6>Version: {{appVersion}}</h6>
         </div>
     </div>
@@ -39,7 +39,31 @@
                         hasMargin="true"
                         headerColor="#488aff"
                         [expanded]="expand === 'picking'">
-            <p text-wrap>Info about the picking page</p>
+
+            <h5>Picking Shipments</h5>
+
+            <h6>Main Screen</h6>
+            <p text-wrap>
+                The main screen allows you to enter or scan a shipment number for picking.
+                Once a shipment is loaded it will display summary information and two buttons:
+            </p>
+            <ul>
+                <li>Start Picking: Will open the entry screen and allow you to start entering un-picked items for the current shipment.
+                    Clicking this button will by default perform an assignment check to make sure that no other devices are currently picking the same shipment.</li>
+                <li>Review Items: Will open a screen showing already picked and total quantities of items and allocations on the shipment.</li>
+            </ul>
+
+            <h6>Entry Screen</h6>
+            <p text-wrap>The entry screen provides three tabs:</p>
+            <ol>
+                <li>Enter: Unpicked item entry</li>
+                <li>Unpicked: Displays all remaining items, grouped by location and ordered by pick sequence.</li>
+                <li>Pending: Displays pending items that have been entered but not committed.
+            </ol>
+            <p>
+
+            </p>
+
         </accordion-list>
         <accordion-list id="transfers"
                         title="Transfers"
@@ -47,6 +71,7 @@
                         hasMargin="true"
                         headerColor="#488aff"
                         [expanded]="expand === 'transfers'">
+            <h5>Transferring Inventory</h5>
             <p text-wrap>Info about the transfer page</p>
         </accordion-list>
         <accordion-list id="receipts"
@@ -55,6 +80,7 @@
                         hasMargin="false"
                         headerColor="#488aff"
                         [expanded]="expand === 'receipts'">
+            <h5>Receiving Shipments</h5>
             <p text-wrap>Info about the receive page</p>
         </accordion-list>
         <accordion-list id="lookups"
@@ -63,6 +89,7 @@
                         hasMargin="false"
                         headerColor="#488aff"
                         [expanded]="expand === 'lookups'">
+            <h5>Inventory Lookup</h5>
             <p text-wrap>Info about the lookup page</p>
         </accordion-list>
         <accordion-list id="adjustments"
@@ -71,6 +98,7 @@
                         hasMargin="false"
                         headerColor="#488aff"
                         [expanded]="expand === 'adjustments'">
+            <h5>Creating Inventory Adjustments</h5>
             <p text-wrap>Info about the adjustment page</p>
         </accordion-list>
         <accordion-list id="counts"
@@ -79,6 +107,7 @@
                         hasMargin="false"
                         headerColor="#488aff"
                         [expanded]="expand === 'counts'">
+            <h5>Physical Count Entry</h5>
             <p text-wrap>Info about the count page</p>
         </accordion-list>
         <accordion-list id="setup"
@@ -87,6 +116,7 @@
                         hasMargin="false"
                         headerColor="#488aff"
                         [expanded]="expand === 'setup'">
+            <h5>Setting Up AcuStock</h5>
             <p text-wrap>Info about setup barcode</p>
         </accordion-list>
     </div>

@@ -16,26 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component } from '@angular/core';
-import { ViewController, NavController, App } from "ionic-angular";
-import { UserguidePage } from "../about/userguide/userguide";
+import { NgModule } from '@angular/core';
+import { IonicPageModule } from 'ionic-angular';
+import { QRPage } from './qr';
 
-@Component({
-    template: `
-    <ion-list no-margin>
-      <button ion-item (click)="openUserguide()">About Picking</button>
-    </ion-list>
-  `
+@NgModule({
+    imports: [
+        IonicPageModule.forChild(QRPage)
+    ],
 })
-export class PickPopover {
-
-    constructor(public viewCtrl: ViewController, public navCtrl:NavController, public app:App) {
-
-    }
-
-    openUserguide(){
-        this.viewCtrl.dismiss().then(()=> {
-            this.app.getRootNav().push(UserguidePage, {active: 'picking'});
-        });
-    }
+export class QRPageModule {
 }

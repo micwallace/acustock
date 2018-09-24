@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, Events } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, Events, AlertController } from 'ionic-angular';
 import { PickShipmentsPage } from "../pick-shipments/pick-shipments";
 import { Api } from '../../providers/providers';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
@@ -7,7 +7,6 @@ import { PreferencesProvider } from "../../providers/core/preferences";
 import { PreferencesPage } from "../preferences/preferences";
 import { UtilsProvider } from "../../providers/core/utils";
 import { CacheProvider } from "../../providers/core/cache";
-import {AlertController} from "ionic-angular/index";
 import { AboutPage } from "../about/about";
 
 /**
@@ -115,16 +114,29 @@ export class SetupPage {
 
         this.api.testConnection(null, null).then((res) => {
 
-            this.cache.getWarehouseList().then((warehouseList:any)=>{
+            if (this.prefs.getPreference('warehouse') == "") {
+
+                this.cache.getWarehouseList().then((warehouseList:any)=> {
+
+                    loader.dismiss();
+                    this.promptForWarehouse(warehouseList);
+
+                }).catch((err) => {
+                    loader.dismiss();
+                    this.utils.playFailedSound(isScan);
+                    this.utils.processApiError("Error", "Connection failed: " + err.message, err, this.navCtrl);
+                });
+
+            } else {
 
                 loader.dismiss();
-                this.promptForWarehouse(warehouseList);
 
-            }).catch((err) => {
-                loader.dismiss();
-                this.utils.playFailedSound(isScan);
-                this.utils.processApiError("Error", "Connection failed: " + err.message, err, this.navCtrl);
-            });
+                if (this.prefs.getPreference("device") === this.prefs.getDefault("device")){
+                    this.promptForDeviceName();
+                } else {
+                    this.setupComplete();
+                }
+            }
 
         }).catch((err) => {
             loader.dismiss();
@@ -143,10 +155,17 @@ export class SetupPage {
                 {
                     text: "OK",
                     handler: (data)=> {
+
                         this.prefs.setPreference("warehouse", data);
+
                         alert.dismiss().then(()=>{
-                            this.promptForDeviceName();
+                            if (this.prefs.getPreference("device") === this.prefs.getDefault("device")){
+                                this.promptForDeviceName();
+                            } else {
+                                this.setupComplete();
+                            }
                         });
+
                         return false;
                     }
                 }
@@ -184,13 +203,7 @@ export class SetupPage {
                     handler: (data)=> {
                         this.prefs.setPreference("device", data.device);
                         alert.dismiss().then(()=>{
-                            if (this.firsTimeSetup){
-                                console.log("Setting root");
-                                this.navCtrl.setRoot(PickShipmentsPage);
-                            } else {
-                                this.navCtrl.pop();
-                            }
-                            this.cache.initialLoad();
+                            this.setupComplete();
                         });
                         return false;
                     }
@@ -199,6 +212,16 @@ export class SetupPage {
         });
 
         alert.present();
+    }
+
+    private setupComplete(){
+        if (this.firsTimeSetup){
+            console.log("Setting root");
+            this.navCtrl.setRoot(PickShipmentsPage);
+        } else {
+            this.navCtrl.pop();
+        }
+        this.cache.initialLoad();
     }
 
 }

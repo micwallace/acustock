@@ -17,33 +17,41 @@
  */
 
 import { Component } from '@angular/core';
-import { ViewController, NavController } from "ionic-angular";
+import { ViewController, NavController, App } from "ionic-angular";
 import { UserguidePage } from "../about/userguide/userguide";
 import { SetupPage } from "../setup/setup";
+import { QRPage } from "./qr/qr";
 
 @Component({
     template: `
     <ion-list no-margin>
       <button ion-item (click)="openUserguide()">About Setup</button>
       <button ion-item (click)="openSetup()">Open Setup</button>
+      <button ion-item (click)="generateQR()">Generate QR</button>
     </ion-list>
   `
 })
 export class PreferencesPopover {
 
-    constructor(public viewCtrl: ViewController, public navCtrl:NavController) {}
+    constructor(public viewCtrl: ViewController, public navCtrl:NavController, public app:App) {
 
-    dismiss() {
-        this.viewCtrl.dismiss();
     }
 
     openUserguide(){
-        this.navCtrl.push(UserguidePage, {active: 'setup'});
-        this.dismiss();
+        this.viewCtrl.dismiss().then(()=> {
+            this.app.getRootNav().push(UserguidePage, {active: 'setup'});
+        });
     }
 
     openSetup(){
-        this.navCtrl.push(SetupPage, {firstTime: false});
-        this.dismiss();
+        this.viewCtrl.dismiss().then(()=> {
+            this.app.getRootNav().push(SetupPage, {firstTime: false});
+        });
+    }
+
+    generateQR(){
+        this.viewCtrl.dismiss().then(()=> {
+            this.app.getRootNav().push(QRPage);
+        });
     }
 }

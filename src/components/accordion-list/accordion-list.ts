@@ -23,7 +23,7 @@ export class AccordionListComponent {
         this.viewHeight = this.elementView.nativeElement.offsetHeight;
 
         if (!this.expanded) {
-            this.renderer.setElementStyle(this.elementView.nativeElement, 'height', 0 + 'px');
+            //this.renderer.setElementStyle(this.elementView.nativeElement, 'height', 0 + 'px');
         }
 
         var ctx = this;
@@ -32,20 +32,21 @@ export class AccordionListComponent {
             // close other sections
             if (accordion.title != ctx.title) {
                 ctx.expanded = false;
-                ctx.renderer.setElementStyle(ctx.elementView.nativeElement, 'height', '0px');
+                //ctx.renderer.setElementStyle(ctx.elementView.nativeElement, 'height', '0px');
             }
         });
     }
 
     toggleAccordion() {
-        this.expanded = !this.expanded;
-        const newHeight = this.expanded ? '100%' : '0px';
 
-        if (this.expanded){
+        if (!this.expanded){
             this.events.publish('section-opened', this);
         }
 
-        this.renderer.setElementStyle(this.elementView.nativeElement, 'height', newHeight);
+        this.expanded = !this.expanded;
+        //const newHeight = this.expanded ? '100%' : '0px';
+
+        //this.renderer.setElementStyle(this.elementView.nativeElement, 'height', newHeight);
     }
 
 }

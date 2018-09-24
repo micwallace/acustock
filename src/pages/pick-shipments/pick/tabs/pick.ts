@@ -83,6 +83,7 @@ export class PickTab {
         this.events.subscribe('picks:cancel', ()=>{
             this.cancelPicks();
         });
+
         this.events.subscribe('picks:open', (indexes)=>{
             this.openPicklistItem(indexes);
         });

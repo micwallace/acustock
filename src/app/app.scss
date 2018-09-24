@@ -138,25 +138,55 @@ ion-auto-complete {
   -webkit-box-shadow: unset;
   box-shadow: unset;
 
+  .item-inner {
+    border-bottom: none;
+  }
+}
+
+.list-md .item-input:last-child,
+.list-md .item-input:last-child {
+  .item-inner {
+    margin-bottom: 1px;
+  }
 }
 
 accordion-list {
   ion-list, ion-list-header {
     margin: 0 !important;
   }
+  .accordion-content {
+    transition: all 0.2s ease;
+    max-height: 0;
+    &.active {
+      max-height: 1000px;
+    }
+  }
   .accordion-content-inner {
     padding: 10px;
+    h1, h2, h3, h4, h5, h6 {
+      margin-bottom: 1rem;
+      font-weight: 500;
+      line-height: 1.2;
+
+    }
+    h5 {
+      font-size: 2rem !important;
+    }
+    h6 {
+      font-size: 1.6rem !important;
+    }
+    white-space: normal !important;
   }
   ion-label {
     margin: 6px 0 !important;
     .accordion-header {
       min-height: 4rem !important;
       ion-icon {
+        transition-duration: 0.2s;
         margin: 0 !important;
       }
       &.active ion-icon {
         transform: rotate(90deg);
-        /*transition-duration: 0.5s;*/
       }
       .item-inner {
         margin-left: 10px !important;
@@ -165,5 +195,11 @@ accordion-list {
         }
       }
     }
+  }
+}
+
+qrcode {
+  img {
+    margin: auto;
   }
 }

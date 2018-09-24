@@ -76,6 +76,8 @@ import { PickPopover } from "../pages/pick-shipments/pick-popover";
 import { LookupsPopover } from "../pages/bin-lookup/lookups-popover";
 import { CountPopover } from "../pages/count/count-popover";
 import { PreferencesPopover } from "../pages/preferences/preferences-popover";
+import { QRPage } from "../pages/preferences/qr/qr";
+import { QRCodeModule } from "angularx-qrcode";
 
 @NgModule({
     declarations: [
@@ -114,6 +116,7 @@ import { PreferencesPopover } from "../pages/preferences/preferences-popover";
         AdjustmentListTab,
         PreferencesPage,
         PreferencesPopover,
+        QRPage,
         AboutPage,
         UserguidePage
     ],
@@ -125,7 +128,8 @@ import { PreferencesPopover } from "../pages/preferences/preferences-popover";
         LoginPageModule,
         SetupPageModule,
         BarcodeListenerComponentModule,
-        AccordionListComponentModule
+        AccordionListComponentModule,
+        QRCodeModule
     ],
     bootstrap: [IonicApp],
     entryComponents: [
@@ -164,6 +168,7 @@ import { PreferencesPopover } from "../pages/preferences/preferences-popover";
         AdjustmentListTab,
         PreferencesPage,
         PreferencesPopover,
+        QRPage,
         AboutPage,
         UserguidePage
     ],

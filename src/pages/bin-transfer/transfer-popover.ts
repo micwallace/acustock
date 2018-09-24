@@ -17,7 +17,7 @@
  */
 
 import { Component } from '@angular/core';
-import { ViewController, NavController } from "ionic-angular";
+import { ViewController, NavController, App } from "ionic-angular";
 import { PreferencesProvider } from "../../providers/core/preferences";
 import { UserguidePage } from "../about/userguide/userguide";
 
@@ -27,21 +27,21 @@ import { UserguidePage } from "../about/userguide/userguide";
       <button ion-item (click)="openUserguide()">About Transfers</button>
       <ion-item>
         <ion-label>Release Transfers</ion-label>
-        <ion-toggle [(ngModel)]="prefs.preferences['release_transfers']" (ionChange)="dismiss();"></ion-toggle>
+        <ion-toggle [(ngModel)]="prefs.preferences['release_transfers']"></ion-toggle>
       </ion-item>
     </ion-list>
   `
 })
 export class TransferPopover {
 
-    constructor(public viewCtrl: ViewController, public navCtrl:NavController, public prefs:PreferencesProvider) {}
+    constructor(public viewCtrl: ViewController, public navCtrl:NavController,
+                public app:App, public prefs:PreferencesProvider) {
 
-    dismiss() {
-        this.viewCtrl.dismiss();
     }
 
     openUserguide(){
-        this.navCtrl.push(UserguidePage, {active: 'transfers'});
-        this.dismiss();
+        this.viewCtrl.dismiss().then(()=> {
+            this.app.getRootNav().push(UserguidePage, {active: 'transfers'});
+        });
     }
 }

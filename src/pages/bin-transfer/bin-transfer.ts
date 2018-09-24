@@ -20,7 +20,6 @@ import { Component, ViewChild } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController, Events, Tabs } from 'ionic-angular';
 import { EnterTab } from "./tabs/enter";
 import { TransferListTab } from "./tabs/transfer-list";
-//import { TransferHistoryTab } from "./tabs/transfer-history";
 import { TransferProvider } from "../../providers/app/transfer";
 
 /**

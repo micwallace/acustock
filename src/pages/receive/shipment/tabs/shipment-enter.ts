@@ -73,12 +73,16 @@ export class ReceiveShipmentEnterTab {
             this.onBarcodeScan(barcodeText)
         });
 
-        this.events.subscribe('receipts:confirm', (barcodeText)=>{
+        this.events.subscribe('receipts:confirm', ()=>{
             this.confirmReceipts();
         });
 
         this.events.subscribe('receipts:clear', ()=>{
             this.clearReceipts();
+        });
+
+        this.events.subscribe('receipts:open', (item)=>{
+            this.setItem(item.InventoryID, false, null, item);
         });
 
         if (this.receiveProvider.hasSavedReceipts()) {
@@ -113,6 +117,7 @@ export class ReceiveShipmentEnterTab {
         this.events.unsubscribe('barcode:scan');
         this.events.unsubscribe('receipts:confirm');
         this.events.unsubscribe('receipts:clear');
+        this.events.unsubscribe('receipts:open');
     }
 
     presentPopover(event) {
@@ -122,7 +127,7 @@ export class ReceiveShipmentEnterTab {
 
     clearReceipts(){
 
-        if (Object.keys(this.receiveProvider.pendingItems).length > 0) {
+        if (this.receiveProvider.pendingQty > 0) {
 
             let alert = this.alertCtrl.create({
                 title: "Cancel Receipts",
@@ -193,7 +198,7 @@ export class ReceiveShipmentEnterTab {
         });
     }
 
-    setItem(itemId, isScan=false, callback=null) {
+    setItem(itemId, isScan=false, callback=null, receiptLine=null) {
 
         if (itemId) {
             this.enteredData.item = itemId;
@@ -213,20 +218,22 @@ export class ReceiveShipmentEnterTab {
         this.cache.getItemById(itemId).then((item:any)=> {
 
             // validate item against source document
-            var line = this.receiveProvider.getSourceLineByInventoryId(item.InventoryID.value);
+            if (receiptLine == null) {
+                receiptLine = this.receiveProvider.getSourceLineByInventoryId(item.InventoryID.value);
 
-            if (line == null){
-                this.showQty = false;
-                this.enteredData.item = "";
-                this.enteredData.qty = 0;
-                this.utils.playFailedSound(isScan);
-                this.dismissLoader().then(()=>{
-                    this.utils.showAlert("Error", "The item does not exist on this transfer/shipment or has already been received on another receipt.");
-                });
-                return;
+                if (receiptLine == null) {
+                    this.showQty = false;
+                    this.enteredData.item = "";
+                    this.enteredData.qty = 0;
+                    this.utils.playFailedSound(isScan);
+                    this.dismissLoader().then(()=> {
+                        this.utils.showAlert("Error", "The item does not exist on this transfer/shipment or has already been received on another receipt.");
+                    });
+                    return;
+                }
             }
 
-            this.currentSourceLine = line;
+            this.currentSourceLine = receiptLine;
             this.showLocation = true;
 
             if (this.enteredData.location != "") {
@@ -238,8 +245,8 @@ export class ReceiveShipmentEnterTab {
                 this.utils.playScanSuccessSound();
 
             // Set default location
-            if (line.hasOwnProperty("LocationID")){
-                this.setLocation(line.LocationID);
+            if (receiptLine.hasOwnProperty("LocationID")){
+                this.setLocation(receiptLine.LocationID);
                 return;
             } else {
                 var warehouseDetails = this.cache.getItemWarehouseDetails(item);
