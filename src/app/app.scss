@@ -158,7 +158,7 @@ accordion-list {
     transition: all 0.2s ease;
     max-height: 0;
     &.active {
-      max-height: 1000px;
+      max-height: 4000px;
     }
   }
   .accordion-content-inner {
