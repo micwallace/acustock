@@ -90,7 +90,7 @@ export class CountPage {
     startCounting() {
 
         if (this.countProvider.physicalCount.Status.value != "Counting In Progress"){
-            this.utils.showAlert("Error", "This physical count is not in progress status and cannot be counted.");
+            this.utils.showAlert("Error", "This physical count is not in progress and cannot be counted.");
             return;
         }
 

@@ -58,7 +58,7 @@
         <h5>Serial/Lot Summary</h5>
         <ion-row class="table-header">
             <ion-col col-7>Serial / Lot</ion-col>
-            <ion-col col-5 text-right>On-Hand / Available</ion-col>
+            <ion-col col-5 text-right>Available / On-Hand</ion-col>
         </ion-row>
     </div>
 </ion-header>
@@ -71,7 +71,7 @@
                     <strong>{{serial.LotSerialNbr.value}}</strong>
                 </ion-col>
                 <ion-col col-5 class="column-right">
-                    {{serial.QtyOnHand.value}} / {{serial.QtyAvailable.value}}
+                    {{serial.QtyAvailable.value}} / {{serial.QtyOnHand.value}}
                 </ion-col>
             </ion-row>
         </ion-item>

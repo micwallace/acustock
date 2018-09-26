@@ -410,12 +410,16 @@ export class ReceiveShipmentEnterTab {
             this.cache.flushItemLocationCache();
             this.events.publish("closeReceiveScreen");
 
+            console.log(res);
+
+            console.log(this.receiveProvider.transferShipment);
+
             var msg;
             if (this.receiveProvider.type == "shipment"){
                 msg = "Shipment #"+res.ShipmentNbr.value+" was successfully updated";
             } else {
-                msg = (this.receiveProvider.transferShipmentRef == null ? "IN" : "PO") + " Receipt #" +
-                    (this.receiveProvider.transferShipmentRef == null ? res.ReceiptNbr.value : res.ReferenceNbr.value) +
+                msg = (this.receiveProvider.transferShipment == null ? "IN" : "PO") + " Receipt #" +
+                    (this.receiveProvider.transferShipment == null ? res.ReferenceNbr.value : res.ReceiptNbr.value) +
                     " was successfully created" + (res.released ? " and released" : "");
             }
 

@@ -60,21 +60,17 @@
   ion-footer,
   ion-item,
   ion-list {
-    background-color: #3f3f3f !important;
-    background: #3f3f3f !important;
+    background-color: #353535 !important;
+    background: #353535 !important;
     color: white !important;
     & > .item-inner, & > .input-wrapper, & > ion-label {
-      background-color: #3f3f3f !important;
-      background: #3f3f3f !important;
+      background-color: #353535 !important;
+      background: #353535 !important;
     }
   }
 
   .accordion-content-inner p {
     color: #000
-  }
-
-  ion-list {
-    background-color: #100815;
   }
   .time {
     background-color: white;

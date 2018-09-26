@@ -49,15 +49,15 @@
 
 <ion-content padding>
     <ion-row class="table-header">
-        <ion-col col-7>Item</ion-col>
-        <ion-col col-5 text-right>On-Hand / Available</ion-col>
+        <ion-col col-5>Item</ion-col>
+        <ion-col col-7 text-right>Available / On-Hand</ion-col>
     </ion-row>
     <ion-list class="item-list">
         <ion-item class="list-item" no-padding tappable *ngFor="let item of binContents" (click)="openDetailsModal($event, item);">
             <ion-row>
                 <ion-col col-7><strong>{{item.InventoryID.value}}</strong></ion-col>
                 <ion-col col-5 class="column-right">
-                    {{item.QtyOnHand.value}} / {{item.QtyAvailable.value}}
+                    {{item.QtyAvailable.value}} / {{item.QtyOnHand.value}}
                 </ion-col>
             </ion-row>
         </ion-item>

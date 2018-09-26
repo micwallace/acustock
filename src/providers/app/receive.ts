@@ -31,7 +31,7 @@ export class ReceiveProvider {
 
     public sourceDocument = null;
 
-    public transferShipmentRef = null;
+    public transferShipment = null;
 
     public type = "";
 
@@ -52,14 +52,14 @@ export class ReceiveProvider {
     private lastRequest:any = "";
 
     constructor(public api:Api, public prefs:PreferencesProvider) {
-        console.log('Hello ReceiveProvider Provider');
+
     }
 
     public loadReceipt(referenceNbr, type) {
 
         return new Promise((resolve, reject)=> {
 
-            this.transferShipmentRef = null;
+            this.transferShipment = null;
             this.pendingItems = {};
             this.pendingQty = 0;
 
@@ -94,10 +94,10 @@ export class ReceiveProvider {
 
                     let shipment = res;
 
-                    if (shipment.Operation.value != "Receipt" && shipment.Type.value != "Transfer"){
+                    /*if (shipment.Operation.value != "Receipt" && shipment.Type.value != "Transfer"){
                         reject({message: "Shipment #" + referenceNbr + " was found but is not a transfer or receipt shipment."});
                         return;
-                    }
+                    }*/
 
                     if (shipment.Type.value == "Shipment" && shipment.Operation.value == "Receipt") {
 
@@ -138,7 +138,7 @@ export class ReceiveProvider {
                         }
 
                         // TODO: allow selection of transfer? Can a transfer shipment even have more than one transfer document?
-                        this.transferShipmentRef = transferRefs[0];
+                        this.transferShipment = transferRefs[0];
 
                         referenceNbr = transferRefs[0].InventoryRefNbr;
 
@@ -197,6 +197,11 @@ export class ReceiveProvider {
         });
 
     }
+
+    // TODO: Use separate function for loading transfers.
+    /*private loadTransfer(referenceNbr){
+
+    }*/
 
     private initialiseSource() {
 
@@ -436,7 +441,7 @@ export class ReceiveProvider {
 
                     loader.data.content = "Confirming Shipment...";
 
-                    this.api.confirmShipment(data.ShipmentNbr.value).then((releaseRes)=> {
+                    this.api.confirmShipment(data.ShipmentNbr.value).then((res)=> {
 
                         this.postConfirmSuccess();
 
@@ -458,7 +463,7 @@ export class ReceiveProvider {
                 return;
             }
 
-            if (this.type == "purchase" || this.transferShipmentRef != null){
+            if (this.type == "purchase" || this.transferShipment != null){
                 // Add purchase receipt document
                 data = this.getPurchaseReceiptObject();
 
@@ -479,18 +484,27 @@ export class ReceiveProvider {
 
                         loader.data.content = "Reloading document...";
 
-                        var sourceId = this.type == "purchase" ? this.sourceDocument.OrderNbr.value : this.transferShipmentRef.ShipmentNbr;
+                        var sourceId = this.type == "purchase" ? this.sourceDocument.OrderNbr.value : this.transferShipment.ShipmentNbr;
 
                         res.released = true;
 
-                        this.loadReceipt(sourceId, this.type).then((res)=>{
+                        this.loadReceipt(sourceId, this.type).then((reloadRes)=>{
                             resolve(res);
                         }).catch((err)=> {
                             reject(err);
                         });
 
                     }).catch((err)=> {
-                        reject(err);
+
+                        loader.data.content = "Failed to release, reverting changes...";
+
+                        this.api.deletePurchaseReceipt(res.id).then((deleteRes:any)=> {
+                            err.message = "Failed to release purchase receipt. " + err.message;
+                            reject(err);
+                        }).catch((derror)=> {
+                            err.message = "Failed to release purchase receipt and revert changes. Please delete purchase receipt #" + res.ReceiptNbr.value + " manually." + err.message + " " + derror.message;
+                            reject(err);
+                        });
                     });
 
                 }).catch((err)=>{
@@ -521,14 +535,23 @@ export class ReceiveProvider {
 
                         res.released = true;
 
-                        this.loadReceipt(this.sourceDocument.ReferenceNbr.value, "transfer").then((res)=> {
+                        this.loadReceipt(this.sourceDocument.ReferenceNbr.value, "transfer").then((reloadRes)=> {
                             resolve(res);
                         }).catch((err)=> {
                             reject(err);
                         });
 
                     }).catch((err)=> {
-                        reject(err);
+
+                        loader.data.content = "Failed to release, reverting changes...";
+
+                        this.api.deleteReceipt(res.ReferenceNbr.value).then((deleteRes:any)=> {
+                            err.message = "Failed to release receipt. " + err.message;
+                            reject(err);
+                        }).catch((derror)=> {
+                            err.message = "Failed to release receipt and revert changes. Please delete receipt #" + res.ReferenceNbr.value + " manually." + err.message + " " + derror.message;
+                            reject(err);
+                        });
                     });
 
                 }).catch((err)=> {
@@ -695,9 +718,9 @@ export class ReceiveProvider {
             } else {
                 item.OrigRefNbr = this.sourceDocument.ReferenceNbr;
                 item.OrigLineNbr = {value: i};
-                item.TransferOrderNbr = {value: this.transferShipmentRef.OrderNbr};
-                item.TransferOrderType = {value: this.transferShipmentRef.OrderType};
-                item.TransferShipmentNbr = {value: this.transferShipmentRef.ShipmentNbr};
+                item.TransferOrderNbr = {value: this.transferShipment.OrderNbr};
+                item.TransferOrderType = {value: this.transferShipment.OrderType};
+                item.TransferShipmentNbr = {value: this.transferShipment.ShipmentNbr};
             }
 
             for (var y in pending.Allocations) {

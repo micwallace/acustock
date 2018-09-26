@@ -43,7 +43,7 @@ export class UserguidePage {
     ionViewDidLoad(){
         if (this.expand != null) {
             let yOffset = document.getElementById(this.expand).offsetTop;
-            this.content.getScrollElement().scrollTo(0, yOffset + 800);
+            this.content.getScrollElement().scrollTo(0, yOffset);
         }
     }
 

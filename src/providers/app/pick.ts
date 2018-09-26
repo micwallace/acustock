@@ -52,7 +52,7 @@ export class PickProvider {
     private lastRequest:any = "";
 
     constructor(public api:Api, public cache:CacheProvider, public loadingCtrl:LoadingController, public prefs:PreferencesProvider) {
-        console.log('Hello PickProvider Provider');
+
     }
 
     public loadShipment(shipmentNbr) {

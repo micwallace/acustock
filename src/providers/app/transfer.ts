@@ -39,9 +39,7 @@ export class TransferProvider {
     private lastRequest:any = "";
 
     constructor(public api:Api, public cache:CacheProvider, public loadingCtrl:LoadingController, public prefs:PreferencesProvider) {
-        console.log('Hello TransferProvider Provider');
         this.loadPending();
-        //this.loadHistory();
     }
 
     private loadPending() {
@@ -166,7 +164,7 @@ export class TransferProvider {
                 WarehouseID: {value: warehouse},
                 ToWarehouseID: {value: warehouse},
                 Hold: {value: false},
-                Description: {value: "AcuShip Location Transfer"},
+                Description: {value: "AcuStock Location Transfer"},
                 Details: []
             };
 

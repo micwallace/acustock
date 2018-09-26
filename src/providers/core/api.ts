@@ -200,12 +200,20 @@ export class Api {
         return this.postActionAndGetResult("Receipt/ReleaseReceipt", {entity: {ReferenceNbr: {value: referenceNbr}}});
     }
 
+    deleteReceipt(referenceNbr){
+        return this.delete("Receipt/" + referenceNbr);
+    }
+
     putPurchaseReceipt(data){
         return this.put("PurchaseReceipt", data, {});
     }
 
     releasePurchaseReceipt(referenceNbr){
         return this.postActionAndGetResult("PurchaseReceipt/ReleasePurchaseReceipt", {entity: {ReceiptNbr: {value: referenceNbr}}});
+    }
+
+    deletePurchaseReceipt(referenceNbr){
+        return this.delete("PurchaseReceipt/" + referenceNbr);
     }
 
     getTransfer(referenceNbr){

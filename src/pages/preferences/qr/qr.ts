@@ -20,6 +20,7 @@ import { Component } from '@angular/core';
 import { ViewController, NavController } from "ionic-angular";
 import { PreferencesProvider } from "../../../providers/core/preferences";
 import { UtilsProvider } from "../../../providers/core/utils";
+import { SocialSharing } from '@ionic-native/social-sharing';
 
 @Component({
     templateUrl: 'qr.html'
@@ -29,7 +30,7 @@ export class QRPage {
     qr = null;
 
     constructor(public viewCtrl: ViewController, public navCtrl:NavController,
-                public prefs:PreferencesProvider, public utils:UtilsProvider) {
+                public prefs:PreferencesProvider, public utils:UtilsProvider, public sharing:SocialSharing) {
 
     }
 
@@ -41,11 +42,26 @@ export class QRPage {
         this.viewCtrl.dismiss();
     }
 
-    sendQR(){
+    private static getQRCodeString(){
 
+        var imgs = document.getElementById('qrcode').getElementsByTagName('img');
+
+        if (imgs.length > 0){
+
+            var imgSrc = imgs[0].src;
+
+            //imgSrc = imgSrc.substring(imgSrc.indexOf(',') + 1);
+            console.log(imgSrc);
+
+            return imgSrc;
+        }
+
+        return "";
     }
 
     shareQR(){
-
+        this.sharing.share("Scan this QR code on the setup screen of other devices to quickly set them up.", "AcuStock setup QR", QRPage.getQRCodeString()).catch((err)=>{
+            this.utils.showAlert("Error", err);
+        });
     }
 }

@@ -97,7 +97,7 @@ export class UtilsProvider {
                 attachments: [
                     'base64:error-information.json//' + btoa(JSON.stringify(errorData))
                 ],
-                subject: 'AcuShip Error Report',
+                subject: 'AcuStock Error Report',
                 body: (exception.hasOwnProperty('exception') ? 'Error Summary: ' + exception.exception.message + '<br/>' : '') + 'Additional Information:',
                 isHtml: true
             };

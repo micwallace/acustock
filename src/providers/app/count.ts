@@ -50,7 +50,6 @@ export class CountProvider {
     private lastRequest:any = "";
 
     constructor(public api:Api, public prefs:PreferencesProvider) {
-        console.log('Hello CountProvider Provider');
     }
 
     public loadCount(referenceNbr) {

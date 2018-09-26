@@ -79,12 +79,12 @@
                 {{receiveProvider.sourceDocument.OrderNbr.value}}
             </ion-col>
         </ion-row>
-        <ion-row *ngIf="receiveProvider.transferShipmentRef">
+        <ion-row *ngIf="receiveProvider.transferShipment">
             <ion-col>
-                <label>Transfer Shipment #:</label>
+                <label>Trans. Shipment #:</label>
             </ion-col>
             <ion-col>
-                {{receiveProvider.transferShipmentRef.ShipmentNbr}}
+                {{receiveProvider.transferShipment.ShipmentNbr}}
             </ion-col>
         </ion-row>
         <ion-row>

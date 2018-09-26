@@ -35,12 +35,9 @@ export class AdjustmentProvider {
     public pendingVariance = 0;
 
     private lastRequest:any = "";
-    //public AdjustmentHistory = [];
 
     constructor(public api:Api, public prefs:PreferencesProvider) {
-        console.log('Hello AdjustmentProvider Provider');
         this.loadPending();
-        //this.loadHistory();
     }
 
     private loadPending() {
@@ -55,18 +52,6 @@ export class AdjustmentProvider {
     private savePending() {
         localStorage.setItem("unconfirmed_adjustments", JSON.stringify(this.pendingItems));
     }
-
-    /*private loadHistory() {
-
-        var history = JSON.parse(localStorage.getItem("adjustment_history"));
-        if (history)
-            this.adjustmentHistory = history;
-    }
-
-    private addHistory(adjustmentObject) {
-        this.adjustmentHistory.unshift(adjustmentObject);
-        localStorage.setItem("adjustment_history", JSON.stringify(this.adjustmentHistory))
-    }*/
 
     public calcTotalQuantities() {
         this.pendingVariance = 0;

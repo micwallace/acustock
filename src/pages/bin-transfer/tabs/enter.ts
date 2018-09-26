@@ -366,7 +366,6 @@ export class EnterTab {
 
         this.enteredData.item = "";
         this.enteredData.qty = 0;
-        this.showItem = false;
         this.showQty = false;
     }
 

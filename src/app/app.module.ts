@@ -78,6 +78,7 @@ import { CountPopover } from "../pages/count/count-popover";
 import { PreferencesPopover } from "../pages/preferences/preferences-popover";
 import { QRPage } from "../pages/preferences/qr/qr";
 import { QRCodeModule } from "angularx-qrcode";
+import { SocialSharing } from '@ionic-native/social-sharing';
 
 @NgModule({
     declarations: [
@@ -177,6 +178,7 @@ import { QRCodeModule } from "angularx-qrcode";
         SplashScreen,
         {provide: ErrorHandler, useClass: IonicErrorHandler},
         BarcodeScanner,
+        SocialSharing,
         Api,
         HTTP,
         CacheProvider,

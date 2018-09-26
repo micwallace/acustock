@@ -52,18 +52,37 @@
                     Clicking this button will by default perform an assignment check to make sure that no other devices are currently picking the same shipment.</li>
                 <li>Review Items: Will open a screen showing already picked and total quantities of items and allocations on the shipment.</li>
             </ul>
+            <p>
+                Clicking on the start picking button will run a check to make sure no other devices are picking the shipment and assign it to the current device.
+            </p>
 
-            <h6>Entry Screen</h6>
-            <p text-wrap>The entry screen provides three tabs:</p>
+            <h6>Pick Entry Screen</h6>
+            <p>The entry screen provides three tabs:</p>
             <ol>
                 <li>Enter: Unpicked item entry</li>
-                <li>Unpicked: Displays all remaining items, grouped by location and ordered by pick sequence.</li>
+                <li>
+                    Unpicked: Displays all remaining items, grouped by location and ordered by pick sequence.
+                    It does not include quantities that have already been picked.
+                    To see all items, use the Review Items button on the main screen.
+                </li>
                 <li>Pending: Displays pending items that have been entered but not committed.
             </ol>
             <p>
-
+                To pick items, start by scanning or entering a bin location, then scan items as you take them from the shelf.
+                You can also click on an item in the picklist to load it into the entry form.
+                If you scan a different product, location or press the commit button, the currently entered item gets automatically added onto the pending list.
+                To update the location you can scan another location barcode at any time.
             </p>
-
+            <p>
+                Pressing the arrow buttons will allow you to move between the items remaining on the pick list and display the suggested (allocation) values in the left hand column.
+                If you scan a location that is different to what is allocated you will be prompted to confirm the change.
+                If you over-pick an allocation, the quantities of the other allocations will be reduced in the order in which they appear on the pick list.
+            </p>
+            <p>
+                Clicking on an item in the pending list will allow you to update it's quantity and
+                Once you have picked all items click on the commit picks button to finalise the process.
+                In Acumatica, this adjusts any allocations you have altered, sets the picked quantity field and changes the pick status to partially picked or picked.
+            </p>
         </accordion-list>
         <accordion-list id="transfers"
                         title="Transfers"
@@ -72,7 +91,28 @@
                         headerColor="#488aff"
                         [expanded]="expand === 'transfers'">
             <h5>Transferring Inventory</h5>
-            <p text-wrap>Info about the transfer page</p>
+
+            <p>
+                The transfer function allows you to transfer stock between locations (bins) in the same warehouse.
+                It's best used for transferring a lot of items from a single location to 1 or more destination locations.
+                The screen has 2 tabs, entry and pending, the latter of which lists entered items that have not been committed.
+                To transfer items use the following steps:
+            </p>
+            <ol>
+                <li>Scan (or enter) the "from bin".</li>
+                <li>Physically take the stock to the destination location.</li>
+                <li>Scan the "to bin"</li>
+                <li>Scan or each item as you are putting them in the destination location. When you scan a new item, the currently entered item is added onto the pending list.</li>
+            </ol>
+            <p>
+                If you make a mistake, you can edit the quantity on the entry screen or by clicking on the item in the pending list.
+                Once you have entered all items, click on the commit button to submit the transfer.
+            </p>
+            <p>
+                By default transfers are released when submitted,
+                but you can easily change this option on the fly from the transfer screen context menu in the top right hand corner.
+                This can be helpful if you would like to review the transfer in Acumatica before releasing.
+            </p>
         </accordion-list>
         <accordion-list id="receipts"
                         title="Receipts"
@@ -81,7 +121,56 @@
                         headerColor="#488aff"
                         [expanded]="expand === 'receipts'">
             <h5>Receiving Shipments</h5>
-            <p text-wrap>Info about the receive page</p>
+            <p>The receipt screen allows you to receive the following items in Acumatica:</p>
+            <ul>
+                <li>Receipt shipments (customer returns)</li>
+                <li>Purchase orders</li>
+                <li>Transfers (either transfer shipments or IN transfers)</li>
+            </ul>
+            <h6>Main Screen</h6>
+            <p>
+                To start enter a shipment (transfer or receipt), transfer or purchase order number.
+                When successfully loaded, the screen shows summary information for the loaded document, including total and already received (committed) quantities.
+                Click on the add receipt button to start receiving items.
+            </p>
+            <h6>Entry Screen</h6>
+            <p>The entry screen provides three tabs:</p>
+            <ol>
+                <li>Enter: Receipt item entry.</li>
+                <li>Pending: Displays pending items that have been entered but not committed.</li>
+                <li>
+                    Items: Displays all items on the current document which are destined for the current warehouse.
+                    The received qty displayed includes pending items.
+                </li>
+            </ol>
+            <p>
+                To receive items, start by entering or scanning an item. You can also click on an item in the items list to load it into the entry form.
+                A default location will be set based on:
+            </p>
+            <ol>
+                <li>The location on the shipment (for the receipt shipment)</li>
+                <li>The default receipt location for the item, as set on the "Item Warehouse Details" screen in Acumatica</li>
+                <li>The default receipt location for the warehouse, as set on the warehouses configuration screen in Acumatica.</li>
+            </ol>
+            <p>
+                <!--TODO: Check this is correct -->
+                You can scan a location barcode at any time to override the receipt location for the current item.
+                If you scan a different item, the currently entered item gets automatically added onto the pending list.
+            </p>
+            <p>
+                If you make a mistake, you can edit the quantity on the entry screen or by clicking on the item in the pending list.
+                Once you have entered all items, click on the commit button to submit the receipt.
+            </p>
+            <p>
+                When receiving Purchase orders and transfer shipments, a purchase receipt document is created in Acumatica.
+                If a transfer number is entered, an inventory receipt is created instead.
+                For receipt shipments, if there are items that have not been received, the shipped quantity will be adjusted and the shipment confirmed.
+            </p>
+            <p>
+                By default all receipts and purchase receipts are released when submitted,
+                but you can easily change this option on the fly from the transfer screen context menu in the top right hand corner.
+                This can be helpful if you would like to review the receipt in Acumatica before releasing.
+            </p>
         </accordion-list>
         <accordion-list id="lookups"
                         title="Item/Bin Lookup"
@@ -90,7 +179,14 @@
                         headerColor="#488aff"
                         [expanded]="expand === 'lookups'">
             <h5>Inventory Lookup</h5>
-            <p text-wrap>Info about the lookup page</p>
+            <p>
+                The Item and Bin (location) lookup pages allow you to quickly lookup inventory quantities and other details.
+
+            </p>
+            <h6>Item Details Page</h6>
+            <p>
+                TBC
+            </p>
         </accordion-list>
         <accordion-list id="adjustments"
                         title="Adjustments"
@@ -99,7 +195,10 @@
                         headerColor="#488aff"
                         [expanded]="expand === 'adjustments'">
             <h5>Creating Inventory Adjustments</h5>
-            <p text-wrap>Info about the adjustment page</p>
+            <p>This screen provides a quick way to stock-take a few items, without going through the added steps of setting up a physical count.</p>
+            <p>
+                TBC
+            </p>
         </accordion-list>
         <accordion-list id="counts"
                         title="Physical Count"
@@ -108,7 +207,10 @@
                         headerColor="#488aff"
                         [expanded]="expand === 'counts'">
             <h5>Physical Count Entry</h5>
-            <p text-wrap>Info about the count page</p>
+            <p>The screen allows you to enter physical counts (stock-take) and is the equivalent of using the Physical inventory review screen in Acumatica to enter counted stock</p>
+            <p>
+                TBC
+            </p>
         </accordion-list>
         <accordion-list id="setup"
                         title="Setup"
@@ -117,7 +219,21 @@
                         headerColor="#488aff"
                         [expanded]="expand === 'setup'">
             <h5>Setting Up AcuStock</h5>
-            <p text-wrap>Info about setup barcode</p>
+            <h6>Acumatica Customisation Project</h6>
+            <p>
+                TBC
+            </p>
+            <p>
+                AcuStock can be configured manually via the settings screen or by scanning a special configuration barcode.
+                The application provides an easy option to generate a configuration barcodes from the devices current configuration.
+                Use the following steps to generate config barcodes:
+            </p>
+            <ol>
+                <li>From the main menu, click on settings.</li>
+                <li>If required, change the current preferences to those that you would like to export.</li>
+                <li>From the context menu in the top right hand corner, click on the Generate QR option.</li>
+                <li>The generated QR will be displayed. Click on the share button to send the image or use other devices to scan the configuration directly from the screen.</li>
+            </ol>
         </accordion-list>
     </div>
 </ion-content>

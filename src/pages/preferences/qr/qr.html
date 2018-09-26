@@ -24,8 +24,7 @@
 
 <ion-content padding text-center>
     <div text-center style="margin-bottom: 20px;">
-        <qrcode [qrdata]="qr" [size]="256" [level]="'M'"></qrcode>
+        <qrcode id="qrcode" [qrdata]="qr" [size]="256" [level]="'M'"></qrcode>
     </div>
-    <button ion-button (click)="sendQR();">Send</button>
     <button ion-button (click)="shareQR();">Share</button>
 </ion-content>

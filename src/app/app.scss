@@ -164,16 +164,18 @@ accordion-list {
   .accordion-content-inner {
     padding: 10px;
     h1, h2, h3, h4, h5, h6 {
-      margin-bottom: 1rem;
+      margin: 1rem 0;
       font-weight: 500;
       line-height: 1.2;
-
     }
     h5 {
       font-size: 2rem !important;
     }
     h6 {
       font-size: 1.6rem !important;
+    }
+    p, li {
+      margin: 1rem 0;
     }
     white-space: normal !important;
   }
