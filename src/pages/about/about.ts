@@ -20,7 +20,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import {UserguidePage} from "./userguide/userguide";
 declare function require(moduleName: string): any;
-const { version : appVersion } = require('../../../package.json');
+const { version : appVersion, versionType: versionType } = require('../../../package.json');
 
 @IonicPage()
 @Component({
@@ -34,7 +34,7 @@ export class AboutPage {
     public license = "arr";
 
     constructor(public navCtrl:NavController, public navParams:NavParams) {
-        this.appVersion = appVersion
+        this.appVersion = appVersion + versionType;
     }
 
     openUserguide(){

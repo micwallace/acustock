@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { NgModule, ErrorHandler } from '@angular/core';
+import { NgModule, ErrorHandler, Injectable, Injector } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { AcuStock } from './app.component';
@@ -79,6 +79,34 @@ import { PreferencesPopover } from "../pages/preferences/preferences-popover";
 import { QRPage } from "../pages/preferences/qr/qr";
 import { QRCodeModule } from "angularx-qrcode";
 import { SocialSharing } from '@ionic-native/social-sharing';
+import { Pro } from '@ionic/pro';
+declare function require(moduleName: string): any;
+const { version : appVersion } = require('../../package.json');
+
+Pro.init('cb4667f2', {
+    appVersion: appVersion
+});
+
+@Injectable()
+export class MyErrorHandler implements ErrorHandler {
+    ionicErrorHandler: IonicErrorHandler;
+
+    constructor(injector: Injector) {
+        try {
+            this.ionicErrorHandler = injector.get(IonicErrorHandler);
+        } catch(e) {
+            // Unable to get the IonicErrorHandler provider, ensure
+            // IonicErrorHandler has been added to the providers list below
+        }
+    }
+
+    handleError(err: any): void {
+        Pro.monitoring.handleNewError(err);
+        // Remove this if you want to disable Ionic's auto exception handling
+        // in development mode.
+        this.ionicErrorHandler && this.ionicErrorHandler.handleError(err);
+    }
+}
 
 @NgModule({
     declarations: [
@@ -176,7 +204,6 @@ import { SocialSharing } from '@ionic-native/social-sharing';
     providers: [
         StatusBar,
         SplashScreen,
-        {provide: ErrorHandler, useClass: IonicErrorHandler},
         BarcodeScanner,
         SocialSharing,
         Api,
@@ -192,7 +219,9 @@ import { SocialSharing } from '@ionic-native/social-sharing';
         ReceiveProvider,
         AdjustmentProvider,
         Vibration,
-        EmailComposer
+        EmailComposer,
+        IonicErrorHandler,
+        { provide: ErrorHandler, useClass: MyErrorHandler }
     ]
 })
 export class AppModule {

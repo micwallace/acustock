@@ -34,10 +34,10 @@
         <ion-item-group class="preference-group" *ngFor="let group of preferences.schema">
                 <ion-item-divider class="preference-header">
                     <ion-icon name="settings"></ion-icon>
-                    <ion-label>{{group.title}}</ion-label>
+                    <ion-label color="primary">{{group.title}}</ion-label>
                 </ion-item-divider>
                 <ion-item *ngFor="let pref of group.preferences">
-                    <ion-label color="primary">{{pref.title}}</ion-label>
+                    <ion-label>{{pref.title}}</ion-label>
 
                     <ion-input *ngIf="['text', 'password', 'url', 'number'].indexOf(pref.type) > -1"
                                placeholder="{{pref.placeholder}}" type="{{pref.type}}"
@@ -57,6 +57,23 @@
                         </ion-option>
                     </ion-select>
                 </ion-item>
+        </ion-item-group>
+        <ion-item-group class="preference-group">
+            <ion-item-divider class="preference-header">
+                <ion-icon name="settings"></ion-icon>
+                <ion-label color="primary">Update</ion-label>
+            </ion-item-divider>
+            <ion-item tappable (click)="checkForUpdate();">
+                <ion-label>Check for update</ion-label>
+            </ion-item>
+            <ion-item>
+                <ion-label>Change version</ion-label>
+                <ion-select (ionChange)="switchVersion();">
+                    <ion-option [selected]="">
+                        Test
+                    </ion-option>
+                </ion-select>
+            </ion-item>
         </ion-item-group>
     </ion-list>
 </ion-content>

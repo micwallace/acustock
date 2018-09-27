@@ -19,7 +19,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { IonicPage, NavController, NavParams, Content } from 'ionic-angular';
 declare function require(moduleName: string): any;
-const { version : appVersion } = require('../../../../package.json');
+const { version : appVersion, versionType: versionType } = require('../../../../package.json');
 
 @IonicPage()
 @Component({
@@ -35,7 +35,7 @@ export class UserguidePage {
     public expand = null;
 
     constructor(public navCtrl:NavController, public navParams:NavParams) {
-        this.appVersion = appVersion;
+        this.appVersion = appVersion + versionType;
         if (this.navParams.get('active'))
             this.expand = this.navParams.get('active');
     }

@@ -79,7 +79,7 @@
                 If you over-pick an allocation, the quantities of the other allocations will be reduced in the order in which they appear on the pick list.
             </p>
             <p>
-                Clicking on an item in the pending list will allow you to update it's quantity and
+                Clicking on an item in the pending list will allow you to update it's quantity and clicking on a picklist item will open the item on the entry tab.
                 Once you have picked all items click on the commit picks button to finalise the process.
                 In Acumatica, this adjusts any allocations you have altered, sets the picked quantity field and changes the pick status to partially picked or picked.
             </p>
@@ -168,7 +168,7 @@
             </p>
             <p>
                 By default all receipts and purchase receipts are released when submitted,
-                but you can easily change this option on the fly from the transfer screen context menu in the top right hand corner.
+                but you can easily change this option on the fly from the receive screen context menu in the top right hand corner.
                 This can be helpful if you would like to review the receipt in Acumatica before releasing.
             </p>
         </accordion-list>
@@ -181,12 +181,18 @@
             <h5>Inventory Lookup</h5>
             <p>
                 The Item and Bin (location) lookup pages allow you to quickly lookup inventory quantities and other details.
-
+                Both pages include an auto complete inventory ID or barcode input so you can quickly lookup items without scanning.
             </p>
+            <p>
+                When an item is selected or scanned, the locations of the item are displayed along with available and on hand quantities.
+                Likewise scanning or selecting a location will display the contents of the location.
+                Clicking on an item will display item details, along with lot/serial numbers if applicable.
+            </p>
+            <!-- // TODO: Allocation/History lookup
             <h6>Item Details Page</h6>
             <p>
                 TBC
-            </p>
+            </p>-->
         </accordion-list>
         <accordion-list id="adjustments"
                         title="Adjustments"
@@ -195,9 +201,20 @@
                         headerColor="#488aff"
                         [expanded]="expand === 'adjustments'">
             <h5>Creating Inventory Adjustments</h5>
-            <p>This screen provides a quick way to stock-take a few items, without going through the added steps of setting up a physical count.</p>
             <p>
-                TBC
+                This screen provides a quick way to stock-take a few items, without going through the added steps of setting up a physical count.
+                It contains two tabs, entry and pending. If there are already pending adjustments when returning to this screen,
+                the book quantities are refresh and any items with changes are removed from the list to prevent making adjustments with outdated data.
+            </p>
+            <p>
+                To adjust stock first scan or enter a location and then an item. The book quantity will be displayed, along with the variance qty.
+                Scanning each item or adjusting the quantity will recalculate the variance.
+                You can scan a new item or location at any time. If there's a valid item already entered, it's added to the pending list before the new values are updated.
+            </p>
+            <p>
+                By default adjustments are released when submitted,
+                but you can easily change this option on the fly from the adjustment screen context menu in the top right hand corner.
+                This can be helpful if you would like to review the adjustment in Acumatica before releasing.
             </p>
         </accordion-list>
         <accordion-list id="counts"
@@ -207,9 +224,25 @@
                         headerColor="#488aff"
                         [expanded]="expand === 'counts'">
             <h5>Physical Count Entry</h5>
-            <p>The screen allows you to enter physical counts (stock-take) and is the equivalent of using the Physical inventory review screen in Acumatica to enter counted stock</p>
             <p>
-                TBC
+                The screen allows you to enter physical counts (stock-take) and is the equivalent of using the Physical inventory review screen in Acumatica to enter counted stock.
+                It consists of 3 tabs:
+            </p>
+            <ol>
+                <li>Enter: Count item entry.</li>
+                <li>Pending: Displays pending items that have been counted but not committed.</li>
+                <li>
+                    List: Displays all items on the physical count.
+                </li>
+            </ol>
+            <p>
+                To count stock first scan or enter a location and then an item. The book quantity will be displayed, along with the already counted and pending quantities.
+                You can scan a new item or location at any time. If there's a valid item already entered, it's added to the pending list before the new values are updated.
+                Clicking on an item in the list tab allows you to quickly open it on the entry tab without scanning or manual entry.
+            </p>
+            <p>
+                If you make a mistake, you can edit the quantity on the entry screen or by clicking on the item in the pending list.
+                Once you have counted some items, click on the commit button to submit your counts. It is advisable to do this frequently, such as after every location or pallet.
             </p>
         </accordion-list>
         <accordion-list id="setup"

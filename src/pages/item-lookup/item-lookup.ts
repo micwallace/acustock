@@ -18,7 +18,7 @@
 
 import { Component } from '@angular/core';
 import 'rxjs/add/operator/map'
-import { IonicPage, NavController, LoadingController, ModalController, PopoverController } from 'ionic-angular';
+import { IonicPage, NavController, LoadingController, PopoverController } from 'ionic-angular';
 import { Api, CacheProvider, ItemAutocompleteService, PreferencesProvider } from '../../providers/providers';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { ItemLookupDetailsPage } from '../item-lookup-details/item-lookup-details';
