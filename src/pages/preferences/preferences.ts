@@ -142,7 +142,9 @@ export class PreferencesPage {
                 });
                 alert.present();
             } else {
-                this.utils.showAlert("No Update", "There are no updated available.");
+                loader.dismiss().then(()=> {
+                    this.utils.showAlert("No Update", "There are no updates available.");
+                });
             }
         }).catch((err)=>{
             loader.dismiss();
