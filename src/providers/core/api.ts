@@ -495,7 +495,9 @@ export class Api {
             if (!err.responseData.hasOwnProperty('exceptionMessage'))
                 err.responseData.exceptionMessage = err.responseData.message;
 
-            err.message = "API Error: " + (err.hasOwnProperty("status") ? err.status+" " : "") + exceptionMsg.substring(0, 250);
+            var ellipse =  exceptionMsg.length > 500 ? "..." : "";
+
+            err.message = "API Error: " + (err.hasOwnProperty("status") ? err.status+" " : "") + exceptionMsg.substring(0, 500) + ellipse;
 
         } else {
             // CORS errors return status 0, give the user a hint.
