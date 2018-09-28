@@ -171,6 +171,7 @@ export class PreferencesPage {
         });
     }
 
+    /* Not supported at the moment
     public rollbackVersion(){
 
         Pro.deploy.getCurrentVersion().then((curVersion)=>{
@@ -206,6 +207,6 @@ export class PreferencesPage {
             alert.present();
 
         });
-    }
+    }*/
 
 }

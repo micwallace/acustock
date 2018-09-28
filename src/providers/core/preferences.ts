@@ -33,6 +33,7 @@ export class PreferencesProvider {
             preferences: [
                 {
                     key: "connection_url",
+                    min_key: "url",
                     title: "URL",
                     type: "url",
                     placeholder: "https://acumaticainstance/url",
@@ -40,6 +41,7 @@ export class PreferencesProvider {
                 },
                 {
                     key: "connection_username",
+                    min_key: "usr",
                     title: "Username",
                     type: "text",
                     placeholder: "",
@@ -47,6 +49,7 @@ export class PreferencesProvider {
                 },
                 {
                     key: "connection_password",
+                    min_key: "pwd",
                     title: "Password",
                     type: "password",
                     placeholder: "",
@@ -54,6 +57,7 @@ export class PreferencesProvider {
                 },
                 {
                     key: "remember_password",
+                    min_key: "rpw",
                     title: "Remember password",
                     type: "toggle",
                     placeholder: "",
@@ -61,6 +65,7 @@ export class PreferencesProvider {
                 },
                 {
                     key: "connection_company",
+                    min_key: "cpy",
                     title: "Company ID",
                     type: "text",
                     placeholder: "",
@@ -73,12 +78,14 @@ export class PreferencesProvider {
             preferences: [
                 {
                     key: "warehouse",
+                    min_key: "whs",
                     title: "Warehouse",
                     type: "select",
                     def_value: ""
                 },
                 {
                     key: "device",
+                    min_key: "dev",
                     title: "Device Name",
                     type: "text",
                     def_value: "Device 1"
@@ -90,6 +97,7 @@ export class PreferencesProvider {
             preferences: [
                 {
                     key: "cache_prime_items",
+                    min_key: "cpi",
                     title: "Prime Item Cache",
                     type: "select",
                     options: [
@@ -106,6 +114,7 @@ export class PreferencesProvider {
             preferences: [
                 {
                     key: "success_sound",
+                    min_key: "ss",
                     title: "Scanner Success Sound",
                     type: "select",
                     def_value: "success-1",
@@ -113,20 +122,23 @@ export class PreferencesProvider {
                 },
                 {
                     key: "prompt_sound",
+                    min_key: "ps",
                     title: "Prompt Sound",
                     type: "select",
-                    def_value: "success-1",
+                    def_value: "success-3",
                     options: PreferencesProvider.successSounds
                 },
                 {
                     key: "alert_sound",
+                    min_key: "as",
                     title: "Scanner Alert Sound",
                     type: "select",
-                    def_value: "alert-1",
+                    def_value: "alert-4",
                     options: PreferencesProvider.failureSounds
                 },
                 {
                     key: "alert_vibrate",
+                    min_key: "av",
                     title: "Alert & Prompt Vibrate",
                     type: "toggle",
                     def_value: true
@@ -138,18 +150,21 @@ export class PreferencesProvider {
             preferences: [
                 {
                     key: "release_transfers",
+                    min_key: "rt",
                     title: "Release Transfers",
                     type: "toggle",
                     def_value: true
                 },
                 {
                     key: "release_receipts",
+                    min_key: "rr",
                     title: "Release Receipts",
                     type: "toggle",
                     def_value: true
                 },
                 {
                     key: "release_adjustments",
+                    min_key: "ra",
                     title: "Release Adjustments",
                     type: "toggle",
                     def_value: true
@@ -161,6 +176,7 @@ export class PreferencesProvider {
             preferences: [
                 {
                     key: "theme",
+                    min_key: "thm",
                     title: "Theme",
                     type: "select",
                     def_value: "theme-light",
@@ -210,6 +226,8 @@ export class PreferencesProvider {
 
     private defaults = {};
 
+    public minMap = {};
+
     constructor() {
         console.log('Hello PreferencesProvider Provider');
 
@@ -222,6 +240,9 @@ export class PreferencesProvider {
                     this.preferences[pref.key] = pref.def_value;
 
                 this.defaults[pref.key] = pref.def_value;
+
+                this.minMap[pref.key] = pref.min_key;
+                this.minMap[pref.min_key] = pref.key;
             }
         }
     }

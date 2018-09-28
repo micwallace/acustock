@@ -1,7 +1,7 @@
 {
   "name": "AcuStock",
-  "version": "0.0.2",
-  "versionType": "alpha",
+  "version": "1.0.1",
+  "versionType": "beta",
   "author": "Michael Wallace",
   "homepage": "https://wallaceit.com.au/",
   "private": true,

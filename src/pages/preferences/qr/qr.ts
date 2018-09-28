@@ -35,7 +35,15 @@ export class QRPage {
     }
 
     ionViewDidLoad(){
-        this.qr = JSON.stringify(this.prefs.preferences);
+
+        var minPrefs = {};
+
+        for (var i in this.prefs.preferences){
+            var key = this.prefs.minMap.hasOwnProperty(i) ? this.prefs.minMap[i] : i;
+            minPrefs[key] = this.prefs.preferences[i];
+        }
+
+        this.qr = JSON.stringify(minPrefs);
     }
 
     dismiss() {
