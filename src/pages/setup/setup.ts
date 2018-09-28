@@ -89,10 +89,13 @@ export class SetupPage {
             if (values) {
                 for (var i in values) {
 
-                    var key = this.prefs.minMap.hasOwnProperty(i) ? this.prefs.minMap[i] : i;
+                    if (this.prefs.preferences.hasOwnProperty(i)) {
 
-                    if (this.prefs.preferences.hasOwnProperty(key)) {
-                        this.prefs.setPreference(key, values[i]);
+                        this.prefs.setPreference(i, values[i]);
+
+                    } else if (this.prefs.minMap.hasOwnProperty(i)){
+
+                        this.prefs.setPreference(this.prefs.minMap[i], values[i]);
                     }
                 }
                 this.prefs.savePreferences();
