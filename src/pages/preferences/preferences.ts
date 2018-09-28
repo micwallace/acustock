@@ -43,7 +43,6 @@ export class PreferencesPage {
 
         this.preferences = prefs;
         this.currentWarehouse = prefs.getPreference('warehouse');
-        this.loadVersions();
     }
 
     ionViewWillLeave() {
@@ -107,15 +106,6 @@ export class PreferencesPage {
     }
 
     // pro stuff
-    availableVersions = [];
-
-    private loadVersions(){
-        Pro.deploy.getAvailableVersions().then((versions)=>{
-            console.log(JSON.stringify(versions));
-            this.availableVersions = versions;
-        });
-    }
-
     public checkForUpdate(){
         let loader = this.loadingCtrl.create({content: "Loading..."});
         loader.present();
@@ -181,8 +171,41 @@ export class PreferencesPage {
         });
     }
 
-    public switchVersion(){
+    public rollbackVersion(){
 
+        Pro.deploy.getCurrentVersion().then((curVersion)=>{
+
+            if (!curVersion){
+                this.utils.showAlert("Not Available", "There is no other snapshot to roll back to.");
+                return;
+            }
+
+            let alert = this.alertCtrl.create({
+                title: "Rollback",
+                message: "Are you sure? You will not be able to upgrade to this version again if it's been superseded.",
+                buttons: [
+                    {
+                        text: "No",
+                        role: "cancel"
+                    },
+                    {
+                        text: "Yes",
+                        handler: ()=> {
+                            Pro.deploy.deleteVersionById(curVersion.versionId).then((res)=>{
+                                if (!res){
+                                    this.utils.showAlert("Rollback failed", "Failed to remove the current snapshot. Rollback was not successful.");
+                                    return;
+                                }
+                                Pro.deploy.reloadApp();
+                            });
+                        }
+                    }
+                ]
+            });
+
+            alert.present();
+
+        });
     }
 
 }

@@ -66,13 +66,8 @@
             <ion-item tappable (click)="checkForUpdate();">
                 <ion-label>Check for update</ion-label>
             </ion-item>
-            <ion-item>
-                <ion-label>Change version</ion-label>
-                <ion-select (ionChange)="switchVersion();">
-                    <ion-option [selected]="">
-                        Test
-                    </ion-option>
-                </ion-select>
+            <ion-item tappable ()="rollbackVersion()">
+                <ion-label>Rollback to last version</ion-label>
             </ion-item>
         </ion-item-group>
     </ion-list>
