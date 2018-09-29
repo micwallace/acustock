@@ -21,6 +21,8 @@ import { Http, Headers, RequestOptions } from '@angular/http'
 import { Injectable } from '@angular/core';
 import { PreferencesProvider } from "./preferences";
 import { Platform } from "ionic-angular";
+declare function require(moduleName: string): any;
+const { minAcumaticaVersion : minAcumaticaVersion } = require('../../../package.json');
 
 /**
  * Api is a generic REST Api handler. Set your API url first.
@@ -35,6 +37,9 @@ export class Api {
     private company:string = '';
 
     private jsReqOptions:RequestOptions = new RequestOptions();
+
+    private static MSG_CUST_NOT_INSTALLED = "The connection to Acumatica was successful, but the AcuStock customisation is not installed. " +
+                                            "Please install the AcuStock customisation in Acumatica before continuing.";
 
     constructor(public http:HTTP, public prefs:PreferencesProvider, public jsHttp:Http, public platform:Platform) {
         this.updateSettings(null, null);
@@ -83,13 +88,74 @@ export class Api {
                     this.prefs.setPreference("connection_password", "", true);
                 }
 
-                resolve();
+                this.get('AcuStockConfig').then((res:any)=>{
+
+                    if (res.length > 0){
+
+                        var config = res[0];
+
+                        if (this.versionCompare(config.Version.value, minAcumaticaVersion) > -1)
+                            return resolve();
+
+                        reject({message: "The current version of Acustock requires at least Acumatica customisation version " + minAcumaticaVersion +
+                                        " but " + config.Version.value + " is installed. Please update the customisation project to continue using AcuStock, or reinstall a version compatible with " + config.Version.value});
+
+                        return;
+                    }
+
+                    reject({message: Api.MSG_CUST_NOT_INSTALLED});
+
+                }).catch((err)=>{
+                    err.message = Api.MSG_CUST_NOT_INSTALLED;
+                    reject(err);
+                });
+
+                //resolve();
             }).catch((err)=> {
                 reject(err);
             });
-
-            // TODO: Acumatica plugin version test
         });
+    }
+
+    // Taken from here because I couldn't be bothered to re invent the wheel:
+    // https://stackoverflow.com/questions/6832596
+    // Return 1 if a > b
+    // Return -1 if a < b
+    // Return 0 if a == b
+    private versionCompare(a, b) {
+        if (a === b) {
+            return 0;
+        }
+
+        var a_components = a.split(".");
+        var b_components = b.split(".");
+
+        var len = Math.min(a_components.length, b_components.length);
+
+        // loop while the components are equal
+        for (var i = 0; i < len; i++) {
+            // A bigger than B
+            if (parseInt(a_components[i]) > parseInt(b_components[i])) {
+                return 1;
+            }
+
+            // B bigger than A
+            if (parseInt(a_components[i]) < parseInt(b_components[i])) {
+                return -1;
+            }
+        }
+
+        // If one's a prefix of the other, the longer one is greater.
+        if (a_components.length > b_components.length) {
+            return 1;
+        }
+
+        if (a_components.length < b_components.length) {
+            return -1;
+        }
+
+        // Otherwise they are the same.
+        return 0;
     }
 
     login() {

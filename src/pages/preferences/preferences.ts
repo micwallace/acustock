@@ -96,6 +96,7 @@ export class PreferencesPage {
                     this.preferences.setPreference("remember_password", true, true);
                 }
                 break;
+            // TODO: Detect change of URL or company and retest connection.
         }
     }
 
