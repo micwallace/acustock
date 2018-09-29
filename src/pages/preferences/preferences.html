@@ -66,6 +66,13 @@
             <ion-item tappable (click)="checkForUpdate();">
                 <ion-label>Check for update</ion-label>
             </ion-item>
+            <ion-item>
+                <ion-label>Update Channel</ion-label>
+                <ion-select [(ngModel)]="updateChannel" (ngModelChange)="setUpdateChannel();">
+                    <ion-option [value]="Production">Production (Stable)</ion-option>
+                    <ion-option [value]="Master">Development (Unstable)</ion-option>
+                </ion-select>
+            </ion-item>
             <!--<ion-item tappable (click)="rollbackVersion()">
                 <ion-label>Rollback to last version</ion-label>
             </ion-item>-->

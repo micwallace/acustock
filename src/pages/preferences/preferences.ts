@@ -43,6 +43,7 @@ export class PreferencesPage {
 
         this.preferences = prefs;
         this.currentWarehouse = prefs.getPreference('warehouse');
+        this.loadCurrentChannel();
     }
 
     ionViewWillLeave() {
@@ -108,13 +109,14 @@ export class PreferencesPage {
 
     // pro stuff
     public checkForUpdate(){
+
         let loader = this.loadingCtrl.create({content: "Loading..."});
         loader.present();
 
         Pro.deploy.checkForUpdate().then((update)=>{
 
-            console.log(JSON.stringify(update));
-            if (update.available){
+            //console.log(JSON.stringify(update));
+            if (update && update.available){
                 let alert = this.alertCtrl.create({
                     title: "Update Available",
                     message: "An update is available, would you like to apply it now?",
@@ -138,11 +140,14 @@ export class PreferencesPage {
                 });
             }
         }).catch((err)=>{
-            loader.dismiss();
+            loader.dismiss().then(()=> {
+                this.utils.showAlert("Update Error", "Could not check for updates: "+err);
+            });
         });
     }
 
     private updateApp(){
+
         let loader = this.loadingCtrl.create({content: "Loading 0%"});
         loader.present();
 
@@ -165,10 +170,43 @@ export class PreferencesPage {
                     Pro.deploy.reloadApp();
                 });
             }).catch((err)=>{
-                loader.dismiss();
+                loader.dismiss().then(()=> {
+                    this.utils.showAlert("Update Error", "Failed to extract update: "+err);
+                });
             });
         }).catch((err)=>{
+            loader.dismiss().then(()=> {
+                this.utils.showAlert("Update Error", "Failed to download update: "+err);
+            });
+        });
+    }
+
+    channelLoaded = false;
+    updateChannel = "Production";
+
+    public loadCurrentChannel(){
+        Pro.deploy.getConfiguration().then((config)=>{
+            this.updateChannel = config.channel;
+            this.channelLoaded = true;
+        }).catch((err)=>{
+            // Silently fail
+        });
+    }
+
+    public setUpdateChannel(){
+        // Workaround for ion-change firing on current channel load
+        if (!this.channelLoaded)
+            return;
+
+        let loader = this.loadingCtrl.create({content: "Setting Channel..."});
+        loader.present();
+
+        Pro.deploy.configure({channel: this.updateChannel}).then((res)=>{
             loader.dismiss();
+        }).catch((err)=>{
+            loader.dismiss().then(()=> {
+                this.utils.showAlert("Failed", "Could not set update channel.");
+            });
         });
     }
 

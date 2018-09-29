@@ -23,4 +23,17 @@ page-preferences {
   .preference-header .label {
     font-size: 1.6rem;
   }
+
+  .item-input .label-md, .item-select .label-md, .item-datetime .label-md, .item-toggle .label-md {
+    color: #6a6a6a !important;
+  }
+
+}
+
+.theme-dark {
+  page-preferences {
+    .item-input .label-md, .item-select .label-md, .item-datetime .label-md, .item-toggle .label-md {
+      color: #cdcdcd !important;
+    }
+  }
 }
