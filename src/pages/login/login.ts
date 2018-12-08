@@ -17,7 +17,7 @@
  */
 
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
 import { Api } from "../../providers/core/api";
 import { CacheProvider } from "../../providers/core/cache";
 import { PickShipmentsPage } from "../pick-shipments/pick-shipments";
@@ -38,6 +38,7 @@ export class LoginPage {
     constructor(public navCtrl:NavController,
                 public navParams:NavParams,
                 public loadingCtrl:LoadingController,
+                public alertCtrl:AlertController,
                 public cache:CacheProvider,
                 public api:Api,
                 public utils:UtilsProvider) {
@@ -59,7 +60,7 @@ export class LoginPage {
         let loader = this.loadingCtrl.create({content: "Logging in..."});
         loader.present();
 
-        this.api.testConnection(this.username, this.password).then(() => {
+        this.api.testConnection(this.username, this.password, this.alertCtrl).then(() => {
 
             loader.dismiss();
 
@@ -73,7 +74,11 @@ export class LoginPage {
             this.cache.prefs.setPreference("connection_username", this.username);
 
         }).catch((err) => {
+
             loader.dismiss();
+            if (err == "version_mismatch")
+                return;
+
             this.utils.processApiError("Error", "Login failed, please check connection. " + err.message, err);
         });
     }

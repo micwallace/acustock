@@ -58,6 +58,12 @@
 .table-header {
   border-bottom: 1px solid #888;
   font-weight: bold;
+  ion-col {
+    display: flex;
+    flex-direction: row;
+    flex-flow: row;
+    align-items: center;
+  }
 }
 
 .item-list {
@@ -100,6 +106,7 @@
 
 .column-right {
   justify-content: flex-end;
+  text-align: right;
 }
 
 .qty-padding {

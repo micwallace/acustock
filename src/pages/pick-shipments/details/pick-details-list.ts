@@ -16,24 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-page-preferences {
-  .preference-group {
-    margin-bottom: 15px;
-  }
-  .preference-header .label {
-    font-size: 1.6rem;
-  }
+import { Component } from '@angular/core';
+import { IonicPage, PopoverController  } from 'ionic-angular';
+import { PickProvider } from '../../../providers/providers';
+import { PickPopover } from "../pick-popover";
 
-  .item-input .label-md, .item-select .label-md, .item-datetime .label-md, .item-toggle .label-md {
-    color: #777 !important;
-  }
+@IonicPage()
+@Component({
+    selector: 'page-pick-details-list',
+    templateUrl: 'pick-details-list.html'
+})
+export class PickDetailsListPage {
 
-}
-
-.theme-dark {
-  page-preferences {
-    .item-input .label-md, .item-select .label-md, .item-datetime .label-md, .item-toggle .label-md {
-      color: #d3d3d3 !important;
+    constructor(public pickProvider:PickProvider, public popoverCtrl:PopoverController) {
+        //console.log(JSON.stringify(this.pickProvider.currentShipment));
     }
-  }
+
+    presentPopover(event) {
+        let popover = this.popoverCtrl.create(PickPopover);
+        popover.present({ev:event});
+    }
+
 }

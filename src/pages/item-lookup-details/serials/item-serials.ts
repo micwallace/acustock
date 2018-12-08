@@ -16,24 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-page-preferences {
-  .preference-group {
-    margin-bottom: 15px;
-  }
-  .preference-header .label {
-    font-size: 1.6rem;
-  }
+import { Component } from '@angular/core';
+import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
-  .item-input .label-md, .item-select .label-md, .item-datetime .label-md, .item-toggle .label-md {
-    color: #777 !important;
-  }
+@IonicPage()
+@Component({
+    selector: 'page-item-serials',
+    templateUrl: 'item-serials.html',
+})
+export class ItemSerialsPage {
 
-}
+    item = {};
 
-.theme-dark {
-  page-preferences {
-    .item-input .label-md, .item-select .label-md, .item-datetime .label-md, .item-toggle .label-md {
-      color: #d3d3d3 !important;
+    detailsCollapsed = false;
+
+    constructor(public navCtrl:NavController, public navParams:NavParams) {
+        this.item = navParams.get("data");
     }
-  }
+
+    toggleCollapsed(){
+        this.detailsCollapsed = !this.detailsCollapsed;
+    }
+
 }

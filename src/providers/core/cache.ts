@@ -45,6 +45,9 @@ export class CacheProvider {
     locationItems = {};
     itemLocations = {};
 
+    locationCacheTs = 0;
+    itemCacheTs = 0;
+
     constructor(public api:Api, public prefs:PreferencesProvider, public toastCtrl:ToastController) {
         console.log('Hello CacheProvider Provider');
     }
@@ -83,38 +86,26 @@ export class CacheProvider {
         });
     }
 
-    public getItemById(id) {
+    public getItemById(id, includeWhDetails=false) {
 
         return new Promise((resolve, reject)=> {
 
-            // TODO: Perform fresh lookup on cache expiry
+            if (this.itemIndex.hasOwnProperty(id)) {
 
-            if (this.itemIndex.hasOwnProperty(id))
-                return resolve(this.itemIndex[id]);
+                // Fetch data if item warehouse details are required and null or if cache expiry has been exceeded
+                if ((includeWhDetails && this.itemIndex[id].WarehouseDetails == null) ||
+                    new Date().getTime() > (this.itemIndex[id].cache_ts + (this.prefs.getPreference("cache_expiry") * 1000))){
 
-            for (var i = 0; i < this.itemList.length; i++) {
+                    this.loadItemData(this.itemIndex[id].InventoryID.value, resolve, reject);
 
-                if (this.itemList[i].InventoryID.value == id) {
-
-                    this.itemIndex[id] = this.itemList[i];
-                    resolve(this.itemList[i]);
-                    return;
-                }
-
-
-                for (var x = 0; x < this.itemList[i].CrossReferences.length; x++) {
-
-                    if (this.itemList[i].CrossReferences[x].AlternateID.value == id) {
-
-                        this.itemIndex[id] = this.itemList[i];
-                        resolve(this.itemList[i]);
-                        return;
-                    }
-
+                } else {
+                    return resolve(this.itemIndex[id]);
                 }
             }
 
-            if (this.itemCachePrimed)
+            // Only perform a fresh lookup if cache isn't primed or cache expiry has been exceeded
+            if (this.itemCachePrimed &&
+                new Date().getTime() < (this.itemCacheTs + (this.prefs.getPreference("cache_expiry") * 1000)))
                 reject({message: "The item with ID " + id + " was not found."});
 
             this.api.itemLookup(id).then((res:any)=> {
@@ -124,29 +115,42 @@ export class CacheProvider {
                     return;
                 }
 
-                var inventoryId = res.Results[0].InventoryID.value;
-
-                this.api.getItem(inventoryId).then((item:any)=> {
-
-                    this.itemList.push(item);
-                    this.itemIndex[id] = item;
-                    resolve(item);
-
-                }).catch((err)=> {
-
-                    if (err.status == 404) {
-                        reject({message: "Item lookup succeeded but failed to load the item data."});
-                        return;
-                    }
-
-                    reject(err);
-                })
+                this.loadItemData(res.Results[0].InventoryID.value, resolve, reject);
 
             }).catch((err)=> {
                 reject(err);
             });
 
         });
+    }
+
+    private loadItemData(inventoryId, resolve, reject){
+
+        this.api.getItem(inventoryId).then((item:any)=> {
+
+            if (item.ItemStatus.value === "Inactive"){
+                reject({message: "An item with ID " + inventoryId + " (" + inventoryId + ") was found but is inactive."});
+                return;
+            }
+
+            item.cache_ts = new Date().getTime();
+
+            this.addItemToIndex(item);
+
+            this.itemList.push(item);
+
+            resolve(item);
+
+        }).catch((err)=> {
+
+            if (err.status == 404) {
+                reject({message: "Item lookup succeeded but failed to load the item data."});
+                return;
+            }
+
+            reject(err);
+        })
+
     }
 
     public getItemWarehouseDetails(item) {
@@ -201,7 +205,10 @@ export class CacheProvider {
     public getBinById(id) {
         return new Promise((resolve, reject)=> {
 
-            if (this.binIndex && this.binIndex.hasOwnProperty(id)) {
+            // Return cached data if it exists and expiry has not been exceeded
+            if (this.binIndex && this.binIndex.hasOwnProperty(id) &&
+                new Date().getTime() < (this.locationCacheTs + (this.prefs.getPreference("cache_expiry") * 1000))) {
+
                 resolve(this.binIndex[id]);
                 return;
             }
@@ -318,7 +325,7 @@ export class CacheProvider {
     public initialLoad() {
 
         var toast = this.toastCtrl.create({
-            message: 'Initial cache load in progress. Some operations will be slower until this completes.',
+            message: 'Priming cache: locations...',
             showCloseButton: true,
             closeButtonText: "OK"
         });
@@ -326,7 +333,9 @@ export class CacheProvider {
 
         if (this.warehouseList != null){
 
-            this.primeItemCache().then(()=>{
+            toast.setMessage('Priming cache: items...');
+
+            this.primeItemCache(toast).then(()=>{
                 toast.setMessage('Initial load complete.');
                 setTimeout(()=> {
                     toast.dismissAll();
@@ -340,7 +349,9 @@ export class CacheProvider {
 
             this.loadWarehouseList().then(()=>{
 
-                this.primeItemCache().then(()=>{
+                toast.setMessage('Priming cache: items...');
+
+                this.primeItemCache(toast).then(()=>{
                     toast.setMessage('Initial load complete.');
                     setTimeout(()=> {
                         toast.dismissAll();
@@ -354,6 +365,8 @@ export class CacheProvider {
                 this.loadFailed(toast, err);
             });
         }
+
+        setInterval(this.primeItemCache, (this.prefs.getPreference("cache_refresh_items") * 1000));
     }
 
     private loadFailed(toast, err) {
@@ -364,7 +377,7 @@ export class CacheProvider {
         console.log("Initial data load failed: " + err.message);
     }
 
-    private primeItemCache(){
+    private primeItemCache(toast=null){
 
         return new Promise((resolve, reject)=>{
 
@@ -374,34 +387,75 @@ export class CacheProvider {
                 return resolve();
 
             if (cachePref == "full") {
-                this.api.getItemList().then((itemList:any) => {
+
+                var warehouseDetPref = this.prefs.getPreference("cache_item_warehouse");
+
+                this.api.getItemList("$expand=CrossReferences" + (warehouseDetPref == "withitems" ? ",WarehouseDetails" : "") + "&$filter=ItemStatus ne 'Inactive'").then((itemList:any) => {
+
+                    var ts = new Date().getTime();
+
+                    for (var item of itemList){
+                        item.cache_ts = ts;
+                        this.addItemToIndex(item);
+                    }
+
                     this.itemList = itemList;
                     this.itemCachePrimed = true;
+                    this.itemCacheTs = ts;
                     resolve();
                 }).catch((err) => {
                     reject(err);
                 });
             } else {
                 this.itemList = [];
-                this.batchLoadItems(resolve, reject);
+                this.batchLoadItems(resolve, reject, toast);
             }
         });
     }
 
-    private batchLoadItems(resolve, reject, skip=0, limit=200){
+    private addItemToIndex(item){
 
-        this.api.getItemList("$expand=CrossReferences&$expand=WarehouseDetails&$top=" + limit + (skip>0 ? "&$skip="+skip : "")).then((itemList:any) => {
+        this.itemIndex[item.InventoryID.value] = item;
+
+        for (var x = 0; x < item.CrossReferences.length; x++) {
+
+            this.itemIndex[item.CrossReferences[x].AlternateID.value] = item;
+        }
+    }
+
+    private batchLoadItems(resolve, reject, toast, skip=0, limit=100){
+
+        var warehouseDetPref = this.prefs.getPreference("cache_item_warehouse");
+
+        var queryStr = "$expand=CrossReferences" + (warehouseDetPref == "withitems" ? ",WarehouseDetails" : "") + "&$filter=ItemStatus ne 'Inactive'&$top=" + limit + (skip>0 ? "&$skip="+skip : "");
+
+        this.api.getItemList(queryStr).then((itemList:any) => {
+
+            var ts = new Date().getTime();
+
+            for (var item of itemList){
+                item.cache_ts = ts;
+                this.addItemToIndex(item);
+            }
 
             this.itemList = this.itemList.concat(itemList);
 
             if (itemList.length < limit){
+
                 resolve();
                 this.itemCachePrimed = true;
+                this.itemCacheTs = ts;
+
                 console.log("Item batch load "+skip+" to "+(skip+itemList.length)+" completed");
             } else {
-                console.log("Item batch load "+skip+" to "+(skip+limit)+" completed");
+
                 skip += limit;
-                this.batchLoadItems(resolve, reject, skip);
+                this.batchLoadItems(resolve, reject, toast, skip);
+
+                if (toast != null)
+                    toast.setMessage('Priming cache: items ('+ skip +')...');
+
+                console.log("Item batch load "+skip+" to "+(skip+limit)+" completed");
             }
         }).catch((err) => {
             reject(err);
@@ -413,6 +467,8 @@ export class CacheProvider {
         return new Promise((resolve, reject)=>{
 
             this.api.getWarehouseList().then((warehouseList:any) => {
+
+                this.locationCacheTs = new Date().getTime();
 
                 this.warehouseList = warehouseList;
                 this.generateBinList();

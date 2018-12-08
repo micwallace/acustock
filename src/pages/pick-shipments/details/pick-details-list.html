@@ -24,7 +24,7 @@
                 <ion-icon name="arrow-back"></ion-icon>
             </button>
         </ion-buttons>
-        <ion-title>Shipment List</ion-title>
+        <ion-title>Shipment Items</ion-title>
         <ion-buttons end>
             <button ion-button icon-only (click)="presentPopover($event)">
                 <ion-icon name="more"></ion-icon>
@@ -37,20 +37,24 @@
 
 <ion-content padding>
     <ion-grid>
+        <ion-row class="table-header">
+            <ion-col col-8>Item/Location</ion-col>
+            <ion-col col-4 text-right>Picked/Qty</ion-col>
+        </ion-row>
         <ion-list class="item-list">
-            <ion-item no-margin no-padding class="list-item" *ngFor="let ship of pickProvider.shipmentList; let i = index" (click)="openShipment(ship.ShipmentNbr.value, i);">
-                <ion-row no-margin>
-                    <ion-col col-8>
-                        <div>
-                            <strong>{{ship.ShipmentNbr.value}}</strong><br/>
-                            {{ship.Type.value}}
-                        </div>
-                    </ion-col>
-                    <ion-col col-4 class="column-right" text-right>
-                        {{util.formatDatetime(ship.ShipmentDate.value)}}<br/>
-                        {{ship.PickStatus.value}}
-                    </ion-col>
+            <ion-item no-margin no-padding class="list-group" *ngFor="let item of pickProvider.currentShipment.Details">
+                <ion-row class="item-group-header" no-margin>
+                    <ion-col col-8><strong>{{item.InventoryID.value}}</strong></ion-col>
+                    <ion-col col-4 class="column-right">{{item.PickedQty.value}}/{{item.ShippedQty.value}}</ion-col>
                 </ion-row>
+                <ion-list no-margin no-padding>
+                    <ion-item no-margin no-padding class="list-item" *ngFor="let allocation of item.Allocations">
+                        <ion-row no-margin no-padding>
+                            <ion-col col-8>{{allocation.LocationID.value}}</ion-col>
+                            <ion-col col-4 class="column-right">{{allocation.PickedQty.value}}/{{allocation.Qty.value}}</ion-col>
+                        </ion-row>
+                    </ion-item>
+                </ion-list>
             </ion-item>
         </ion-list>
     </ion-grid>

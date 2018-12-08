@@ -129,24 +129,17 @@ export class BinLookupPage {
 
     openDetailsModal(event, item) {
 
-        let loader = this.loadingCtrl.create({content: "Loading..."});
-        loader.present();
+        this.loader = this.loadingCtrl.create({content: "Loading..."});
+        this.loader.present();
 
-        this.api.getItemLotSerialInfo(item.InventoryID.value, item.Warehouse.value, item.Location.value).then((res) => {
+        this.cache.getItemById(item.InventoryID.value).then((itemData)=>{
 
-            item.LotSerialDetails = res;
-
-            loader.dismiss();
+            this.dismissLoader();
             //noinspection TypeScriptValidateTypes
-            this.navCtrl.push(ItemLookupDetailsPage, {data: item});
-
+            this.navCtrl.push(ItemLookupDetailsPage, {data: Object.assign(item, itemData)});
         }).catch((err) => {
-
-            loader.dismiss().then(()=> {
-                this.utils.processApiError("Error", err.message, err, this.navCtrl);
-            });
+            this.utils.processApiError("Error", err.message, err, this.navCtrl);
         });
-
     }
 
 }

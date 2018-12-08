@@ -16,24 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-page-preferences {
-  .preference-group {
-    margin-bottom: 15px;
-  }
-  .preference-header .label {
-    font-size: 1.6rem;
-  }
-
-  .item-input .label-md, .item-select .label-md, .item-datetime .label-md, .item-toggle .label-md {
-    color: #777 !important;
-  }
-
-}
-
-.theme-dark {
-  page-preferences {
-    .item-input .label-md, .item-select .label-md, .item-datetime .label-md, .item-toggle .label-md {
-      color: #d3d3d3 !important;
-    }
+page-item-allocations {
+  tr td {
+    padding: 4px 0;
   }
 }

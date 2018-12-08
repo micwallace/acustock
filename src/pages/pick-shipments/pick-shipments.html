@@ -53,6 +53,14 @@
                            [ngModel]="pickProvider.currentShipment?.Type?.value" readonly></ion-input>
             </ion-item>
         </ion-list>
+        <ion-row>
+            <ion-col>
+                <button type="button" ion-button (click)="loadShipment();">Next</button>
+            </ion-col>
+            <ion-col>
+                <button type="button" ion-button (click)="openShipmentList();">List</button>
+            </ion-col>
+        </ion-row>
         <ion-grid *ngIf="pickProvider.currentShipment">
             <ion-row>
                 <ion-col>

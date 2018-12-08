@@ -127,25 +127,9 @@ export class ItemLookupPage {
     }
 
     openDetailsModal(event, item) {
-
-        this.loader = this.loadingCtrl.create({content: "Loading..."});
-        this.loader.present();
-
-        this.api.getItemLotSerialInfo(item.InventoryID.value, item.Warehouse.value, item.Location.value).then((res) => {
-
-            item.LotSerialDetails = res;
-
-            this.dismissLoader();
-            //noinspection TypeScriptValidateTypes
-            this.navCtrl.push(ItemLookupDetailsPage, {data: item});
-
-        }).catch((err) => {
-
-            this.dismissLoader().then(()=> {
-                this.utils.processApiError("Error", err.message, err, this.navCtrl);
-            });
-        });
-
+        // combine data and open details page
+        //noinspection TypeScriptValidateTypes
+        this.navCtrl.push(ItemLookupDetailsPage, {data: Object.assign(item, this.selectedItem)});
     }
 
 }

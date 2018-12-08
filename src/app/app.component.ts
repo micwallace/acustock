@@ -17,7 +17,7 @@
  */
 
 import { Component, ViewChild } from '@angular/core';
-import { Platform, Nav, LoadingController } from 'ionic-angular';
+import { Platform, Nav, LoadingController, AlertController } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
@@ -45,6 +45,7 @@ export class AcuStock {
     constructor(public platform:Platform,
                 public statusBar:StatusBar,
                 public splashScreen:SplashScreen,
+                public alertCtrl:AlertController,
                 public prefs:PreferencesProvider,
                 public api:Api,
                 public cache:CacheProvider,
@@ -59,6 +60,22 @@ export class AcuStock {
             // Here you can do any higher level native things you might need.
             statusBar.styleDefault();
             splashScreen.hide();
+
+            // Confirm exit
+            this.platform.registerBackButtonAction(() => {
+
+                if (this.navCtrl.length() == 1) {
+                    if (!this.showedAlert) {
+                        this.confirmExitApp();
+                    } else {
+                        this.showedAlert = false;
+                        this.confirmAlert.dismiss();
+                    }
+                    return;
+                }
+
+                this.navCtrl.pop();
+            });
 
             var context = this;
 
@@ -75,7 +92,7 @@ export class AcuStock {
                 let loader = context.loadingCtrl.create({content: "Logging in..."});
                 loader.present();
 
-                context.api.testConnection(null, null).then(() => {
+                context.api.testConnection(null, null, context.alertCtrl).then(() => {
 
                     loader.dismiss();
                     context.navCtrl.setRoot(PickShipmentsPage);
@@ -83,8 +100,13 @@ export class AcuStock {
                     console.log("Login succeeded, loading initial data...");
 
                 }).catch((err) => {
+
                     loader.dismiss();
                     context.navCtrl.setRoot(SetupPage);
+
+                    if (err == "version_mismatch")
+                        return;
+
                     this.utils.processApiError("Error", "Connection failed: "+err.message, err, this.navCtrl);
                 });
 
@@ -93,6 +115,36 @@ export class AcuStock {
         }).catch((err) => {
 
         });
+    }
+
+    showedAlert = false;
+    confirmAlert = null;
+
+    confirmExitApp() {
+
+        this.showedAlert = true;
+
+        this.confirmAlert = this.alertCtrl.create({
+            title: "Exit",
+            message: "Are you sure you want to exit AcuStock?",
+            buttons: [
+                {
+                    text: 'Cancel',
+                    handler: () => {
+                        this.showedAlert = false;
+                        return;
+                    }
+                },
+                {
+                    text: 'Exit',
+                    handler: () => {
+                        this.platform.exitApp();
+                    }
+                }
+            ]
+        });
+
+        this.confirmAlert.present();
     }
 
     goToTransfer(params) {

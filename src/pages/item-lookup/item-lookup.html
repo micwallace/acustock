@@ -51,7 +51,7 @@
 <ion-content padding>
     <ion-row class="table-header">
         <ion-col col-5>Location</ion-col>
-        <ion-col col-7 text-right>Available / On-Hand</ion-col>
+        <ion-col col-7 class="column-right">Available / On-Hand</ion-col>
     </ion-row>
     <ion-list class="item-list">
         <ion-item class="list-item" no-padding tappable *ngFor="let location of itemLocations" (click)="openDetailsModal($event, location);">

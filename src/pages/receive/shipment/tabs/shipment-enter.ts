@@ -215,7 +215,7 @@ export class ReceiveShipmentEnterTab {
 
         this.currentSourceLine = null;
 
-        this.cache.getItemById(itemId).then((item:any)=> {
+        this.cache.getItemById(itemId, true).then((item:any)=> {
 
             // validate item against source document
             if (receiptLine == null) {

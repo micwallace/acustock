@@ -51,8 +51,61 @@ export class PickProvider {
 
     private lastRequest:any = "";
 
+    public shipmentList:Array<any> = [];
+
+    public currentListIndex = 0;
+
     constructor(public api:Api, public cache:CacheProvider, public loadingCtrl:LoadingController, public prefs:PreferencesProvider) {
 
+    }
+
+    public getShipmentList(refresh=false){
+
+        return new Promise((resolve, reject)=> {
+
+            if (this.shipmentList.length > 0 && !refresh){
+                return resolve(this.shipmentList);
+            }
+
+            this.api.getShipmentList().then((res)=>{
+                this.shipmentList = res;
+                return resolve(this.shipmentList);
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
+    public loadNextShipment(){
+
+        if (this.shipmentList.length > 0){
+            this.currentListIndex++;
+
+            if (this.currentListIndex < this.shipmentList.length){
+                return this.loadShipment(this.shipmentList[this.currentListIndex].ShipmentNbr.value);
+            }
+
+            this.currentListIndex = 0;
+        }
+
+        return new Promise((resolve, reject)=> {
+
+            this.getShipmentList(true).then((res)=>{
+
+                if (res.length == 0){
+                    return reject({message: "There are no shipments available to pick."});
+                }
+
+                this.loadShipment(this.shipmentList[this.currentListIndex].ShipmentNbr.value).then((res)=>{
+                    resolve();
+                }).catch((err) => {
+                    reject(err);
+                });
+
+            }).catch((err) => {
+                reject(err);
+            });
+        });
     }
 
     public loadShipment(shipmentNbr) {
@@ -838,6 +891,8 @@ export class PickProvider {
 
                 this.generateSourceList();
                 this.calculateQtys();
+
+                this.shipmentList = []; // Force reload of shipment list
 
                 resolve(res);
 

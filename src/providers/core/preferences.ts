@@ -96,6 +96,21 @@ export class PreferencesProvider {
             title: "Cache",
             preferences: [
                 {
+                    key: "cache_expiry",
+                    min_key: "cex",
+                    title: "Cache Expiry",
+                    type: "select",
+                    options: [
+                        {label: "30 Minutes", value: 1800},
+                        {label: "1 Hour", value: 3600},
+                        {label: "2 Hours", value: 7200},
+                        {label: "4 Hours", value: 14400},
+                        {label: "8 Hours", value: 28800},
+                        {label: "12 Hours", value: 43200},
+                    ],
+                    def_value: 14400
+                },
+                {
                     key: "cache_prime_items",
                     min_key: "cpi",
                     title: "Prime Item Cache",
@@ -106,7 +121,33 @@ export class PreferencesProvider {
                         {label: "Load on demand", value: "none"},
                     ],
                     def_value: "batch"
-                }
+                },
+                {
+                    key: "cache_refresh_items",
+                    min_key: "cri",
+                    title: "Refresh Items Every",
+                    type: "select",
+                    options: [
+                        {label: "30 Minutes", value: 1800},
+                        {label: "1 Hour", value: 3600},
+                        {label: "2 Hours", value: 7200},
+                        {label: "4 Hours", value: 14400},
+                        {label: "8 Hours", value: 28800},
+                        {label: "12 Hours", value: 43200},
+                    ],
+                    def_value:14400
+                },
+                {
+                    key: "cache_item_warehouse",
+                    min_key: "cwh",
+                    title: "Cache Item Warehouse",
+                    type: "select",
+                    options: [
+                        {label: "With Item Cache", value: "withitems"},
+                        {label: "On-Demand (5000+ Items)", value: "ondemand"},
+                    ],
+                    def_value: "withitems"
+                },
             ]
         },
         {

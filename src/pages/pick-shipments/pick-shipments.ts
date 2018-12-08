@@ -20,11 +20,12 @@ import { Component } from '@angular/core';
 import { NavController, ModalController, LoadingController, AlertController, PopoverController } from 'ionic-angular';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { PickProvider } from '../../providers/app/pick';
-import { PickShipmentsListPage } from "./list/pick-shipments-list";
+import { PickDetailsListPage } from "./details/pick-details-list";
 import { PickShipmentsPickPage } from "./pick/pick-shipments-pick";
 import { UtilsProvider } from "../../providers/core/utils";
 import {PreferencesProvider} from "../../providers/core/preferences";
 import { PickPopover } from "./pick-popover";
+import {PickShipmentsListPage} from "./list/pick-shipments-list";
 
 @Component({
     selector: 'page-pick-shipments',
@@ -74,26 +75,67 @@ export class PickShipmentsPage {
         });
     }
 
-    loadShipment(shipmentNbr, isScan=false) {
-        this.shipmentNbr = shipmentNbr;
+    loadShipment(shipmentNbr=null, isScan=false) {
 
         let loader = this.loadingCtrl.create({content: "Loading..."});
         loader.present();
 
-        this.pickProvider.loadShipment(shipmentNbr).then((res)=> {
+        if (shipmentNbr != null) {
+
+            this.shipmentNbr = shipmentNbr;
+
+            this.pickProvider.loadShipment(shipmentNbr).then((res)=> {
+                loader.dismiss();
+            }).catch((err)=> {
+                loader.dismiss();
+                this.shipmentNbr = "";
+                this.utils.playFailedSound(isScan);
+                this.utils.processApiError("Error", err.message, err, this.navCtrl);
+            });
+
+        } else {
+
+            this.pickProvider.loadNextShipment().then((res)=> {
+                this.shipmentNbr = this.pickProvider.currentShipment.ShipmentNbr.value;
+                loader.dismiss();
+            }).catch((err)=> {
+                loader.dismiss();
+                this.shipmentNbr = "";
+                this.utils.playFailedSound(isScan);
+                this.utils.processApiError("Error", err.message, err, this.navCtrl);
+            });
+
+        }
+    }
+
+    openShipmentList(){
+
+        let loader = this.loadingCtrl.create({content: "Loading..."});
+        loader.present();
+
+        this.pickProvider.getShipmentList(true).then((res)=>{
+
             loader.dismiss();
+
+            let modal = this.modalCtrl.create(PickShipmentsListPage);
+
+            modal.onDidDismiss(data => {
+                if (data && data.shipmentNbr) {
+                    this.pickProvider.currentListIndex = data.index;
+                    this.loadShipment(data.shipmentNbr);
+                }
+            });
+
+            modal.present();
+
         }).catch((err)=> {
             loader.dismiss();
-            this.shipmentNbr = "";
-            this.utils.playFailedSound(isScan);
             this.utils.processApiError("Error", err.message, err, this.navCtrl);
         });
     }
 
     openItemsDialog() {
-        console.log(JSON.stringify(this.pickProvider.currentShipment.Details));
-
-        let modal = this.modalCtrl.create(PickShipmentsListPage);
+        let modal = this.modalCtrl.create(PickDetailsListPage);
         modal.present();
     }
 

@@ -16,24 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-page-preferences {
-  .preference-group {
-    margin-bottom: 15px;
-  }
-  .preference-header .label {
-    font-size: 1.6rem;
-  }
+import { NgModule } from '@angular/core';
+import { IonicPageModule } from 'ionic-angular';
+import { PickDetailsListPage } from './pick-details-list';
 
-  .item-input .label-md, .item-select .label-md, .item-datetime .label-md, .item-toggle .label-md {
-    color: #777 !important;
-  }
-
-}
-
-.theme-dark {
-  page-preferences {
-    .item-input .label-md, .item-select .label-md, .item-datetime .label-md, .item-toggle .label-md {
-      color: #d3d3d3 !important;
-    }
-  }
+@NgModule({
+    imports: [
+        IonicPageModule.forChild(PickDetailsListPage),
+    ],
+})
+export class PickDetailsListPageModule {
 }

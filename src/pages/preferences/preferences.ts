@@ -113,32 +113,37 @@ export class PreferencesPage {
         let loader = this.loadingCtrl.create({content: "Loading..."});
         loader.present();
 
+        //noinspection TypeScriptUnresolvedVariable
         Pro.deploy.checkForUpdate().then((update)=>{
 
             //console.log(JSON.stringify(update));
-            if (update && update.available){
-                let alert = this.alertCtrl.create({
-                    title: "Update Available",
-                    message: "An update is available, would you like to apply it now?",
-                    buttons: [
-                        {
-                            text: "No",
-                            role: "cancel"
-                        },
-                        {
-                            text: "Yes",
-                            handler: ()=> {
-                                this.updateApp();
+            loader.dismiss().then(()=> {
+
+                if (update && update.available) {
+
+                    let alert = this.alertCtrl.create({
+                        title: "Update Available",
+                        message: "An update is available, would you like to apply it now?",
+                        buttons: [
+                            {
+                                text: "No",
+                                role: "cancel"
+                            },
+                            {
+                                text: "Yes",
+                                handler: ()=> {
+                                    this.updateApp();
+                                }
                             }
-                        }
-                    ]
-                });
-                alert.present();
-            } else {
-                loader.dismiss().then(()=> {
+                        ]
+                    });
+                    alert.present();
+
+                } else {
                     this.utils.showAlert("No Update", "There are no updates available.");
-                });
-            }
+                }
+            });
+
         }).catch((err)=>{
             loader.dismiss().then(()=> {
                 this.utils.showAlert("Update Error", "Could not check for updates: "+err);
@@ -151,6 +156,7 @@ export class PreferencesPage {
         let loader = this.loadingCtrl.create({content: "Loading 0%"});
         loader.present();
 
+        //noinspection TypeScriptUnresolvedVariable
         Pro.deploy.downloadUpdate((progress) => {
 
             loader.data.content = "Loading " + progress + "%";
@@ -159,6 +165,7 @@ export class PreferencesPage {
 
             console.log(JSON.stringify(result));
 
+            //noinspection TypeScriptUnresolvedVariable
             Pro.deploy.extractUpdate((progress) => {
 
                 loader.data.content = "Loading " + progress + "%";
@@ -167,6 +174,7 @@ export class PreferencesPage {
 
                 console.log(JSON.stringify(result));
                 loader.dismiss().then(()=>{
+                    //noinspection TypeScriptUnresolvedVariable
                     Pro.deploy.reloadApp();
                 });
             }).catch((err)=>{
@@ -185,6 +193,7 @@ export class PreferencesPage {
     updateChannel = "Production";
 
     public loadCurrentChannel(){
+        //noinspection TypeScriptUnresolvedVariable
         Pro.deploy.getConfiguration().then((config)=>{
             this.updateChannel = config.channel;
             this.channelLoaded = true;
@@ -201,6 +210,7 @@ export class PreferencesPage {
         let loader = this.loadingCtrl.create({content: "Setting Channel..."});
         loader.present();
 
+        //noinspection TypeScriptUnresolvedVariable
         Pro.deploy.configure({channel: this.updateChannel}).then((res)=>{
             loader.dismiss();
         }).catch((err)=>{

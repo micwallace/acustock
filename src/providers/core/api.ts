@@ -68,7 +68,7 @@ export class Api {
         this.password = password != null ? password : this.prefs.getPreference('connection_password');
     }
 
-    public testConnection(username, password) {
+    public testConnection(username, password, alertCtrl) {
 
         return new Promise((resolve, reject) => {
 
@@ -97,8 +97,29 @@ export class Api {
                         if (this.versionCompare(config.Version.value, minAcumaticaVersion) > -1)
                             return resolve();
 
-                        reject({message: "The current version of Acustock requires at least Acumatica customisation version " + minAcumaticaVersion +
-                                        " but " + config.Version.value + " is installed. Please update the customisation project to continue using AcuStock, or reinstall a version compatible with " + config.Version.value});
+
+                        let confirmAlert = alertCtrl.create({
+                            title: "Version Mismatch",
+                            message: "The current version of Acustock requires at least Acumatica customisation version " + minAcumaticaVersion +
+                                    " but " + config.Version.value + " is installed. Please update the customisation project or reinstall a version compatible with " + config.Version.value +
+                                    ". You can continue using the app but some things may not work as expected.",
+                            buttons: [
+                                {
+                                    text: 'Continue',
+                                    handler: () => {
+                                        resolve();
+                                    }
+                                },
+                                {
+                                    text: 'Cancel',
+                                    handler: () => {
+                                        reject("version_mismatch");
+                                    }
+                                }
+                            ]
+                        });
+
+                        confirmAlert.present();
 
                         return;
                     }
@@ -168,6 +189,11 @@ export class Api {
 
         return new Promise((resolve, reject)=> {
             if (this.useNativeHttp()) {
+
+                this.http.setHeader('*', 'Content-Type', 'application/json');
+                this.http.setHeader('*', 'Accept', 'application/json');
+                this.http.setDataSerializer('json');
+
                 this.http.post(this.url + '/entity/auth/login', data, {}).then((res)=>{
                     resolve(res);
                 }, (err)=>{
@@ -175,6 +201,7 @@ export class Api {
                 }).catch((err)=> {
                     reject(this.processApiError(err));
                 });
+
             } else {
                 //this.jsReqOptions.withCredentials = false;
                 this.jsHttp.post(this.url + '/entity/auth/login', JSON.stringify(data), this.jsReqOptions).toPromise().then((res)=> {
@@ -187,14 +214,14 @@ export class Api {
     }
 
     logout() {
-        return this.http.post(this.url + '/entity/auth/login', null, {});
+        return this.http.post(this.url + '/entity/auth/logout', null, {});
     }
 
     getItem(itemId) {
         return this.get('StockItem/'+itemId+'?$expand=CrossReferences,WarehouseDetails');
     }
 
-    getItemList(paramStr = "$expand=CrossReferences,WarehouseDetails") {
+    getItemList(paramStr = "$expand=CrossReferences&$filter=ItemStatus ne 'Inactive'") {
         return this.get('StockItem?'+paramStr);
     }
 
@@ -218,6 +245,17 @@ export class Api {
         return this.get("InventoryLocations?$filter=Location eq '" + locationId + "'" + warehouseFilter);
     }
 
+    getItemAllocationInfo(itemId:string, warehouseId:string, locationId:string){
+
+        let data = {
+            InventoryID: {value: itemId},
+            WarehouseID: {value: warehouseId},
+            Location: {value: locationId},
+        };
+
+        return this.put("InventoryAllocationInquiry?$expand=Details", data);
+    }
+
     getItemLotSerialInfo(itemId:string, warehouseId:string, locationId:string) {
 
         let filter = [];
@@ -239,7 +277,7 @@ export class Api {
     }
 
     getShipmentList() {
-        return this.get("ShipmentPriorityList");
+        return this.get("ShipmentList?$filter=WarehouseID eq '" + this.prefs.getPreference("warehouse") + "'");
     }
 
     putShipment(data, expand = "Details,Details/Allocations") {
@@ -322,10 +360,6 @@ export class Api {
 
         return new Promise((resolve, reject) => {
 
-            this.http.setHeader('*', 'Content-Type', 'application/json');
-            this.http.setHeader('*', 'Accept', 'application/json');
-            this.http.setDataSerializer('json');
-
             this.request('post', endpoint, body, {}, {}, false, true).then((res:any)=> {
 
                 if (res.status == 204)
@@ -378,28 +412,22 @@ export class Api {
     }
 
     get(endpoint:string, params?:any, headers?:any) {
+
         return this.request('get', endpoint, null, headers, params);
     }
 
     post(endpoint:string, body:any) {
-        this.http.setHeader('*', 'Content-Type', 'application/json');
-        this.http.setHeader('*', 'Accept', 'application/json');
-        this.http.setDataSerializer('json');
 
         return this.request('post', endpoint, body, {});
     }
 
     put(endpoint:string, body:any, headers?:any) {
-        // sometimes cordova plugin isn't initialized when the contructor runs resulting in these values not being set
-        // this is a cheap workaround
-        this.http.setHeader('*', 'Content-Type', 'application/json');
-        this.http.setHeader('*', 'Accept', 'application/json');
-        this.http.setDataSerializer('json');
 
         return this.request('put', endpoint, body, headers);
     }
 
     delete(endpoint:string, headers?:any) {
+
         return this.request('delete', endpoint, null, headers);
     }
 
@@ -412,6 +440,12 @@ export class Api {
             console.log(url);
 
             if (this.useNativeHttp()) {
+
+                // sometimes cordova plugin isn't initialized when the contructor runs resulting in these values not being set
+                // this is a cheap workaround
+                this.http.setHeader('*', 'Content-Type', 'application/json');
+                this.http.setHeader('*', 'Accept', 'application/json');
+                this.http.setDataSerializer('json');
 
                 switch (method) {
                     case "get":
@@ -536,7 +570,7 @@ export class Api {
             this.useNativeHttp() ? delete err.error : delete err._body;
         } catch (e) {}
 
-        console.log(JSON.stringify(err, Object.getOwnPropertyNames(err)));
+        //console.log(JSON.stringify(err, Object.getOwnPropertyNames(err)));
 
         delete err.headers;
 
@@ -544,7 +578,7 @@ export class Api {
         if (err.responseData && err.responseData.type != "error"){
             var exceptionMsg = (err.responseData.hasOwnProperty('exceptionMessage') ? err.responseData.exceptionMessage : err.responseData.message);
 
-            // Detect not found error and modify status to 404: Acumatica, do you even no what REST is!!
+            // Detect not found error and modify status to 404: Acumatica, do you even know what REST is!!
             if (err.responseData.hasOwnProperty('exceptionType') &&
                 err.responseData.exceptionType == "PX.Api.ContractBased.NoEntitySatisfiesTheConditionException")
                 err.status = 404;
@@ -571,7 +605,10 @@ export class Api {
                 err.statusText = "Unidentifiable error. This may be a network or CORS related issue.";
 
             err.message = (err.hasOwnProperty("status") ? err.status+" " : "") + (err.hasOwnProperty("statusText") ? err.statusText+" " : "")
-                + (err.hasOwnProperty("error") ? err.error : "")
+                + (err.hasOwnProperty("error") ? err.error.substring(0, err.error.indexOf("<!--")) : "");
+
+            if (err.message == "")
+                err.message = "Unknown Error";
         }
 
         return err;

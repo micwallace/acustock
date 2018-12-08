@@ -56,10 +56,12 @@ export class SetupPage {
             this.testConnection();
         });
 
+        //noinspection TypeScriptValidateTypes
         this.navCtrl.push(PreferencesPage);
     }
 
     showAbout(){
+        //noinspection TypeScriptValidateTypes
         this.navCtrl.push(AboutPage);
     }
 
@@ -118,7 +120,7 @@ export class SetupPage {
         let loader = this.loadingCtrl.create({content: "Loading..."});
         loader.present();
 
-        this.api.testConnection(null, null).then((res) => {
+        this.api.testConnection(null, null, this.alertCtrl).then((res) => {
 
             if (this.prefs.getPreference('warehouse') == "") {
 
@@ -145,7 +147,12 @@ export class SetupPage {
             }
 
         }).catch((err) => {
+
             loader.dismiss();
+
+            if (err == "version_mismatch")
+                return;
+
             this.utils.playFailedSound(isScan);
             this.utils.processApiError("Error", "Connection failed: " + err.message, err, this.navCtrl);
         });
@@ -223,6 +230,7 @@ export class SetupPage {
     private setupComplete(){
         if (this.firsTimeSetup){
             console.log("Setting root");
+            //noinspection TypeScriptValidateTypes
             this.navCtrl.setRoot(PickShipmentsPage);
         } else {
             this.navCtrl.pop();

@@ -38,7 +38,7 @@ import { Api, CacheProvider, ItemAutocompleteService, LocationAutocompleteServic
 import { HTTP } from '@ionic-native/http';
 import { HttpModule } from '@angular/http'
 import { ItemLookupDetailsPage } from "../pages/item-lookup-details/item-lookup-details";
-import { PickShipmentsListPage } from "../pages/pick-shipments/list/pick-shipments-list";
+import { PickDetailsListPage } from "../pages/pick-shipments/details/pick-details-list";
 import { PickShipmentsPickPage } from "../pages/pick-shipments/pick/pick-shipments-pick";
 import { PickTab} from "../pages/pick-shipments/pick/tabs/pick";
 import { PickListTab } from "../pages/pick-shipments/pick/tabs/pick-list";
@@ -80,6 +80,10 @@ import { QRPage } from "../pages/preferences/qr/qr";
 import { QRCodeModule } from "angularx-qrcode";
 import { SocialSharing } from '@ionic-native/social-sharing';
 import { Pro } from '@ionic/pro';
+import { ItemSerialsPage } from "../pages/item-lookup-details/serials/item-serials";
+import { ItemAllocationsPage } from "../pages/item-lookup-details/allocations/item-allocations";
+import { PickShipmentsListPage } from "../pages/pick-shipments/list/pick-shipments-list";
+
 declare function require(moduleName: string): any;
 const { version : appVersion } = require('../../package.json');
 
@@ -101,6 +105,7 @@ export class MyErrorHandler implements ErrorHandler {
     }
 
     handleError(err: any): void {
+        //noinspection TypeScriptUnresolvedVariable
         Pro.monitoring.handleNewError(err);
         // Remove this if you want to disable Ionic's auto exception handling
         // in development mode.
@@ -119,6 +124,7 @@ export class MyErrorHandler implements ErrorHandler {
         PickShipmentsPage,
         PickPopover,
         PickShipmentsListPage,
+        PickDetailsListPage,
         PickShipmentsPickPage,
         PickTab,
         PickListTab,
@@ -126,6 +132,8 @@ export class MyErrorHandler implements ErrorHandler {
         ItemLookupPage,
         LookupsPopover,
         ItemLookupDetailsPage,
+        ItemSerialsPage,
+        ItemAllocationsPage,
         BinLookupPage,
         ReceivePage,
         ReceivePopover,
@@ -171,6 +179,7 @@ export class MyErrorHandler implements ErrorHandler {
         PickShipmentsPage,
         PickPopover,
         PickShipmentsListPage,
+        PickDetailsListPage,
         PickShipmentsPickPage,
         PickTab,
         PickListTab,
@@ -178,6 +187,8 @@ export class MyErrorHandler implements ErrorHandler {
         ItemLookupPage,
         LookupsPopover,
         ItemLookupDetailsPage,
+        ItemAllocationsPage,
+        ItemSerialsPage,
         BinLookupPage,
         ReceivePage,
         ReceivePopover,
@@ -224,5 +235,6 @@ export class MyErrorHandler implements ErrorHandler {
         { provide: ErrorHandler, useClass: MyErrorHandler }
     ]
 })
+
 export class AppModule {
 }

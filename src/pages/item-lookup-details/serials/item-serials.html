@@ -1,0 +1,62 @@
+<!--
+  ~ This file is part of AcuStock
+  ~ Copyright (c) 2018 Michael B Wallace
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<ion-header>
+
+    <ion-navbar>
+        <ion-title>Item Serial/Lots</ion-title>
+    </ion-navbar>
+
+    <div id="details-container">
+        <div id="details-table">
+            <table>
+                <tr>
+                    <td style="width: 100px;">InventoryID:</td>
+                    <td>{{item.InventoryID.value}}</td>
+                </tr>
+                <tr>
+                    <td>Warehouse:</td>
+                    <td>{{item.Warehouse.value}}</td>
+                </tr>
+                <tr>
+                    <td>Location:</td>
+                    <td>{{item.Location.value}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</ion-header>
+
+<ion-content padding>
+    <ion-row class="table-header">
+        <ion-col col-7>Serial / Lot</ion-col>
+        <ion-col col-5 class="column-right">Available / On-Hand</ion-col>
+    </ion-row>
+    <ion-list class="item-list">
+        <ion-item class="list-item" no-padding *ngFor="let serial of item.LotSerialDetails">
+            <ion-row>
+                <ion-col col-7>
+                    <strong>{{serial.LotSerialNbr.value}}</strong>
+                </ion-col>
+                <ion-col col-5 class="column-right">
+                    {{serial.QtyAvailable.value}} / {{serial.QtyOnHand.value}}
+                </ion-col>
+            </ion-row>
+        </ion-item>
+    </ion-list>
+</ion-content>

@@ -173,4 +173,32 @@ export class UtilsProvider {
         e.preventDefault();
     }
 
+    public formatDatetime(timestamp, includeTime=false){
+
+        if (!timestamp)
+            return "";
+
+        let date = new Date(timestamp);
+
+        let month = date.getMonth() + 1;
+        let day = date.getDate();
+
+        month = (month < 10 ? "0" : "") + month;
+        day = (day < 10 ? "0" : "") + day;
+
+        var dateStr = day+"/"+month+"/"+date.getFullYear();
+
+        if (includeTime){
+            let hour = date.getHours();
+            let min = date.getMinutes();
+            let sec = date.getSeconds();
+            hour = (hour < 10 ? "0" : "") + hour;
+            min = (min < 10 ? "0" : "") + min;
+            sec = (sec < 10 ? "0" : "") + sec;
+            dateStr += " "+hour+":"+min+":"+sec;
+        }
+
+        return dateStr;
+    }
+
 }
