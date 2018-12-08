@@ -82,7 +82,7 @@
       "cordova-plugin-x-socialsharing": {},
       "cordova-plugin-ionic": {
         "APP_ID": "cb4667f2",
-        "CHANNEL_NAME": "Master",
+        "CHANNEL_NAME": "Production",
         "UPDATE_METHOD": "none",
         "UPDATE_API": "https://api.ionicjs.com",
         "MAX_STORE": "2",

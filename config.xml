@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="au.com.wallaceit.acustock" version="1.0.2" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="au.com.wallaceit.acustock" version="1.1.1" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>AcuStock</name>
     <description>Mobile stock management for Acumatica</description>
     <author email="michael@wallaceit.com.au" href="http://wallaceit.com.au/">Michael Wallace</author>
-    <content original-src="index.html" src="http://192.168.1.15:8100" />
+    <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
