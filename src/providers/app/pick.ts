@@ -51,7 +51,7 @@ export class PickProvider {
 
     private lastRequest:any = "";
 
-    public shipmentList:Array<any> = [];
+    public shipmentList:any = [];
 
     public currentListIndex = 0;
 

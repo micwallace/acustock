@@ -180,8 +180,8 @@ export class UtilsProvider {
 
         let date = new Date(timestamp);
 
-        let month = date.getMonth() + 1;
-        let day = date.getDate();
+        let month:any = date.getMonth() + 1;
+        let day:any = date.getDate();
 
         month = (month < 10 ? "0" : "") + month;
         day = (day < 10 ? "0" : "") + day;
@@ -189,9 +189,9 @@ export class UtilsProvider {
         var dateStr = day+"/"+month+"/"+date.getFullYear();
 
         if (includeTime){
-            let hour = date.getHours();
-            let min = date.getMinutes();
-            let sec = date.getSeconds();
+            let hour:any = date.getHours();
+            let min:any = date.getMinutes();
+            let sec:any = date.getSeconds();
             hour = (hour < 10 ? "0" : "") + hour;
             min = (min < 10 ? "0" : "") + min;
             sec = (sec < 10 ? "0" : "") + sec;
