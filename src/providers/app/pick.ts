@@ -90,7 +90,7 @@ export class PickProvider {
 
         return new Promise((resolve, reject)=> {
 
-            this.getShipmentList(true).then((res)=>{
+            this.getShipmentList(true).then((res:any)=>{
 
                 if (res.length == 0){
                     return reject({message: "There are no shipments available to pick."});
