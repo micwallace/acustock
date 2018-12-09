@@ -2,7 +2,7 @@
   "name": "AcuStock",
   "version": "1.1.2",
   "versionType": "beta",
-  "minAcumaticaVersion": "1.1.2",
+  "minAcumaticaVersion": "1.1.1",
   "author": "Michael Wallace",
   "homepage": "https://wallaceit.com.au/",
   "private": true,
