@@ -146,7 +146,7 @@ export class PickShipmentsPage {
             return;
         }
 
-        if (this.pickProvider.unpickedQty == 0) {
+        if (this.pickProvider.confirmedUnpickedQty == 0) {
             this.utils.showAlert("Error", "There are no items left to pick.");
             return;
         }
@@ -179,9 +179,14 @@ export class PickShipmentsPage {
                     alert.present();
                 });
             } else {
-                this.dismissLoader();
-                //noinspection TypeScriptValidateTypes
-                this.navCtrl.push(PickShipmentsPickPage);
+                if (this.pickProvider.currentShipment.PickStatus.value == "Assigned"){
+                    // Shipment is already assigned to this device - no need to reassign.
+                    this.dismissLoader();
+                    //noinspection TypeScriptValidateTypes
+                    this.navCtrl.push(PickShipmentsPickPage);
+                } else {
+                    this.assignDeviceAndStartPick();
+                }
             }
         }).catch((err)=>{
             this.dismissLoader().then(()=>{

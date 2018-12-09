@@ -47,6 +47,8 @@ export class PickProvider {
 
     public unpickedQty = 0;
 
+    public confirmedUnpickedQty = 0;
+
     public pendingQty = 0;
 
     private lastRequest:any = "";
@@ -213,7 +215,7 @@ export class PickProvider {
 
             var data = {
                 ShipmentNbr: this.currentShipment.ShipmentNbr,
-                PickStatus: {value: "2"},
+                PickStatus: {value: "Assigned"},
                 PickDevice: {value: this.prefs.getPreference("device")}
             };
 
@@ -242,6 +244,9 @@ export class PickProvider {
 
             var item = this.currentShipment.Details[i];
 
+            if (!item.PickedQty.value)
+                item.PickedQty.value = 0;
+
             if (item.PickedQty.value >= item.ShippedQty.value)
                 continue;
 
@@ -255,6 +260,9 @@ export class PickProvider {
             var shipmentLine = item.LineNbr.value;
 
             for (var x = 0; x < item.Allocations.length; x++) {
+
+                if (!item.Allocations[x].PickedQty.value)
+                    item.Allocations[x].PickedQty.value = 0;
 
                 var shipmentAlloc = JSON.parse(JSON.stringify(item.Allocations[x]));
 
@@ -517,6 +525,8 @@ export class PickProvider {
             this.totalQty += item.ShippedQty.value;
             pickedQty += item.PickedQty.value;
         }
+
+        this.confirmedUnpickedQty = this.totalQty - pickedQty;
 
         // add uncommitted picks
         for (var x in this.pendingPicks) {
@@ -801,8 +811,8 @@ export class PickProvider {
                 Details: []
             };
 
-            if (["Open", "Assigned", "Partially Picked", "Picked"].indexOf(this.currentShipment.PickStatus.value) > -1)
-                data.PickStatus = {value: (this.unpickedQty > 0 ? "Partially Picked" : "Picked")};
+            if (["Open", "Assigned", "Partial", "Picked"].indexOf(this.currentShipment.PickStatus.value) > -1)
+                data.PickStatus = {value: (this.unpickedQty > 0 ? "Partial" : "Picked")};
 
             for (var i in this.pendingPicks) {
 
