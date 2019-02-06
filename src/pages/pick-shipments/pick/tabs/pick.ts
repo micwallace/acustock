@@ -47,7 +47,7 @@ export class PickTab {
         qty: 0
     };
 
-    //showLot = false;
+    showItem = false;
     showQty = false;
 
     loader = null;
@@ -268,7 +268,7 @@ export class PickTab {
         }
     }
 
-    resetForm(keepLocation, focus) {
+    resetForm(keepLocation) {
 
         if (!keepLocation)
             this.enteredData.location = "";
@@ -277,9 +277,7 @@ export class PickTab {
         //this.enteredData.lot = "";
         this.enteredData.qty = 0;
 
-        if (focus)
-            this.locationInput.setFocus();
-
+        this.showItem = false;
         this.showQty = false;
     }
 
@@ -300,6 +298,7 @@ export class PickTab {
 
             // check if sales are allowed from this location
             if (!bin.SalesAllowed.value){
+                this.showItem = false;
                 this.showQty = false;
                 this.enteredData.location = "";
                 this.utils.playFailedSound(isScan);
@@ -309,43 +308,52 @@ export class PickTab {
                 return;
             }
 
-            this.dismissLoader();
+            /*var curItem = this.getSuggestedAllocation();
 
-            var curItem = this.getSuggestedAllocation();
-
-            if (this.enteredData.item != "" && curItem.LocationID.value != this.enteredData.location){
+            if (curItem.LocationID.value != this.enteredData.location){
                 // try find another allocation which matches this location
-                var allocIndexes = this.pickProvider.getBestFitAllocation(this.enteredData.item, this.enteredData.location);
+                var allocIndexes = this.pickProvider.getBestFitAllocation(curItem.InventoryID, this.enteredData.location);
 
                 if (allocIndexes != null){
                     this.currentLocationIndex = allocIndexes[0];
                     this.currentItemIndex = allocIndexes[1];
                 }
-            }
+            }*/
 
-            // if the item is already set, verify location item availability and prompt for bin override.
-            if (this.enteredData.item == ""){
+            // verify location item availability and prompt for bin override.
+            this.verifyLocation(isScan).then((res)=>{
+
+                this.showItem = true;
+
+                if (res !== true) return;
+
+                this.dismissLoader();
+
                 if (isScan)
                     this.utils.playScanSuccessSound();
-            } else {
-                if (!this.verifyLocation(isScan)){
-                    this.showQty = false;
-                    this.enteredData.location = "";
+
+                if (callback != null)
+                    callback();
+
+                if (locId)
                     return;
-                }
-            }
 
-            if (callback != null)
-                callback();
+                setTimeout(()=> {
+                    try { this.itemInput.setFocus(); }catch(e){}
+                });
 
-            if (locId)
-                return;
-            //document.getElementById("item").focus();
-            setTimeout(()=> {
-                try { this.itemInput.setFocus(); }catch(e){}
+            }).catch((err)=>{
+                this.showItem = false;
+                this.showQty = false;
+                this.enteredData.location = "";
+                this.utils.playFailedSound(isScan);
+                this.dismissLoader().then(()=>{
+                    this.utils.showAlert("Error", err.message, {exception: err});
+                });
             });
 
         }).catch((err)=>{
+            this.showItem = false;
             this.showQty = false;
             this.enteredData.location = "";
             this.utils.playFailedSound(isScan);
@@ -373,6 +381,8 @@ export class PickTab {
 
             var curItem = this.getSuggestedAllocation();
 
+            this.enteredData.item = item.InventoryID.value;
+
             if (item.InventoryID.value != curItem.InventoryID.value) {
                 // Search the picklist for the item & load the best match
                 var allocIndexes = this.pickProvider.getBestFitAllocation(item.InventoryID.value, this.enteredData.location);
@@ -383,7 +393,7 @@ export class PickTab {
                     this.enteredData.qty = 0;
                     this.utils.playFailedSound(isScan);
                     this.dismissLoader().then(()=> {
-                        this.utils.showAlert("Error", "The item does not exist on the picklist or has already been picked.");
+                        this.utils.showAlert("Error", "The item does not exist on the pick list or has already been picked.");
                     });
                     return;
                 }
@@ -392,36 +402,34 @@ export class PickTab {
                 this.currentItemIndex = allocIndexes[1];
             }
 
-            this.pickProvider.getItemAvailabilty(item.InventoryID.value).then((res)=>{
+            // TODO: Only verify location if the item is not the suggested one and the location has already been set, otherwise it's verified in the set location function
 
-                this.itemAvailability = res;
+            this.verifyLocation(isScan).then((res)=>{
 
-                this.dismissLoader();
+                if (res !== true) return;
 
-                if (this.verifyLocation(isScan)){
+                this.showQty = true;
+                this.enteredData.qty = 1;
 
-                    this.showQty = true;
-                    this.enteredData.qty = 1;
-                    this.enteredData.item = item.InventoryID.value;
+                if (isScan)
+                    this.utils.playScanSuccessSound();
 
-                    if (callback != null)
-                        callback();
+                if (callback != null)
+                    callback();
 
-                    if (itemId)
-                        return;
+                if (itemId)
+                    return;
 
-                    setTimeout(()=> {
-                        try { this.qtyInput.setFocus(); }catch(e){}
-                    }, 500);
-
-                }
+                setTimeout(()=> {
+                    try { this.qtyInput.setFocus(); }catch(e){}
+                }, 500);
 
             }).catch((err)=>{
                 this.showQty = false;
                 this.enteredData.item = "";
                 this.utils.playFailedSound(isScan);
                 this.dismissLoader().then(()=>{
-                    this.utils.showAlert("Error", "Failed to load item availability: "+err.message, {exception: err});
+                    this.utils.showAlert("Error", err.message, {exception: err});
                 });
             });
 
@@ -437,52 +445,69 @@ export class PickTab {
 
     private verifyLocation(isScan=false){
 
-        var enteredBin = this.enteredData.location;
+        return new Promise((resolve, reject)=>{
 
-        // Validate bin has available qty
-        var onhandQty = this.itemAvailability.hasOwnProperty(enteredBin) ? this.itemAvailability[enteredBin].QtyOnHand.value : 0;
+            var enteredBin = this.enteredData.location;
 
-        if (onhandQty == 0){
-            this.utils.playFailedSound(isScan);
-            this.utils.showAlert("Error", "There is no stock available for the current item and location. Please choose a different location or add an adjustment first.");
-            return false;
-        }
+            var item = this.getSuggestedAllocation().InventoryID.value;
 
-        var curBin = this.getSuggestedAllocation().LocationID.value;
+            this.pickProvider.getItemAvailabilty(item).then((res)=>{
 
-        // If the bin is not the suggested bin, prompt for override
-        if (curBin != enteredBin) {
+                this.dismissLoader();
 
-            this.utils.playPromptSound(isScan);
+                this.itemAvailability = res;
 
-            let alert = this.alertCtrl.create({
-                title: "Override Bin",
-                message: enteredBin + " is not a recommended bin (" + curBin + ") for this item, override?",
-                buttons: [
-                    {
-                        text: "No",
-                        role: "cancel",
-                        handler: ()=> {
-                            this.enteredData.location = curBin;
-                        }
-                    },
-                    {
-                        text: "Yes",
-                        handler: ()=> {
-                        }
-                    }
-                ]
+                // Validate bin has available qty
+                var onhandQty = this.itemAvailability.hasOwnProperty(enteredBin) ? this.itemAvailability[enteredBin].QtyOnHand.value : 0;
+
+                if (onhandQty == 0){
+                    // TODO: Flush the cache for this particular item. An adjustment or transfer may be done externally.
+                    reject({message: "There is no stock available for the current item and location. Please choose a different location or add an adjustment first."});
+                    return;
+                }
+
+                var curBin = this.getSuggestedAllocation().LocationID.value;
+
+                // If the bin is not the suggested bin, prompt for override
+                if (curBin != enteredBin) {
+
+                    this.utils.playPromptSound(isScan);
+
+                    let alert = this.alertCtrl.create({
+                        title: "Override Bin",
+                        message: enteredBin + " is not a recommended bin (" + curBin + ") for this item, override?",
+                        buttons: [
+                            {
+                                text: "No",
+                                role: "cancel",
+                                handler: ()=> {
+                                    this.enteredData.location = curBin;
+                                    resolve(false);
+                                }
+                            },
+                            {
+                                text: "Yes",
+                                handler: ()=> {
+                                    resolve(true);
+                                }
+                            }
+                        ]
+                    });
+
+                    alert.present();
+
+                    return;
+                }
+
+                resolve(true);
+                return;
+
+            }).catch((err)=>{
+                err.message = "Failed to load item availability: "+err.message;
+                reject(err);
             });
 
-            alert.present();
-
-            return true;
-        }
-
-        if (isScan)
-            this.utils.playScanSuccessSound();
-
-        return true;
+        });
     }
 
     private verifyAvailability(addQty=0){
@@ -575,7 +600,7 @@ export class PickTab {
 
         var newAlloc = this.getSuggestedAllocation();
 
-        this.resetForm((newAlloc != null && curAlloc.LocationID.value == newAlloc.LocationID.value), !isScan);
+        this.resetForm((newAlloc != null && curAlloc.LocationID.value == newAlloc.LocationID.value));
 
         if (!newAlloc) {
             let alert = this.alertCtrl.create({
@@ -707,7 +732,19 @@ export class PickTab {
                     this.dismissLoader();
 
                     if (this.enteredData.item == "" || this.enteredData.qty == 0) {
-                        this.setItem(item.InventoryID.value, true, callback);
+
+                        var ctx = this;
+
+                        this.setItem(item.InventoryID.value, true, function(){
+                            // If the completed quantity is reached let's automatically move to the next suggested pick
+                            if (ctx.getTotalRemainingQty() - ctx.enteredData.qty == 0) {
+                                return ctx.addPick(true);
+                            } else {
+                                if (callback != null)
+                                    callback();
+                            }
+                        });
+
                         return;
                     }
 
