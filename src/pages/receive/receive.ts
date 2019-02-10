@@ -18,7 +18,7 @@
 
 import { Component } from '@angular/core';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
-import { IonicPage, NavController, NavParams, LoadingController, AlertController, PopoverController } from 'ionic-angular';
+import { IonicPage, NavController, LoadingController, AlertController, PopoverController, Events } from 'ionic-angular';
 import { ReceiveProvider } from "../../providers/app/receive";
 import { ReceiveShipmentPage } from "./shipment/receive-shipment";
 import { UtilsProvider } from "../../providers/core/utils";
@@ -35,14 +35,29 @@ export class ReceivePage {
     public referenceNbr = "";
 
     constructor(public navCtrl:NavController,
-                public navParams:NavParams,
                 public barcodeScanner:BarcodeScanner,
                 public loadingCtrl:LoadingController,
                 public receiveProvider:ReceiveProvider,
                 public alertCtrl: AlertController,
                 public utils:UtilsProvider,
-                public popoverCtrl:PopoverController) {
+                public popoverCtrl:PopoverController,
+                public events:Events) {
 
+    }
+
+    barcodeScanHandler = (barcodeText)=>{
+        if (!(this.navCtrl.getActive().instance instanceof ReceivePage))
+            return;
+
+        this.onBarcodeScan(barcodeText)
+    };
+
+    ionViewDidLoad() {
+        this.events.subscribe('barcode:scan', this.barcodeScanHandler);
+    }
+
+    ionViewWillUnload() {
+        this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
     }
 
     presentPopover(event) {
@@ -61,7 +76,7 @@ export class ReceivePage {
         let loader = this.loadingCtrl.create({content: "Loading..."});
         loader.present();
 
-        this.receiveProvider.loadReceipt(this.referenceNbr, this.receiptType).then((res)=> {
+        this.receiveProvider.loadReceipt(this.referenceNbr, this.receiptType).then(()=> {
 
             loader.dismiss();
             this.receiptType = this.receiveProvider.type;

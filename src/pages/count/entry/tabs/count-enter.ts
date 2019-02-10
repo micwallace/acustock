@@ -17,7 +17,7 @@
  */
 
 import { Component, ViewChild, NgZone, Renderer } from '@angular/core';
-import { IonicPage, NavController, Events, AlertController, PopoverController } from 'ionic-angular';
+import { IonicPage, NavController, Events, AlertController, PopoverController, Tabs } from 'ionic-angular';
 import { CountProvider } from '../../../../providers/app/count'
 import { CacheProvider } from "../../../../providers/core/cache";
 import { LoadingController } from "ionic-angular/index";
@@ -64,10 +64,16 @@ export class CountEntryEnterTab {
 
     }
 
+    barcodeScanHandler = (barcodeText)=>{
+        var tabs: Tabs = this.navCtrl.parent;
+        if (tabs.selectedIndex !== 0)
+            tabs.select(0, {});
+
+        this.onBarcodeScan(barcodeText)
+    };
+
     ionViewDidLoad() {
-        this.events.subscribe('barcode:scan', (barcodeText)=>{
-            this.onBarcodeScan(barcodeText)
-        });
+        this.events.subscribe('barcode:scan', this.barcodeScanHandler);
 
         this.events.subscribe('counts:commit', ()=>{
             this.commitCounts();
@@ -110,7 +116,7 @@ export class CountEntryEnterTab {
     }
 
     ionViewWillUnload(){
-        this.events.unsubscribe('barcode:scan');
+        this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
         this.events.unsubscribe('counts:commit');
         this.events.unsubscribe('counts:clear');
         this.events.unsubscribe('counts:open');

@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Events } from 'ionic-angular'
 
 @Component({
     selector: 'barcode-listener',
@@ -24,13 +25,6 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 })
 
 export class BarcodeListenerComponent implements OnInit {
-    // our output will be the event emitter
-    @Output() scan:EventEmitter<string> = new EventEmitter<string>();
-    // Add the listener for the keypress
-    /*@HostListener('document:keypress', ['$event'])
-    keypress(e:KeyboardEvent) {
-        this.keypressHandler(e);
-    }*/
 
     currentTime = 0;
     currentTimeDiff = 0;
@@ -41,7 +35,7 @@ export class BarcodeListenerComponent implements OnInit {
 
     listenersAdded = false;
 
-    constructor() {
+    constructor(public events: Events) {
 
     }
 
@@ -54,13 +48,13 @@ export class BarcodeListenerComponent implements OnInit {
             });
 
             document.addEventListener('keydown', (e)=> {
-                if (this.outputString != "" && e.key == "Enter")
+                if (this.outputString != "" && (e.key == "Enter" || e.key == "Tab"))
                     this.keypressHandler(e);
             });
         }
     }
 
-    keypressHandler(e) {
+    keypressHandler(e:any) {
         let timestamp = new Date().getTime();
         this.previousKey = this.currentKey;
         this.currentKey = e.key;
@@ -75,6 +69,7 @@ export class BarcodeListenerComponent implements OnInit {
         this.currentTime = timestamp;
 
         //console.log(this.currentTimeDiff)
+        //console.log("Key press: "+ e.key);
 
         //if either the current time diff is less than 15, or the current time diff is less than 15
         //and the previous time diff was greater than 15. This is in the case where there is certainly a longer
@@ -92,14 +87,16 @@ export class BarcodeListenerComponent implements OnInit {
             //If they are both less than 15, we know we are beyond the first characters,
             //and we may start only adding the current character. Also, the current code cannot
             //be Enter, because that is when we need to emit the outputString
-            if (this.currentTimeDiff <= 25 && this.previousTimeDiff <= 25 && e.key != 'Enter') {
+            if (this.currentTimeDiff <= 25 && this.previousTimeDiff <= 25 && e.key != 'Enter' && e.key != 'Tab') {
                 this.outputString += this.currentKey;
+                // This prevents active element such as buttons from triggering their click event when the enter key is pressed.
+                (document.activeElement as HTMLElement).blur();
             }
 
             //If we are in the middle of the scan and the code is 13, we can stop adding to the
             //outputString and emit it instead. We must then set is back to empty for the next scan.
-            if (this.currentTimeDiff <= 25 && this.previousTimeDiff <= 25 && e.key == 'Enter' && this.outputString !== '') {
-                this.scan.emit(this.outputString);
+            if (this.currentTimeDiff <= 25 && this.previousTimeDiff <= 25 && (e.key == 'Enter' || e.key == 'Tab') && this.outputString !== '') {
+                this.events.publish('barcode:scan', this.outputString);
                 this.outputString = '';
             }
 

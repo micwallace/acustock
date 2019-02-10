@@ -83,6 +83,7 @@ import { Pro } from '@ionic/pro';
 import { ItemSerialsPage } from "../pages/item-lookup-details/serials/item-serials";
 import { ItemAllocationsPage } from "../pages/item-lookup-details/allocations/item-allocations";
 import { PickShipmentsListPage } from "../pages/pick-shipments/list/pick-shipments-list";
+import { LocationSelectorModal } from "../components/location-selector-modal/location-selector-modal";
 
 declare function require(moduleName: string): any;
 const { version : appVersion } = require('../../package.json');
@@ -129,6 +130,7 @@ export class MyErrorHandler implements ErrorHandler {
         PickTab,
         PickListTab,
         UnpickedListTab,
+        LocationSelectorModal,
         ItemLookupPage,
         LookupsPopover,
         ItemLookupDetailsPage,
@@ -184,6 +186,7 @@ export class MyErrorHandler implements ErrorHandler {
         PickTab,
         PickListTab,
         UnpickedListTab,
+        LocationSelectorModal,
         ItemLookupPage,
         LookupsPopover,
         ItemLookupDetailsPage,

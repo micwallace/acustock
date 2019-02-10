@@ -18,7 +18,7 @@
 
 import { Component } from '@angular/core';
 import 'rxjs/add/operator/map'
-import { IonicPage, NavController, LoadingController, PopoverController } from 'ionic-angular';
+import { IonicPage, NavController, LoadingController, PopoverController, Events } from 'ionic-angular';
 import { Api, CacheProvider, ItemAutocompleteService, PreferencesProvider } from '../../providers/providers';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { ItemLookupDetailsPage } from '../item-lookup-details/item-lookup-details';
@@ -47,7 +47,20 @@ export class ItemLookupPage {
                 public barcodeScanner:BarcodeScanner,
                 public cache:CacheProvider,
                 public prefs:PreferencesProvider,
-                public utils:UtilsProvider) {
+                public utils:UtilsProvider,
+                public events:Events) {
+    }
+
+    barcodeScanHandler = (barcodeText)=>{
+        this.loadItemByBarcode(barcodeText)
+    };
+
+    ionViewDidLoad() {
+        this.events.subscribe('barcode:scan', this.barcodeScanHandler);
+    }
+
+    ionViewWillUnload() {
+        this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
     }
 
     presentPopover(event) {
@@ -63,9 +76,31 @@ export class ItemLookupPage {
         }
 
         this.api.getItemWarehouseLocations(item.InventoryID.value, this.prefs.getPreference('warehouse')).then((res:any) => {
-            this.itemLocations = res;
-            console.log(JSON.stringify(res));
-            this.dismissLoader();
+
+            this.cache.getBinList().then((bins:any)=>{
+
+                console.log(res);
+
+                console.log(bins);
+
+                for (let location of res) {
+                    for (let bin of bins) {
+                        if (location.Location.value == bin.LocationID.value) {
+                            location.LocDescription = bin.Description.value;
+                            break;
+                        }
+                    }
+                }
+
+                this.itemLocations = res;
+                console.log(JSON.stringify(res));
+                this.dismissLoader();
+
+            }).catch((err)=>{
+                this.dismissLoader().then(()=> {
+                    this.utils.processApiError("Error", err.message, err, this.navCtrl);
+                });
+            });
 
         }).catch((err) => {
 

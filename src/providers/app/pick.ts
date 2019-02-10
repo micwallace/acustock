@@ -19,7 +19,6 @@
 import { Injectable } from '@angular/core';
 import { Api } from '../core/api'
 import { CacheProvider } from '../core/cache'
-import { LoadingController } from 'ionic-angular';
 import { PreferencesProvider } from "../core/preferences";
 
 /*
@@ -57,7 +56,7 @@ export class PickProvider {
 
     public currentListIndex = 0;
 
-    constructor(public api:Api, public cache:CacheProvider, public loadingCtrl:LoadingController, public prefs:PreferencesProvider) {
+    constructor(public api:Api, public cache:CacheProvider, public prefs:PreferencesProvider) {
 
     }
 
@@ -138,10 +137,6 @@ export class PickProvider {
 
                 this.pendingPicks = {};
 
-                this.generateSourceList();
-
-                this.calculateQtys();
-
                 // load saved picks
                 var picks = JSON.parse(localStorage.getItem("unconfirmed_picks"));
 
@@ -153,7 +148,12 @@ export class PickProvider {
                     this.savedPicks = null;
                 }
 
-                this.precacheAvailability();
+                if (this.hasSavedPicks())
+                    this.loadSavedPicks();
+
+                this.generateSourceList();
+
+                this.calculateQtys();
 
                 resolve(true);
 
@@ -782,8 +782,9 @@ export class PickProvider {
 
     public loadSavedPicks() {
         this.pendingPicks = this.savedPicks;
-        this.calculateQtys();
-        this.generateSourceList();
+        // This happens on shipment load now
+        //this.calculateQtys();
+        //this.generateSourceList();
     }
 
     public clearSavedPicks() {
@@ -800,9 +801,12 @@ export class PickProvider {
         localStorage.setItem("unconfirmed_picks", JSON.stringify(picks));
 
         this.savedPicks = null;
+
+        this.generateSourceList();
+        this.calculateQtys();
     }
 
-    public confirmPicks() {
+    public confirmPicks(removeUnpicked) {
 
         return new Promise((resolve, reject) => {
 
@@ -812,16 +816,24 @@ export class PickProvider {
             };
 
             if (["Open", "Assigned", "Partial", "Picked"].indexOf(this.currentShipment.PickStatus.value) > -1)
-                data.PickStatus = {value: (this.unpickedQty > 0 ? "Partial" : "Picked")};
+                data.PickStatus = {value: ((removeUnpicked==false && this.unpickedQty > 0) ? "Partial" : "Picked")};
+
+            var pickedLineNums = [];
 
             for (var i in this.pendingPicks) {
 
-                var item = {
-                    LineNbr: {value: i},
+                let lineNbr = parseInt(i);
+
+                pickedLineNums.push(lineNbr);
+
+                var item:any = {
+                    LineNbr: {value: lineNbr},
                     Allocations: []
                 };
 
                 var alloc:any;
+
+                var totalPicked = 0;
 
                 var modified = this.modifiedAllocations.hasOwnProperty(i) ? this.modifiedAllocations[i].Allocations : {};
 
@@ -837,9 +849,12 @@ export class PickProvider {
 
                     var pickedQty = pendingAlloc.PickedQty.value + pendingAlloc.PendingQty;
 
+                    totalPicked += pickedQty;
+
                     alloc = {
-                        LineNbr: {value: i},
-                        Qty: {value: (pendingAlloc.Qty.value < pickedQty ? pickedQty : pendingAlloc.Qty.value)}, // If the allocation is over-picked, also increase the allocation qty
+                        LineNbr: {value: lineNbr},
+                        // If the allocation is over-picked or we are removing unpicked items, set the quantity to picked quantity.
+                        Qty: {value: ((removeUnpicked || pendingAlloc.Qty.value < pickedQty) ? pickedQty : pendingAlloc.Qty.value)},
                         PickedQty: {value: pickedQty},
                         LocationID: pendingAlloc.LocationID
                     };
@@ -871,13 +886,15 @@ export class PickProvider {
                     var modAlloc = modified[y];
 
                     alloc = {
-                        LineNbr: {value: i},
+                        LineNbr: {value: lineNbr},
                         SplitLineNbr: modAlloc.SplitLineNbr,
-                        Qty: modAlloc.Qty,
+                        Qty: removeUnpicked ? modAlloc.PickedQty : modAlloc.Qty,
                     };
 
-                    if (modAlloc.hasOwnProperty("delete"))
+                    if (alloc.Qty.value == 0 || modAlloc.hasOwnProperty("delete"))
                         alloc["delete"] = true;
+
+                    totalPicked += modAlloc.PickedQty.value;
 
                     item.Allocations.push(alloc);
                 }
@@ -885,11 +902,36 @@ export class PickProvider {
                 // Combine pending picks along with the modified/deleted ones they are replacing
                 item.Allocations = item.Allocations.concat(allocs);
 
+                if (removeUnpicked)
+                    item.ShippedQty = {value: totalPicked};
+
+                console.log("Total picked for item line "+i+": "+totalPicked);
+
                 data.Details.push(item);
             }
 
+            if (removeUnpicked){
+                // Loop through shipment lines and add lines that don't have pending picks
+                for (let item of this.currentShipment.Details){
+
+                    if (pickedLineNums.indexOf(item.LineNbr.value) === -1){
+
+                        var itemUpdate = {
+                            LineNbr: item.LineNbr,
+                            ShippedQty: item.PickedQty,
+                        };
+
+                        // Delete whole line if there's none picked, otherwise reduce shipped qty to equal picked qty
+                        if (itemUpdate.ShippedQty.value === 0)
+                            itemUpdate['delete'] = true;
+
+                        data.Details.push(itemUpdate);
+                    }
+                }
+            }
+
             //console.log("Submitting Picks");
-            //console.log(JSON.stringify(data));
+            console.log(JSON.stringify(data));
 
             this.lastRequest = data;
 
@@ -898,9 +940,6 @@ export class PickProvider {
                 this.currentShipment = res;
 
                 this.clearSavedPicks();
-
-                this.generateSourceList();
-                this.calculateQtys();
 
                 this.shipmentList = []; // Force reload of shipment list
 

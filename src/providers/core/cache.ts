@@ -295,7 +295,18 @@ export class CacheProvider {
                     this.itemLocations[itemId][item.Location.value] = item;
                 }
 
-                resolve(this.itemLocations[itemId]);
+                this.getBinList().then((bins:any)=>{
+
+                    for (let bin of bins){
+                        if (this.itemLocations[itemId].hasOwnProperty(bin.LocationID.value))
+                            this.itemLocations[itemId][bin.LocationID.value].LocDescription = bin.Description.value;
+                    }
+
+                    resolve(this.itemLocations[itemId]);
+
+                }).catch((err)=>{
+                    reject(err);
+                });
 
             }).catch((err) => {
                 reject(err);
@@ -317,9 +328,18 @@ export class CacheProvider {
         });
     }
 
-    public flushItemLocationCache(){
-        this.itemLocations = {};
-        this.locationItems = {};
+    public flushItemLocationCache(key=null){
+        if (key != null){
+            if (this.itemLocations.hasOwnProperty(key)){
+                delete this.itemLocations[key];
+            } else if (this.locationItems.hasOwnProperty(key)){
+                delete this.locationItems[key];
+            }
+        } else {
+            this.itemLocations = {};
+            this.locationItems = {};
+        }
+
     }
 
     public initialLoad() {

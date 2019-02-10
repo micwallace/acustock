@@ -18,7 +18,7 @@
 
 import { Component } from '@angular/core';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
-import { IonicPage, NavController, LoadingController, PopoverController } from 'ionic-angular';
+import { IonicPage, NavController, LoadingController, PopoverController, Events } from 'ionic-angular';
 import { CountProvider } from "../../providers/app/count";
 import { CountEntryPage } from "./entry/count-entry";
 import { UtilsProvider } from "../../providers/core/utils";
@@ -38,16 +38,28 @@ export class CountPage {
                 public barcodeScanner:BarcodeScanner,
                 public loadingCtrl:LoadingController,
                 public countProvider:CountProvider,
-                public utils:UtilsProvider) {
+                public utils:UtilsProvider,
+                public events:Events) {
+    }
+
+    barcodeScanHandler = (barcodeText)=>{
+        if (!(this.navCtrl.getActive().instance instanceof CountPage))
+            return;
+
+        this.onBarcodeScan(barcodeText)
+    };
+
+    ionViewDidLoad() {
+        this.events.subscribe('barcode:scan', this.barcodeScanHandler);
+    }
+
+    ionViewWillUnload() {
+        this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
     }
 
     presentPopover(event) {
         let popover = this.popoverCtrl.create(CountPopover);
         popover.present({ev:event});
-    }
-
-    isActive(){
-        return this.navCtrl.getActive().instance instanceof CountPage;
     }
 
     loadCount(referenceNbr, isScan=false){

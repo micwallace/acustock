@@ -46,10 +46,15 @@ export class LocationAutocompleteService implements AutoCompleteService {
     }
 
     getResults(keyword:string) {
+
+        keyword = keyword.toLowerCase().trim();
+
         return this.binList.filter(
             item => {
+                if (item.Description.value.toLowerCase().indexOf(keyword) !== -1)
+                    return true;
                 //noinspection TypeScriptUnresolvedVariable
-                return item.LocationID.value.toLowerCase().startsWith(keyword.toLowerCase());
+                return item.LocationID.value.toLowerCase().startsWith(keyword);
             });
     }
 

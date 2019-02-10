@@ -33,16 +33,21 @@
 </ion-header>
 <ion-content no-padding>
     <div *ngIf="getSuggestedAllocation() != null">
-        <button type="button" ion-button small icon-only style="position: absolute; right: 5px; top: 5px;" (click)="startCameraScanner()">
+        <button type="button" ion-button small icon-only style="position: absolute; right: 10px; top: 10px;" (click)="startCameraScanner()">
             <ion-icon name="barcode"></ion-icon>
         </button>
-        <h5 style="text-align: center; margin-top:10px;">{{getSuggestedAllocation()?.InventoryID?.value}}</h5>
+        <h6 style="text-align: center; margin-top:15px;">{{getSuggestedAllocation()?.InventoryID?.value}}</h6>
         <h6 style="text-align: center; margin-top:0;">{{getSuggestedAllocation()?.Description?.value}}</h6>
         <h6 style="text-align: center; margin-top:0;">Picked {{getTotalPickedQty()}} of
             {{getSuggestedAllocation()?.TotalRemainingQty}}</h6>
     </div>
 
-    <ion-grid>
+    <div *ngIf="getSuggestedAllocation() == null">
+        <h3 style="text-align: center;">Picking Completed</h3>
+        <h5 style="text-align: center;">All items on the shipment have been picked.</h5>
+    </div>
+
+    <ion-grid *ngIf="getSuggestedAllocation() != null">
         <ion-row>
             <ion-col>
                 <ion-item no-margin no-padding>
@@ -54,7 +59,7 @@
                 <ion-item>
                     <ion-label color="primary">&nbsp;</ion-label>
                     <ion-input id="location" #location type="text" [(ngModel)]="enteredData.location"
-                               (focus)="$event.target.select();" (change)="setLocation();" (keypress)="$event.stopPropagation();"></ion-input>
+                               (click)="openLocationSelector();" (change)="setLocation();" (keypress)="$event.stopPropagation();" readonly></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
@@ -125,7 +130,7 @@
                 <button type="button" ion-button small (click)="previousItem()">
                     <ion-icon name="arrow-back"></ion-icon>
                 </button>
-                <button type="button" ion-button small (click)="nextItem()">
+                <button type="button" ion-button small (click)="nextItem();" (keydown.enter)="$event.preventDefault();">
                     <ion-icon name="arrow-forward"></ion-icon>
                 </button>
             </ion-col>

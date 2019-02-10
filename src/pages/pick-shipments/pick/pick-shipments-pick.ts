@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, ViewChild } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController, Events, Tabs } from 'ionic-angular';
+import { Component } from '@angular/core';
+import { IonicPage, NavController, Events } from 'ionic-angular';
 import { PickTab } from "./tabs/pick";
 import { PickListTab } from "./tabs/pick-list";
 import { UnpickedListTab } from "./tabs/unpicked-list";
@@ -37,15 +37,11 @@ import { PickProvider } from "../../../providers/app/pick";
 })
 export class PickShipmentsPickPage {
 
-    @ViewChild("tabs") tabs: Tabs;
-
     tab1Root = PickTab;
     tab2Root = UnpickedListTab;
     tab3Root = PickListTab;
 
     constructor(public navCtrl:NavController,
-                public navParams:NavParams,
-                public viewCtrl:ViewController,
                 public events:Events,
                 public pickProvider:PickProvider) {
 
@@ -59,14 +55,6 @@ export class PickShipmentsPickPage {
 
     ionViewWillUnload(){
         this.events.unsubscribe('closeModal');
-    }
-
-    onBarcodeScan(barcodeText){
-        if (this.tabs.selectedIndex !== 0) {
-            this.tabs.select(0, {});
-        }
-
-        this.events.publish('barcode:scan', barcodeText);
     }
 
 }

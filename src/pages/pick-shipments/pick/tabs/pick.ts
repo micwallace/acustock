@@ -17,12 +17,13 @@
  */
 
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController, Events, AlertController, LoadingController, PopoverController } from 'ionic-angular';
+import { IonicPage, NavController, Events, AlertController, LoadingController, PopoverController, ModalController, Tabs } from 'ionic-angular';
 import { PickProvider } from '../../../../providers/providers';
 import { CacheProvider } from "../../../../providers/core/cache";
 import { UtilsProvider } from "../../../../providers/core/utils";
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { PickPopover } from "../../pick-popover";
+import { LocationSelectorModal } from "../../../../components/location-selector-modal/location-selector-modal";
 
 @IonicPage()
 @Component({
@@ -33,7 +34,7 @@ export class PickTab {
 
     @ViewChild('location') locationInput;
     @ViewChild('item') itemInput;
-    @ViewChild('lot') lotInput;
+    //@ViewChild('lot') lotInput;
     @ViewChild('qty') qtyInput;
 
     currentLocationIndex = 0;
@@ -56,25 +57,30 @@ export class PickTab {
     itemAvailability = {};
 
     constructor(public navCtrl:NavController,
-                public navParams:NavParams,
                 public pickProvider:PickProvider,
                 public cache:CacheProvider,
-                public viewCtrl:ViewController,
                 public events:Events,
                 public alertCtrl:AlertController,
                 public loadingCtrl: LoadingController,
                 private ngZone: NgZone,
                 public utils:UtilsProvider,
                 public barcodeScanner:BarcodeScanner,
-                public popoverCtrl:PopoverController) {
+                public popoverCtrl:PopoverController,
+                public modalCtrl:ModalController) {
 
     }
 
+    barcodeScanHandler = (barcodeText)=>{
+        var tabs: Tabs = this.navCtrl.parent;
+        if (tabs.selectedIndex !== 0)
+            tabs.select(0, {});
+
+        this.onBarcodeScan(barcodeText);
+    };
+
     ionViewDidLoad() {
 
-        this.events.subscribe('barcode:scan', (barcodeText)=>{
-            this.onBarcodeScan(barcodeText)
-        });
+        this.events.subscribe('barcode:scan', this.barcodeScanHandler);
 
         this.events.subscribe('picks:confirm', ()=>{
             this.confirmPicks();
@@ -88,7 +94,10 @@ export class PickTab {
             this.openPicklistItem(indexes);
         });
 
-        if (this.pickProvider.hasSavedPicks()) {
+        // Disable this for now. User can clear picks if they wish.
+        /*if (this.pickProvider.hasSavedPicks()) {
+
+            this.pickProvider.loadSavedPicks();
 
             this.utils.playPromptSound();
 
@@ -113,11 +122,11 @@ export class PickTab {
             });
 
             alert.present();
-        }
+        }*/
     }
 
     ionViewWillUnload(){
-        this.events.unsubscribe('barcode:scan');
+        this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
         this.events.unsubscribe('picks:confirm');
         this.events.unsubscribe('picks:cancel');
         this.events.unsubscribe('picks:open');
@@ -149,7 +158,7 @@ export class PickTab {
             this.loaderTimer = null;
         }
 
-        return new Promise((resolve, reject)=>{
+        return new Promise((resolve)=>{
 
             if (this.loader == null)
                 return resolve();
@@ -157,7 +166,7 @@ export class PickTab {
             this.loader.dismiss().then(()=>{
                 this.loader = null;
                 resolve();
-            }).catch((err)=>{
+            }).catch(()=>{
                 resolve();
             });
         });
@@ -247,8 +256,8 @@ export class PickTab {
             this.currentItemIndex = 0;
         }
 
-        console.log(this.currentLocationIndex + " / " + this.currentItemIndex);
-        console.log(this.getSuggestedAllocation());
+        //console.log(this.currentLocationIndex + " / " + this.currentItemIndex);
+        //console.log(this.getSuggestedAllocation());
     }
 
     previousItem() {
@@ -270,15 +279,53 @@ export class PickTab {
 
     resetForm(keepLocation) {
 
-        if (!keepLocation)
+        if (!keepLocation) {
             this.enteredData.location = "";
+            this.showItem = false;
+        }
 
         this.enteredData.item = "";
         //this.enteredData.lot = "";
         this.enteredData.qty = 0;
 
-        this.showItem = false;
         this.showQty = false;
+    }
+
+    public openLocationSelector(){
+
+        if (!this.getSuggestedAllocation())
+            return;
+
+        this.showLoaderDelayed("Loading item locations...");
+
+        console.log(this.getSuggestedAllocation().InventoryID.value);
+
+        this.pickProvider.getItemAvailabilty(this.getSuggestedAllocation().InventoryID.value).then((locations)=>{
+
+            this.dismissLoader();
+
+            let locArr = [];
+
+            for (var i in locations){
+                locArr.push(locations[i]);
+            }
+
+            var modal = this.modalCtrl.create(LocationSelectorModal, {
+                locations: locArr
+            }, {cssClass: 'location-selector'});
+
+            modal.onDidDismiss((data)=>{
+                if (data)
+                    this.setLocation(data.location);
+            });
+
+            modal.present();
+
+        }).catch((err)=>{
+            this.dismissLoader().then(()=>{
+                this.utils.showAlert("Error", err.message, {exception: err});
+            });
+        });
     }
 
     setLocation(locId, isScan=false, callback=null) {
@@ -383,6 +430,7 @@ export class PickTab {
 
             this.enteredData.item = item.InventoryID.value;
 
+            // The item scanned is not the current item. Check if it's on the picklist and update the current allocation.
             if (item.InventoryID.value != curItem.InventoryID.value) {
                 // Search the picklist for the item & load the best match
                 var allocIndexes = this.pickProvider.getBestFitAllocation(item.InventoryID.value, this.enteredData.location);
@@ -400,46 +448,55 @@ export class PickTab {
 
                 this.currentLocationIndex = allocIndexes[0];
                 this.currentItemIndex = allocIndexes[1];
+
+                this.verifyLocation(isScan).then((res)=>{
+
+                    if (res !== true) return;
+
+                    this.setItemSuccessCallback(itemId, isScan, callback);
+
+                }).catch((err)=>{
+                    this.setItemErrorCallback(err, isScan);
+                });
+
+                return;
             }
 
-            // TODO: Only verify location if the item is not the suggested one and the location has already been set, otherwise it's verified in the set location function
+            this.dismissLoader();
 
-            this.verifyLocation(isScan).then((res)=>{
-
-                if (res !== true) return;
-
-                this.showQty = true;
-                this.enteredData.qty = 1;
-
-                if (isScan)
-                    this.utils.playScanSuccessSound();
-
-                if (callback != null)
-                    callback();
-
-                if (itemId)
-                    return;
-
-                setTimeout(()=> {
-                    try { this.qtyInput.setFocus(); }catch(e){}
-                }, 500);
-
-            }).catch((err)=>{
-                this.showQty = false;
-                this.enteredData.item = "";
-                this.utils.playFailedSound(isScan);
-                this.dismissLoader().then(()=>{
-                    this.utils.showAlert("Error", err.message, {exception: err});
-                });
-            });
+            this.setItemSuccessCallback(itemId, isScan, callback);
 
         }).catch((err)=> {
-            this.showQty = false;
-            this.enteredData.item = "";
-            this.utils.playFailedSound(isScan);
-            this.dismissLoader().then(()=>{
-                this.utils.showAlert("Error", err.message, {exception: err});
-            });
+            this.setItemErrorCallback(err, isScan);
+        });
+    }
+
+    private setItemSuccessCallback(itemId, isScan, callback){
+
+        this.showQty = true;
+        this.enteredData.qty = 1;
+
+        if (isScan)
+            this.utils.playScanSuccessSound();
+
+        if (callback != null)
+            callback();
+
+        if (itemId)
+            return;
+
+        setTimeout(()=> {
+            try { this.qtyInput.setFocus(); }catch(e){}
+        }, 500);
+
+    }
+
+    private setItemErrorCallback(err, isScan){
+        this.showQty = false;
+        this.enteredData.item = "";
+        this.utils.playFailedSound(isScan);
+        this.dismissLoader().then(()=>{
+            this.utils.showAlert("Error", err.message, {exception: err});
         });
     }
 
@@ -449,9 +506,9 @@ export class PickTab {
 
             var enteredBin = this.enteredData.location;
 
-            var item = this.getSuggestedAllocation().InventoryID.value;
+            var itemId = this.getSuggestedAllocation().InventoryID.value;
 
-            this.pickProvider.getItemAvailabilty(item).then((res)=>{
+            this.pickProvider.getItemAvailabilty(itemId).then((res)=>{
 
                 this.dismissLoader();
 
@@ -461,7 +518,7 @@ export class PickTab {
                 var onhandQty = this.itemAvailability.hasOwnProperty(enteredBin) ? this.itemAvailability[enteredBin].QtyOnHand.value : 0;
 
                 if (onhandQty == 0){
-                    // TODO: Flush the cache for this particular item. An adjustment or transfer may be done externally.
+                    this.cache.flushItemLocationCache(itemId);
                     reject({message: "There is no stock available for the current item and location. Please choose a different location or add an adjustment first."});
                     return;
                 }
@@ -521,11 +578,13 @@ export class PickTab {
 
         var curAlloc = this.getSuggestedAllocation();
 
+        var itemId = curAlloc.InventoryID.value;
+
         // check availability
         var availability = this.itemAvailability.hasOwnProperty(this.enteredData.location) ? this.itemAvailability[this.enteredData.location] : 0;
 
         if (availability == null){
-
+            this.cache.flushItemLocationCache(itemId);
             this.utils.showAlert("Error", "There is no stock available for the current item and location. Please choose a different location or add an adjustment first.");
             return false;
         } else {
@@ -539,11 +598,13 @@ export class PickTab {
             if (unallocatedQty > 0){
 
                 if (unallocatedQty > onhandQty){
+                    this.cache.flushItemLocationCache(itemId);
                     this.utils.showAlert("Error", "There is is only " + onhandQty + " on-hand units for the current location. Please alter quantity, choose a different location or add an adjustment first.");
                     return false;
                 }
 
                 if (unallocatedQty > availableQty){
+                    this.cache.flushItemLocationCache(itemId);
                     this.utils.showAlert("Error", "There is is only " + availableQty + " available units for the current location. Please alter quantity, choose a different location or add an adjustment first.");
                     return false;
                 }
@@ -665,10 +726,46 @@ export class PickTab {
         if (Object.keys(this.pickProvider.pendingPicks).length == 0)
             return this.utils.showAlert("Error",  "There are no picked items to commit.");
 
+
+        if (this.pickProvider.unpickedQty > 0){
+
+            let alert = this.alertCtrl.create({
+                title: "Unpicked Items",
+                message: "Some items on the shipment have not been picked. Would you like to remove unpicked items from the shipment?",
+                buttons: [
+                    {
+                        text: "Cancel",
+                        role: "cancel"
+                    },
+                    {
+                        text: "No",
+                        handler: ()=> {
+                            this.doConfirmPicks(false);
+                        }
+                    },
+                    {
+                        text: "Yes",
+                        handler: ()=> {
+                            this.doConfirmPicks(true);
+                        }
+                    }
+                ]
+            });
+
+            alert.present();
+
+        } else {
+            this.doConfirmPicks(false);
+        }
+
+    }
+
+    doConfirmPicks(removeUnpicked){
+
         let loader = this.loadingCtrl.create({content: "Confirming picks..."});
         loader.present();
 
-        this.pickProvider.confirmPicks().then((res:any)=>{
+        this.pickProvider.confirmPicks(removeUnpicked).then((res:any)=>{
             loader.dismiss();
             this.cache.flushItemLocationCache();
             this.events.publish('closeModal');

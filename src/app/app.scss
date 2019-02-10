@@ -212,3 +212,17 @@ qrcode {
     margin: auto;
   }
 }
+
+.location-selector {
+  padding: 80px 30px 30px;
+  background: rgba(0,0,0,0.5);
+  ion-header, ion-toolbar {
+    min-height: 35px;
+    .toolbar-title {
+      padding: 5px;
+    }
+  }
+  ion-content > div {
+    padding: 8px 5px 5px;
+  }
+}

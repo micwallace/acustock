@@ -17,7 +17,7 @@
  */
 
 import { Component, ViewChild, NgZone, } from '@angular/core';
-import { IonicPage, NavController, Events, AlertController, LoadingController, PopoverController } from 'ionic-angular';
+import { IonicPage, NavController, Events, AlertController, LoadingController, PopoverController, Tabs } from 'ionic-angular';
 import { ReceiveProvider } from '../../../../providers/app/receive'
 import { CacheProvider } from "../../../../providers/core/cache";
 import { UtilsProvider } from "../../../../providers/core/utils";
@@ -68,10 +68,16 @@ export class ReceiveShipmentEnterTab {
 
     }
 
+    barcodeScanHandler = (barcodeText)=>{
+        var tabs: Tabs = this.navCtrl.parent;
+        if (tabs.selectedIndex !== 0)
+            tabs.select(0, {});
+
+        this.onBarcodeScan(barcodeText)
+    };
+
     ionViewDidLoad() {
-        this.events.subscribe('barcode:scan', (barcodeText)=>{
-            this.onBarcodeScan(barcodeText)
-        });
+        this.events.subscribe('barcode:scan', this.barcodeScanHandler);
 
         this.events.subscribe('receipts:confirm', ()=>{
             this.confirmReceipts();
@@ -114,7 +120,7 @@ export class ReceiveShipmentEnterTab {
     }
 
     ionViewWillUnload(){
-        this.events.unsubscribe('barcode:scan');
+        this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
         this.events.unsubscribe('receipts:confirm');
         this.events.unsubscribe('receipts:clear');
         this.events.unsubscribe('receipts:open');

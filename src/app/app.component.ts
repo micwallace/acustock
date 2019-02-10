@@ -17,7 +17,7 @@
  */
 
 import { Component, ViewChild } from '@angular/core';
-import { Platform, Nav, LoadingController, AlertController } from 'ionic-angular';
+import { IonicApp, Platform, Nav, LoadingController, AlertController } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
@@ -50,7 +50,8 @@ export class AcuStock {
                 public api:Api,
                 public cache:CacheProvider,
                 public loadingCtrl:LoadingController,
-                public utils:UtilsProvider) {
+                public utils:UtilsProvider,
+                private ionicApp: IonicApp) {
 
         platform.ready().then((readySrc) => {
 
@@ -64,7 +65,12 @@ export class AcuStock {
             // Confirm exit
             this.platform.registerBackButtonAction(() => {
 
-                if (this.navCtrl.length() == 1) {
+                let activeModal = this.ionicApp._modalPortal.getActive();
+
+                if(activeModal){
+                    activeModal.dismiss();
+                    return;
+                } else if (this.navCtrl.length() == 1) {
                     if (!this.showedAlert) {
                         this.confirmExitApp();
                     } else {

@@ -31,7 +31,6 @@
     </ion-navbar>
 
 </ion-header>
-<barcode-listener *ngIf="isActive();" (scan)='onBarcodeScan($event)'></barcode-listener>
 <ion-content padding barcode-listener (scan)='onBarcodeScan($event);'>
     <form id="pick-shipments-form1">
         <ion-list id="login-list3">

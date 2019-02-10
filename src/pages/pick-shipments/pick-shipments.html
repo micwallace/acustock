@@ -31,7 +31,6 @@
         </ion-buttons>
     </ion-navbar>
 </ion-header>
-<barcode-listener *ngIf="isActive();" (scan)='onBarcodeScan($event)'></barcode-listener>
 <ion-content padding id="page6">
     <form id="pick-shipments-form1">
         <ion-list id="login-list3">
@@ -92,6 +91,14 @@
                 </ion-col>
                 <ion-col>
                     {{pickProvider.confirmedUnpickedQty}}
+                </ion-col>
+            </ion-row>
+            <ion-row *ngIf="pickProvider.pendingQty > 0">
+                <ion-col>
+                    <label>Pending Qty:</label>
+                </ion-col>
+                <ion-col>
+                    {{pickProvider.pendingQty}}
                 </ion-col>
             </ion-row>
             <ion-row>

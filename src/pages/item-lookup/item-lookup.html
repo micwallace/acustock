@@ -41,9 +41,10 @@
     <div style="padding: 5px 15px;">
         <ng-template #listItem let-attrs="attrs">
             <span [innerHTML]="attrs.data.InventoryID.value | boldprefix:attrs.keyword"></span><br/>
+            <small [innerHTML]="attrs.data.Description.value | boldprefix:attrs.keyword"></small><br/>
             <small *ngIf="attrs.data.AlternateID" [innerHTML]="attrs.data.AlternateID | boldprefix:attrs.keyword"></small>
         </ng-template>
-        <ion-auto-complete id="item-select" [(ngModel)]="selectedItem" [dataProvider]="itemAutocompleteService"
+        <ion-auto-complete id="item-select" [(ngModel)]="selectedItem" [dataProvider]="itemAutocompleteService" [options]="{debounce: 750}"
                            [template]="listItem" (itemSelected)="loadItemLocations($event);" (keydown.enter)="loadItemByBarcode($event.target.value);"></ion-auto-complete>
     </div>
 </ion-header>
@@ -61,7 +62,11 @@
                     {{location.QtyAvailable.value}} / {{location.QtyOnHand.value}}
                 </ion-col>
             </ion-row>
+            <ion-row>
+                <ion-col>
+                    <small>{{location.LocDescription}}</small>
+                </ion-col>
+            </ion-row>
         </ion-item>
     </ion-list>
-    <barcode-listener (scan)='loadItemByBarcode($event);'></barcode-listener>
 </ion-content>

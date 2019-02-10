@@ -18,7 +18,7 @@
 
 import { Component } from '@angular/core';
 import 'rxjs/add/operator/map'
-import { IonicPage, NavController, PopoverController, LoadingController, ModalController } from 'ionic-angular';
+import { IonicPage, NavController, PopoverController, LoadingController, Events } from 'ionic-angular';
 import { Api, CacheProvider, LocationAutocompleteService, PreferencesProvider } from '../../providers/providers';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { ItemLookupDetailsPage } from '../item-lookup-details/item-lookup-details'
@@ -46,9 +46,21 @@ export class BinLookupPage {
                 public loadingCtrl:LoadingController,
                 public barcodeScanner:BarcodeScanner,
                 public cache:CacheProvider,
-                public modalCtrl:ModalController,
                 public prefs:PreferencesProvider,
-                public utils:UtilsProvider) {
+                public utils:UtilsProvider,
+                public events:Events) {
+    }
+
+    barcodeScanHandler = (barcodeText)=>{
+        this.loadItemByBarcode(barcodeText)
+    };
+
+    ionViewDidLoad() {
+        this.events.subscribe('barcode:scan', this.barcodeScanHandler);
+    }
+
+    ionViewWillUnload() {
+        this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
     }
 
     presentPopover(event) {

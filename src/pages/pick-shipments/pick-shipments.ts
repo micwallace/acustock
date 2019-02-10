@@ -17,7 +17,7 @@
  */
 
 import { Component } from '@angular/core';
-import { NavController, ModalController, LoadingController, AlertController, PopoverController } from 'ionic-angular';
+import { NavController, ModalController, LoadingController, AlertController, PopoverController, Events } from 'ionic-angular';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { PickProvider } from '../../providers/app/pick';
 import { PickDetailsListPage } from "./details/pick-details-list";
@@ -45,8 +45,25 @@ export class PickShipmentsPage {
                 public alertCtrl:AlertController,
                 public utils:UtilsProvider,
                 public prefs:PreferencesProvider,
-                public popoverCtrl:PopoverController) {
+                public popoverCtrl:PopoverController,
+                public events:Events) {
 
+    }
+
+    barcodeScanHandler = (barcodeText)=>{
+        if (!(this.navCtrl.getActive().instance instanceof PickShipmentsPage))
+            return;
+
+        this.loadShipment(barcodeText, true);
+    };
+
+    ionViewDidLoad() {
+        this.events.subscribe('barcode:scan', this.barcodeScanHandler);
+    }
+
+    ionViewWillUnload() {
+        console.log("Shipments page unload!");
+        this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
     }
 
     presentPopover(event) {
@@ -54,20 +71,12 @@ export class PickShipmentsPage {
         popover.present({ev:event});
     }
 
-    isActive(){
-        return this.navCtrl.getActive().instance instanceof PickShipmentsPage;
-    }
-
-    onBarcodeScan(barcodeData){
-        this.loadShipment(barcodeData, true);
-    }
-
     startCameraScanner() {
         this.barcodeScanner.scan().then((barcodeData) => {
             if (barcodeData.cancelled)
                 return;
 
-            this.onBarcodeScan(barcodeData.text);
+            this.loadShipment(barcodeData, true);
 
         }, (err) => {
             // An error occurred
@@ -80,6 +89,8 @@ export class PickShipmentsPage {
         let loader = this.loadingCtrl.create({content: "Loading..."});
         loader.present();
 
+        var currShipNumber = this.shipmentNbr;
+
         if (shipmentNbr != null) {
 
             this.shipmentNbr = shipmentNbr;
@@ -88,7 +99,7 @@ export class PickShipmentsPage {
                 loader.dismiss();
             }).catch((err)=> {
                 loader.dismiss();
-                this.shipmentNbr = "";
+                this.shipmentNbr = currShipNumber;
                 this.utils.playFailedSound(isScan);
                 this.utils.processApiError("Error", err.message, err, this.navCtrl);
             });
@@ -100,7 +111,7 @@ export class PickShipmentsPage {
                 loader.dismiss();
             }).catch((err)=> {
                 loader.dismiss();
-                this.shipmentNbr = "";
+                this.shipmentNbr = currShipNumber;
                 this.utils.playFailedSound(isScan);
                 this.utils.processApiError("Error", err.message, err, this.navCtrl);
             });
@@ -178,16 +189,19 @@ export class PickShipmentsPage {
                 this.dismissLoader().then(()=>{
                     alert.present();
                 });
+
             } else {
                 if (this.pickProvider.currentShipment.PickStatus.value == "Assigned"){
                     // Shipment is already assigned to this device - no need to reassign.
                     this.dismissLoader();
                     //noinspection TypeScriptValidateTypes
                     this.navCtrl.push(PickShipmentsPickPage);
+                    this.pickProvider.precacheAvailability();
                 } else {
                     this.assignDeviceAndStartPick();
                 }
             }
+
         }).catch((err)=>{
             this.dismissLoader().then(()=>{
                 this.utils.processApiError("Error", err.message, err, this.navCtrl);

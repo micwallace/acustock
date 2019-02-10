@@ -44,22 +44,11 @@ export class CountEntryPage {
     tab2Root = CountEntryPendingTab;
     tab3Root = CountEntryListTab;
 
-    constructor(public navCtrl:NavController,
-                public events:Events,
-                public countProvider:CountProvider,
-                public utils:UtilsProvider) {
+    constructor(public countProvider:CountProvider) {
 
         /*events.subscribe('closeCountScreen', () => {
             this.navCtrl.pop();
         });*/
-    }
-
-    onBarcodeScan(barcodeText){
-        if (this.tabs.selectedIndex !== 0) {
-            this.tabs.select(0, {});
-        }
-
-        this.events.publish('barcode:scan', barcodeText);
     }
 
 }

@@ -19,5 +19,4 @@
 <ion-tabs #tabs>
     <ion-tab [root]="tab1Root" [rootParams]="data" tabTitle="Enter" tabIcon="cube"></ion-tab>
     <ion-tab [root]="tab2Root" [rootParams]="data" tabTitle="Pending" tabIcon="list-box" [tabBadge]="transferProvider.pendingNumItems"></ion-tab>
-    <barcode-listener (scan)='onBarcodeScan($event)'></barcode-listener>
 </ion-tabs>

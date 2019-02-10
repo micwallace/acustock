@@ -17,7 +17,7 @@
  */
 
 import { Component, ViewChild } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController, Events, Tabs } from 'ionic-angular';
+import { IonicPage, NavController, Events, Tabs } from 'ionic-angular';
 import { ReceiveShipmentEnterTab } from "./tabs/shipment-enter";
 import { ReceiveShipmentListTab } from "./tabs/list";
 import { ReceiveShipmentPendingTab } from "./tabs/pending";
@@ -37,8 +37,6 @@ export class ReceiveShipmentPage {
     tab3Root = ReceiveShipmentListTab;
 
     constructor(public navCtrl:NavController,
-                public navParams:NavParams,
-                public viewCtrl:ViewController,
                 public events:Events, public receiveProvider:ReceiveProvider) {
 
     }
@@ -51,14 +49,6 @@ export class ReceiveShipmentPage {
 
     ionViewWillUnload(){
         this.events.unsubscribe('closeReceiveScreen');
-    }
-
-    onBarcodeScan(barcodeText){
-        if (this.tabs.selectedIndex !== 0) {
-            this.tabs.select(0, {});
-        }
-
-        this.events.publish('barcode:scan', barcodeText);
     }
 
 }

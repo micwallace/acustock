@@ -52,6 +52,10 @@ export class EnterTab {
     loader = null;
     loaderTimer = null;
 
+    barcodeScanHandler = (barcodeText)=>{
+        this.onBarcodeScan(barcodeText);
+    };
+
     constructor(private zone:NgZone,
                 public navCtrl:NavController,
                 public transferProvider:TransferProvider,
@@ -66,9 +70,7 @@ export class EnterTab {
     }
 
     ionViewDidLoad(){
-        this.events.subscribe('barcode:scan', (barcodeText)=>{
-            this.onBarcodeScan(barcodeText)
-        });
+        this.events.subscribe('barcode:scan', this.barcodeScanHandler);
 
         this.events.subscribe('transfers:commit', ()=>{
             this.commitTransfers();
@@ -80,7 +82,7 @@ export class EnterTab {
     }
 
     ionViewWillUnload(){
-        this.events.unsubscribe('barcode:scan');
+        this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
         this.events.unsubscribe('transfers:commit');
         this.events.unsubscribe('transfers:clear');
     }
