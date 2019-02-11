@@ -65,7 +65,7 @@ export class ReceiveShipmentPendingTab {
                     text: 'Ok',
                     handler: data => {
 
-                        if (data.qty <= 0)
+                        if (!data.qty)
                             return this.receiveProvider.removeReceiptItem(line, key);
 
                         var remQty = this.receiveProvider.getCommittedRemainingQty(line);

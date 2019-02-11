@@ -348,6 +348,10 @@ export class Api {
         return this.postActionAndGetResult("Adjustment/ReleaseAdjustment", {entity: {ReferenceNbr: {value: transferId}}});
     }
 
+    getCountList(warehouse) {
+        return this.get("PhysicalInventoryReview?$filter=Status eq 'Counting' and WarehouseID eq '"+warehouse+"'");
+    }
+
     getCount(referenceNbr) {
         return this.get("PhysicalInventoryReview/" + referenceNbr + "?$expand=Details");
     }
@@ -601,11 +605,12 @@ export class Api {
 
         } else {
             // CORS errors return status 0, give the user a hint.
-            if (err.status == 0 && err.statusText == "")
+            if (err.status == 0 && err.statusText == "" && err.error=="")
                 err.statusText = "Unidentifiable error. This may be a network or CORS related issue.";
 
-            err.message = (err.hasOwnProperty("status") ? err.status+" " : "") + (err.hasOwnProperty("statusText") ? err.statusText+" " : "")
-                + (err.hasOwnProperty("error") ? err.error.substring(0, err.error.indexOf("<!--")) : "");
+            err.message = (err.hasOwnProperty("status") ? err.status+" " : "") +
+                    (err.hasOwnProperty("statusText") ? err.statusText+" " : "") +
+                    (err.hasOwnProperty("error") ? (err.error.indexOf("<!--") === -1 ? err.error : err.error.substring(0,  err.error.indexOf("<!--"))) : "");
 
             if (err.message == "")
                 err.message = "Unknown Error";

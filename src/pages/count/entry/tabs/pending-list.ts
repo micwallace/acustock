@@ -62,9 +62,8 @@ export class CountEntryPendingTab {
                     text: 'Ok',
                     handler: data => {
 
-                        if (data.qty <= 0)
+                        if (!data.qty)
                             return this.countProvider.removeCount(item);
-
 
                         this.countProvider.setCount(item, data.qty, false);
                     }

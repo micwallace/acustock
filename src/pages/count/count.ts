@@ -18,11 +18,12 @@
 
 import { Component } from '@angular/core';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
-import { IonicPage, NavController, LoadingController, PopoverController, Events } from 'ionic-angular';
+import { IonicPage, NavController, LoadingController, PopoverController, ModalController, Events } from 'ionic-angular';
 import { CountProvider } from "../../providers/app/count";
 import { CountEntryPage } from "./entry/count-entry";
 import { UtilsProvider } from "../../providers/core/utils";
 import { CountPopover } from "./count-popover";
+import { CountsListPage } from "./list/counts-list";
 
 @IonicPage()
 @Component({
@@ -39,7 +40,8 @@ export class CountPage {
                 public loadingCtrl:LoadingController,
                 public countProvider:CountProvider,
                 public utils:UtilsProvider,
-                public events:Events) {
+                public events:Events,
+                public modalCtrl:ModalController) {
     }
 
     barcodeScanHandler = (barcodeText)=>{
@@ -60,6 +62,30 @@ export class CountPage {
     presentPopover(event) {
         let popover = this.popoverCtrl.create(CountPopover);
         popover.present({ev:event});
+    }
+
+    openCountList(){
+        let loader = this.loadingCtrl.create({content: "Loading..."});
+        loader.present();
+
+        this.countProvider.getCountList().then((countList)=>{
+
+            loader.dismiss();
+
+            let modal = this.modalCtrl.create(CountsListPage, {list: countList});
+
+            modal.onDidDismiss(data => {
+                if (data && data.referenceNbr) {
+                    this.loadCount(data.referenceNbr);
+                }
+            });
+
+            modal.present();
+
+        }).catch((err)=> {
+            loader.dismiss();
+            this.utils.processApiError("Error", err.message, err, this.navCtrl);
+        });
     }
 
     loadCount(referenceNbr, isScan=false){

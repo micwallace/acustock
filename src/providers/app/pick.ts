@@ -508,7 +508,7 @@ export class PickProvider {
         var binOrder = this.cache.binPickSequence;
 
         this.pickList.sort((a, b)=> {
-            return (binOrder.indexOf(a[0]) < binOrder.indexOf(b[0])) ? 1 : -1;
+            return (binOrder.indexOf(a.LocationID.value) < binOrder.indexOf(b.LocationID.value)) ? -1 : 1;
         });
 
     }
@@ -668,7 +668,7 @@ export class PickProvider {
 
         var index = 0;
 
-        qty = parseFloat(qty);
+        qty = !qty ? 0 : parseFloat(qty);
 
         for (let alloc of this.pendingPicks[shipLineNbr].Allocations) {
 

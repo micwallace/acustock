@@ -162,51 +162,61 @@ export class PickShipmentsPage {
             return;
         }
 
-        this.loader = this.loadingCtrl.create({content: "Checking assignment..."});
-        this.loader.present();
+        if (this.prefs.getPreference("pick_assign_check")) {
 
-        this.pickProvider.refreshStatus().then((res)=>{
+            this.loader = this.loadingCtrl.create({content: "Checking assignment..."});
+            this.loader.present();
 
-            if (this.pickProvider.currentShipment.PickStatus.value == "Assigned" && this.pickProvider.currentShipment.PickDevice.value != this.prefs.getPreference('device')){
+            this.pickProvider.refreshStatus().then((res)=> {
+                this.checkPickAssignment();
+            }).catch((err)=> {
+                this.dismissLoader().then(()=> {
+                    this.utils.processApiError("Error", err.message, err, this.navCtrl);
+                })
+            });
 
-                let alert = this.alertCtrl.create({
-                    title: "Shipment Assigned",
-                    message: "This shipment is already assigned to device "+this.pickProvider.currentShipment.PickDevice.value+". Would you like to release it and assign it to this device?",
-                    buttons: [
-                        {
-                            text: "No",
-                            role: "cancel"
-                        },
-                        {
-                            text: "Yes",
-                            handler: ()=> {
-                                this.assignDeviceAndStartPick();
-                            }
+        } else {
+            this.checkPickAssignment();
+        }
+
+    }
+
+    private checkPickAssignment(){
+
+        if (this.pickProvider.currentShipment.PickStatus.value == "Assigned" && this.pickProvider.currentShipment.PickDevice.value != this.prefs.getPreference('device')){
+
+            let alert = this.alertCtrl.create({
+                title: "Shipment Assigned",
+                message: "This shipment is already assigned to device "+this.pickProvider.currentShipment.PickDevice.value+". Would you like to release it and assign it to this device?",
+                buttons: [
+                    {
+                        text: "No",
+                        role: "cancel"
+                    },
+                    {
+                        text: "Yes",
+                        handler: ()=> {
+                            this.assignDeviceAndStartPick();
                         }
-                    ]
-                });
+                    }
+                ]
+            });
 
-                this.dismissLoader().then(()=>{
-                    alert.present();
-                });
-
-            } else {
-                if (this.pickProvider.currentShipment.PickStatus.value == "Assigned"){
-                    // Shipment is already assigned to this device - no need to reassign.
-                    this.dismissLoader();
-                    //noinspection TypeScriptValidateTypes
-                    this.navCtrl.push(PickShipmentsPickPage);
-                    this.pickProvider.precacheAvailability();
-                } else {
-                    this.assignDeviceAndStartPick();
-                }
-            }
-
-        }).catch((err)=>{
             this.dismissLoader().then(()=>{
-                this.utils.processApiError("Error", err.message, err, this.navCtrl);
-            })
-        });
+                alert.present();
+            });
+
+        } else {
+            if (this.pickProvider.currentShipment.PickStatus.value == "Assigned"){
+                // Shipment is already assigned to this device - no need to reassign.
+                this.dismissLoader();
+                //noinspection TypeScriptValidateTypes
+                this.navCtrl.push(PickShipmentsPickPage);
+                this.pickProvider.precacheAvailability();
+            } else {
+                this.assignDeviceAndStartPick();
+            }
+        }
 
     }
 

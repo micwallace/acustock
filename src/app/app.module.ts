@@ -57,6 +57,7 @@ import { ReceiveShipmentListTab } from "../pages/receive/shipment/tabs/list";
 import { ReceiveShipmentPendingTab } from "../pages/receive/shipment/tabs/pending";
 import { ReceiveShipmentEnterTab } from "../pages/receive/shipment/tabs/shipment-enter";
 import { CountPage } from '../pages/count/count';
+import { CountsListPage } from '../pages/count/list/counts-list';
 import { CountEntryPage } from '../pages/count/entry/count-entry';
 import { CountEntryEnterTab } from '../pages/count/entry/tabs/count-enter';
 import { CountEntryListTab } from '../pages/count/entry/tabs/count-list';
@@ -144,6 +145,7 @@ export class MyErrorHandler implements ErrorHandler {
         ReceiveShipmentPendingTab,
         ReceiveShipmentEnterTab,
         CountPage,
+        CountsListPage,
         CountPopover,
         CountEntryPage,
         CountEntryEnterTab,
@@ -200,6 +202,7 @@ export class MyErrorHandler implements ErrorHandler {
         ReceiveShipmentPendingTab,
         ReceiveShipmentEnterTab,
         CountPage,
+        CountsListPage,
         CountPopover,
         CountEntryPage,
         CountEntryEnterTab,

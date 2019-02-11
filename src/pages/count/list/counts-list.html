@@ -1,0 +1,57 @@
+<!--
+  ~ This file is part of AcuStock
+  ~ Copyright (c) 2019 Michael B Wallace
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<ion-header>
+
+    <ion-navbar>
+        <ion-buttons left>
+            <button navPop ion-button icon-only style="margin-left: 10px;">
+                <ion-icon name="arrow-back"></ion-icon>
+            </button>
+        </ion-buttons>
+        <ion-title>Count List</ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="presentPopover($event)">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+    <ion-grid>
+        <ion-list class="item-list">
+            <ion-item no-margin no-padding class="list-item" *ngFor="let count of countList; let i = index" (click)="openCount(count.ReferenceNbr.value);">
+                <ion-row no-margin>
+                    <ion-col col-8>
+                        <div>
+                            <strong>{{count.ReferenceNbr.value}}</strong><br/>
+                            <small>{{count.Description.value}}</small>
+                        </div>
+                    </ion-col>
+                    <ion-col col-4 class="column-right" text-right>
+                        {{count.Status.value}}<br/>
+                        {{count.TotalPhysicalQty.value}}
+                    </ion-col>
+                </ion-row>
+            </ion-item>
+        </ion-list>
+    </ion-grid>
+</ion-content>

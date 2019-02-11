@@ -213,6 +213,18 @@ export class PreferencesProvider {
             ]
         },
         {
+            title: "Picking",
+            preferences: [
+                {
+                    key: "pick_assign_check",
+                    min_key: "pac",
+                    title: "Double-check assignment",
+                    type: "toggle",
+                    def_value: false
+                }
+            ]
+        },
+        {
             title: "Theme",
             preferences: [
                 {

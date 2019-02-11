@@ -52,6 +52,16 @@ export class CountProvider {
     constructor(public api:Api, public prefs:PreferencesProvider) {
     }
 
+    public getCountList(){
+        return new Promise((resolve, reject)=> {
+            this.api.getCountList(this.prefs.getPreference('warehouse')).then((res:any)=>{
+                resolve(res);
+            }).catch((err)=>{
+                reject(err);
+            });
+        });
+    }
+
     public loadCount(referenceNbr) {
 
         return new Promise((resolve, reject)=> {

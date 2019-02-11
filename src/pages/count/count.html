@@ -46,6 +46,9 @@
             </ion-item>
         </ion-list>
     </form>
+    <div style="text-align: right;">
+        <button type="button" ion-button (click)="openCountList();">List</button>
+    </div>
     <ion-grid *ngIf="countProvider.physicalCount">
         <ion-row>
             <ion-col>

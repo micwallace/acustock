@@ -243,14 +243,27 @@ export class CacheProvider {
 
         // Order for pick sequencing
         this.binList.sort((a, b)=> {
-            return (a.Zone.value ? a.Zone.value.localeCompare(b.Zone.value) : 0) ||
-                (a.PickingOrder.value > b.PickingOrder.value ? 1 : -1) ||
-                (a.LocationID.value ? a.LocationID.value.localeCompare(b.LocationID.value) : 0);
+
+            if (!a.Zone.value)
+                a.Zone.value = "";
+
+            if (!b.Zone.value)
+                b.Zone.value = "";
+
+            if (a.Zone.value != b.Zone.value)
+                return a.Zone.value.localeCompare(b.Zone.value);
+
+            if (a.PickingOrder.value != b.PickingOrder.value)
+                return (a.PickingOrder.value < b.PickingOrder.value ? -1 : 1);
+
+            return a.LocationID.value.localeCompare(b.LocationID.value);
         });
 
         // Generate index for quick lookup
         this.binIndex = {};
+        this.binPickSequence = [];
         for (let bin of this.binList) {
+            this.binPickSequence.push(bin.LocationID.value);
             this.binIndex[bin.LocationID.value] = bin;
         }
     }
