@@ -1,9 +1,9 @@
 
-#AcuStock
+# AcuStock
 
-[![Logo](https://acustock.wallaceit.com.au/img/logo.png)](https://acustock.wallaceit.com.au/)
+[![Logo](https://acustock.wallaceit.com.au/img/logo-small.png)](https://acustock.wallaceit.com.au/)
 
-##Mobile warehouse management for Acumatica
+## Mobile warehouse management for Acumatica
 
 AcuStock is a mobile inventory management app for Acumatica ERP (https://www.acumatica.com/) and other white labelled variants such as MYOB Advanced. It enables data entry for the most common warehouse functions via barcode scanning or manual entry. These functions include:
 
@@ -16,7 +16,7 @@ AcuStock is a mobile inventory management app for Acumatica ERP (https://www.acu
 
 AcuStock is an Ionic framework (https://ionicframework.com/) application. Ionic utilises some awesome modern technologies such as Cordova, Typescript, and Angular to create cross-platform applications. AcuStock is only distributed on Android at the moment but can also be compiled for iOS, Windows Phone and even as a web app for use on any device with a modern browser. 
 
-###Features
+### Features
 
 - Advanced caching layer for fast location, item and availability lookup.
 - Data entry via standard barcode scanner (keyboard device), camera scanner or manual entry.
@@ -26,17 +26,17 @@ AcuStock is an Ionic framework (https://ionicframework.com/) application. Ionic 
 - Advanced error reporting and diagnostic info can be sent via email.
 - Easy setup/provisioning via QR codes.
 
-###Anti-features
+### Anti-features
 
 - Does not support Lot/Serial tracked items at this stage, but it can and probably will be added in the future.
 
-##Download
+## Download
 
 Download AcuStock for Android from the Google play store.
 
-[![Download for Android](https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=au.com.wallaceit.acustock&utm_source=acustock_website)
+[![Download for Android](https://acustock.wallaceit.com.au/img/play-badge-small.png)](https://play.google.com/store/apps/details?id=au.com.wallaceit.acustock&utm_source=acustock_website)
 
-##Setup
+## Setup
 
 AcuStock requires a customisation project to be installed in Acumatica to function.
 
