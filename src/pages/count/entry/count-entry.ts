@@ -17,12 +17,11 @@
  */
 
 import { Component, ViewChild } from '@angular/core';
-import { IonicPage, NavController, Events, Tabs } from 'ionic-angular';
+import { IonicPage, Tabs } from 'ionic-angular';
 import { CountEntryEnterTab } from "./tabs/count-enter";
 import { CountEntryListTab } from "./tabs/count-list";
 import { CountEntryPendingTab } from "./tabs/pending-list";
 import { CountProvider } from "../../../providers/app/count";
-import {UtilsProvider} from "../../../providers/core/utils";
 
 /**
  * Generated class for the PickShipmentsPickPage page.
