@@ -40,7 +40,7 @@ Download AcuStock for Android from the Google play store.
 
 AcuStock requires a customisation project to be installed in Acumatica to function.
 
-The customisation project repository can be found (here)[https://github.com/micwallace/acustock-acumatica].
+The customisation project repository can be found (https://github.com/micwallace/acustock-acumatica)[here].
 
 To start, download the latest customisation project package from here:
 
