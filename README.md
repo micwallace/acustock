@@ -18,6 +18,7 @@ AcuStock is an Ionic framework (https://ionicframework.com/) application. Ionic 
 
 ### Features
 
+- Connects & integrates directly with Acumatica, maintaining maximum data integrity and minimising barrier to entry for new users.
 - Advanced caching layer for fast location, item and availability lookup.
 - Data entry via standard barcode scanner (keyboard device), camera scanner or manual entry.
 - The ability to make corrections to or remove pending items. Pending items are saved locally on the device ensuring you never loose your work.
