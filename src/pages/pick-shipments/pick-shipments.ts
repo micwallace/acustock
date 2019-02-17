@@ -62,7 +62,6 @@ export class PickShipmentsPage {
     }
 
     ionViewWillUnload() {
-        console.log("Shipments page unload!");
         this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
     }
 

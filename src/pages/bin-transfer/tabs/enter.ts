@@ -17,7 +17,7 @@
  */
 
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, NavController, Events, AlertController, PopoverController } from 'ionic-angular';
+import { IonicPage, NavController, Events, AlertController, PopoverController, Tabs } from 'ionic-angular';
 import { TransferProvider } from '../../../providers/app/transfer'
 import { CacheProvider } from "../../../providers/core/cache";
 import { LoadingController } from "ionic-angular/index";
@@ -37,7 +37,7 @@ export class EnterTab {
     @ViewChild('item') itemInput;
     @ViewChild('qty') qtyInput;
 
-    enteredData = {
+    enteredData:any = {
         location: "",
         toLocation: "",
         item: "",
@@ -53,6 +53,10 @@ export class EnterTab {
     loaderTimer = null;
 
     barcodeScanHandler = (barcodeText)=>{
+        var tabs: Tabs = this.navCtrl.parent;
+        if (tabs.selectedIndex !== 0)
+            tabs.select(0, {});
+
         this.onBarcodeScan(barcodeText);
     };
 
@@ -106,7 +110,6 @@ export class EnterTab {
         this.showItem = false;
         this.showQty = false;
 
-        this.locationInput.setFocus();
     }
 
     public showLoaderDelayed(message){
@@ -296,6 +299,7 @@ export class EnterTab {
 
             if (!this.validateItemQty(1)) {
                 this.utils.playFailedSound(isScan);
+                this.enteredData.item = "";
                 return;
             }
 
@@ -325,9 +329,11 @@ export class EnterTab {
     }
 
     validateItemQty(qty:any) {
-        var reqQty = qty ? qty : this.enteredData.qty;
+
+        var reqQty = qty ? qty : parseFloat(this.enteredData.qty);
         var srcQty = this.currentLocationItems.hasOwnProperty(this.enteredData.item) ? this.currentLocationItems[this.enteredData.item].QtyOnHand.value : 0;
         var curPendingQty = this.transferProvider.getItemLocPendingQty(this.enteredData.location, this.enteredData.item);
+
         if (srcQty < curPendingQty + reqQty) {
             this.utils.showAlert("Error", "There is only " + srcQty + " available for transfer from the current location. " + (curPendingQty ? curPendingQty + " are pending." : ""));
             if (!qty)
@@ -435,8 +441,6 @@ export class EnterTab {
     }
 
     onBarcodeScan(barcodeText, callback=null) {
-
-        console.log(barcodeText);
 
         this.zone.run(()=> {
 

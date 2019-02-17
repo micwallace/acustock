@@ -36,9 +36,9 @@
         <ion-list id="login-list3">
             <ion-item id="shipment-type">
                 <ion-select name="receipt-type" interface="popover" [(ngModel)]="receiptType" style="padding-left:0;">
-                    <ion-option value="shipment">Receipt Shipment</ion-option>
                     <ion-option value="transfer">Transfer Receipt</ion-option>
                     <ion-option value="purchase">Purchase Receipt</ion-option>
+                    <ion-option value="shipment">Receipt Shipment</ion-option>
                 </ion-select>
             </ion-item>
             <ion-item id="receipt-number">
@@ -53,6 +53,9 @@
             </ion-item>
         </ion-list>
     </form>
+    <div style="text-align: right;">
+        <button type="button" ion-button (click)="openReceiveList();">List</button>
+    </div>
     <ion-grid *ngIf="receiveProvider.sourceDocument">
         <ion-row *ngIf="receiveProvider.type == 'shipment'">
             <ion-col>

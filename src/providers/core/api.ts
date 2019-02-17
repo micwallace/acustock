@@ -292,6 +292,18 @@ export class Api {
         return this.postActionAndGetResult("Shipment/CorrectShipment", {entity: {ShipmentNbr: {value: shipmentNbr}}});
     }
 
+    getReceiptShipmentsList(){
+        return this.get("Shipment?$filter=Operation eq 'Receipt' and Status ne 'Completed' and WarehouseID eq '" + this.prefs.getPreference("warehouse") + "'");
+    }
+
+    getTransferList(){
+        return this.get("TransferList?$filter=WarehouseID eq '" + this.prefs.getPreference("warehouse") + "'");
+    }
+
+    getPurchaseOrderList(){
+        return this.get("POList?$filter=WarehouseID eq '" + this.prefs.getPreference("warehouse") + "'");
+    }
+
     getPurchaseOrder(orderNbr){
         return this.get("PurchaseOrder?$expand=Details&$filter=OrderNbr eq '" + orderNbr + "'");
     }

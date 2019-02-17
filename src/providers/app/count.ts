@@ -212,6 +212,8 @@ export class CountProvider {
 
     public setCount(countLine, qty, add=true){
 
+        qty = parseFloat(qty);
+
         var key = countLine.InventoryID.value + "-" + countLine.LocationID.value;
 
         if (!this.pendingCounts.hasOwnProperty(key)) {
@@ -220,9 +222,9 @@ export class CountProvider {
         }
 
         if (add) {
-            this.pendingCounts[key].PendingQty += parseFloat(qty);
+            this.pendingCounts[key].PendingQty += qty;
         } else {
-            this.pendingCounts[key].PendingQty = parseFloat(qty);
+            this.pendingCounts[key].PendingQty = qty;
         }
 
         this.calculateTotals();

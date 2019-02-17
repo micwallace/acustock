@@ -35,7 +35,7 @@ export class UserguidePage {
     public expand = null;
 
     constructor(public navCtrl:NavController, public navParams:NavParams) {
-        this.appVersion = appVersion + versionType;
+        this.appVersion = appVersion + (versionType!="stable" ? versionType : "");
         if (this.navParams.get('active'))
             this.expand = this.navParams.get('active');
     }

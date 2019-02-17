@@ -166,7 +166,6 @@ export class ReceiveShipmentEnterTab {
         this.showLocation = false;
         this.showQty = false;
 
-        this.locationInput.setFocus();
     }
 
     public showLoaderDelayed(message){

@@ -17,7 +17,7 @@
  */
 
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, NavController, Events, AlertController, PopoverController } from 'ionic-angular';
+import { IonicPage, NavController, Events, AlertController, PopoverController, Tabs } from 'ionic-angular';
 import { AdjustmentProvider } from '../../../providers/app/adjustment'
 import { CacheProvider } from "../../../providers/core/cache";
 import { LoadingController } from "ionic-angular/index";
@@ -40,7 +40,8 @@ export class AdjustmentEnterTab {
         location: "",
         item: "",
         qty: 0,
-        bookQty: 0
+        shelfQty: 0,
+        shippedQty: 0
     };
 
     currentLocationItems = {};
@@ -51,6 +52,10 @@ export class AdjustmentEnterTab {
     loaderTimer = null;
 
     barcodeScanHandler = (barcodeText)=>{
+        var tabs: Tabs = this.navCtrl.parent;
+        if (tabs.selectedIndex !== 0)
+            tabs.select(0, {});
+
         this.onBarcodeScan(barcodeText);
     };
 
@@ -115,14 +120,14 @@ export class AdjustmentEnterTab {
             location: "",
             item: "",
             qty: 0,
-            bookQty: 0
+            shelfQty: 0,
+            shippedQty: 0
         };
 
         this.currentLocationItems = {};
 
         this.showQty = false;
 
-        this.locationInput.setFocus();
     }
 
     public showLoaderDelayed(message){
@@ -264,7 +269,15 @@ export class AdjustmentEnterTab {
 
     loadItem(){
         // get current item quantity
-        this.enteredData.bookQty = this.currentLocationItems.hasOwnProperty(this.enteredData.item) ? this.currentLocationItems[this.enteredData.item].QtyOnHand.value : 0;
+        if (this.currentLocationItems.hasOwnProperty(this.enteredData.item)) {
+            this.enteredData.shelfQty = this.currentLocationItems[this.enteredData.item].QtyOnHand.value;
+            this.enteredData.shippedQty = this.currentLocationItems[this.enteredData.item].QtySOShipped ? this.currentLocationItems[this.enteredData.item].QtySOShipped.value : 0;
+            this.enteredData.shelfQty -= this.enteredData.shippedQty;
+        } else {
+            this.enteredData.shelfQty = 0;
+            this.enteredData.shippedQty = 0;
+        }
+
         this.enteredData.qty = this.adjustmentProvider.getItemPendingPhysicalQty(this.enteredData.item, this.enteredData.location);
 
         this.enteredData.qty++;
@@ -280,25 +293,26 @@ export class AdjustmentEnterTab {
     }
 
     nextItem() {
-        if (this.enteredData.item != "" && this.enteredData.qty > 0) {
+        if (this.enteredData.item != "" && this.enteredData.qty >= 0) {
             this.addAdjustmentItem();
         }
 
         this.enteredData.item = "";
         this.enteredData.qty = 0;
-        this.enteredData.bookQty = 0;
+        this.enteredData.shelfQty = 0;
+        this.enteredData.shippedQty = 0;
         this.showQty = false;
     }
 
     addAdjustmentItem(isScan=false) {
 
-        if (this.enteredData.qty - this.enteredData.bookQty == 0){
+        if (this.enteredData.qty - (this.enteredData.shelfQty + this.enteredData.shippedQty) == 0){
             this.utils.showAlert("No Variance", "This item does not have any variance and will not be added to the list");
             this.utils.playPromptSound(isScan);
             return;
         }
 
-        this.adjustmentProvider.addPendingItem(this.enteredData.location, this.enteredData.item, this.enteredData.qty, this.enteredData.bookQty);
+        this.adjustmentProvider.addPendingItem(this.enteredData.location, this.enteredData.item, this.enteredData.qty, (this.enteredData.shelfQty + this.enteredData.shippedQty));
     }
 
     clearAdjustments(){

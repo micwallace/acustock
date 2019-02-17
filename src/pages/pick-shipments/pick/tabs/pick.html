@@ -52,7 +52,7 @@
             <ion-col>
                 <ion-item no-margin no-padding>
                     <ion-label color="primary">Bin:</ion-label>
-                    <ion-input [ngModel]="getSuggestedAllocation()?.LocationID?.value" readonly></ion-input>
+                    <ion-input (click)="setSuggestedLocation();" [ngModel]="getSuggestedAllocation()?.LocationID?.value" readonly></ion-input>
                 </ion-item>
             </ion-col>
             <ion-col>
@@ -67,7 +67,7 @@
             <ion-col>
                 <ion-item no-margin no-padding>
                     <ion-label color="primary">SKU:</ion-label>
-                    <ion-input [ngModel]="getSuggestedAllocation()?.InventoryID?.value" readonly></ion-input>
+                    <ion-input (click)="setSuggestedItem();" [ngModel]="getSuggestedAllocation()?.InventoryID?.value" readonly></ion-input>
                 </ion-item>
             </ion-col>
             <ion-col>
@@ -103,20 +103,22 @@
                 <ion-item>
                     <ion-label color="primary">&nbsp;</ion-label>
                     <ion-input id="qty" type="number" #qty [(ngModel)]="enteredData.qty" (focus)="$event.target.select();"
-                               (keydown.enter)="addPick(); $event.stopPropagation();" (keypress)="this.utils.limitKeyNumber($event); $event.stopPropagation();"></ion-input>
+                               (keydown.enter)="$event.target.blur();" (keypress)="this.utils.limitKeyNumber($event); $event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
-        <ion-row *ngIf="showQty && itemAvailability.hasOwnProperty(enteredData.location);">
-            <ion-col col-6>
-                Available / On-Hand:
-            </ion-col>
-            <ion-col col-6>
-                {{this.itemAvailability[this.enteredData.location].QtyAvailable.value}} / {{this.itemAvailability[this.enteredData.location].QtyOnHand.value}}
-            </ion-col>
-        </ion-row>
         <ion-row>
-            <ion-col col-12 text-right>
+            <ion-col col-6>
+                <ion-row *ngIf="showQty && itemAvailability.hasOwnProperty(enteredData.location);">
+                    <ion-col col-7>Available:</ion-col>
+                    <ion-col col-5>{{this.itemAvailability[this.enteredData.location].QtyAvailable.value}}</ion-col>
+                </ion-row>
+                <ion-row *ngIf="showQty && itemAvailability.hasOwnProperty(enteredData.location);">
+                    <ion-col col-7>On-Hand:</ion-col>
+                    <ion-col col-5>{{this.itemAvailability[this.enteredData.location].QtyOnHand.value}}</ion-col>
+                </ion-row>
+            </ion-col>
+            <ion-col col-6 text-right>
                 <button type="button" ion-button small (click)="addPick()">OK</button>
                 <button type="button" ion-button small (click)="resetForm()">Cancel</button>
             </ion-col>

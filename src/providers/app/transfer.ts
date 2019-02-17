@@ -91,6 +91,9 @@ export class TransferProvider {
     }
 
     public addPendingItem(location, toLocation, itemId, qty, srcQty) {
+
+        qty = parseFloat(qty);
+
         var key = location + "#" + toLocation; // Hopefully no one will ever use hash in their location names
 
         if (!this.pendingItems.hasOwnProperty(key)) {

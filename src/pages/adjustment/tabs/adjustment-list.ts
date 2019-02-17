@@ -64,7 +64,11 @@ export class AdjustmentListTab {
                 {
                     text: 'Update',
                     handler: data => {
-                        this.adjustmentProvider.updatePendingItemQty(locationId, itemId, data.qty);
+                        let qty = parseFloat(data.qty);
+
+                        if (!qty) qty = 0;
+
+                        this.adjustmentProvider.updatePendingItemQty(locationId, itemId, qty);
                     }
                 }
             ]

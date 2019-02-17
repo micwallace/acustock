@@ -49,13 +49,4 @@ export class AdjustmentPage {
 
     }
 
-    onBarcodeScan(barcodeText){
-
-        if (this.tabs.selectedIndex !== 0) {
-            this.tabs.select(0, {});
-        }
-
-        this.events.publish('barcode:scan', barcodeText);
-    }
-
 }

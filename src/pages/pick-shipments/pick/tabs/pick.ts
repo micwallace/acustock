@@ -298,8 +298,6 @@ export class PickTab {
 
         this.showLoaderDelayed("Loading item locations...");
 
-        console.log(this.getSuggestedAllocation().InventoryID.value);
-
         this.pickProvider.getItemAvailabilty(this.getSuggestedAllocation().InventoryID.value).then((locations)=>{
 
             this.dismissLoader();
@@ -326,6 +324,10 @@ export class PickTab {
                 this.utils.showAlert("Error", err.message, {exception: err});
             });
         });
+    }
+
+    setSuggestedLocation(){
+        this.setLocation(this.getSuggestedAllocation().LocationID.value);
     }
 
     setLocation(locId, isScan=false, callback=null) {
@@ -409,6 +411,10 @@ export class PickTab {
             });
         });
 
+    }
+
+    setSuggestedItem(){
+        this.setItem(this.getSuggestedAllocation().InventoryID.value);
     }
 
     setItem(itemId, isScan=false, callback=null) {

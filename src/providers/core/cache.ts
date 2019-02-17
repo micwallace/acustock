@@ -399,7 +399,7 @@ export class CacheProvider {
             });
         }
 
-        setInterval(this.primeItemCache, (this.prefs.getPreference("cache_refresh_items") * 1000));
+        setInterval(()=>{ this.primeItemCache(); }, (this.prefs.getPreference("cache_refresh_items") * 1000));
     }
 
     private loadFailed(toast, err) {

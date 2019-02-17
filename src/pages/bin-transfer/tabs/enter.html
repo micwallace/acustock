@@ -73,19 +73,19 @@
                 <ion-item no-padding>
                     <ion-label color="primary">Quantity:</ion-label>
                     <ion-input id="qty" #qty type="number" min="0" [(ngModel)]="enteredData.qty" (focus)="$event.target.select();"
-                               (keydown.enter)="addTransferItem(); $event.stopPropagation();" (keypress)="this.utils.limitKeyNumber($event); $event.stopPropagation();"></ion-input>
+                               (keydown.enter)="$event.target.blur();" (keypress)="this.utils.limitKeyNumber($event); $event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
-        <ion-row *ngIf="showQty">
+        <ion-row>
             <ion-col col-6>
                 <ion-row *ngIf="showQty && currentLocationItems.hasOwnProperty(enteredData.item);">
-                    <ion-col>Available Qty:</ion-col>
-                    <ion-col>{{currentLocationItems[this.enteredData.item].QtyAvailable.value}}</ion-col>
+                    <ion-col col-7>Available:</ion-col>
+                    <ion-col col-5>{{currentLocationItems[this.enteredData.item].QtyAvailable.value}}</ion-col>
                 </ion-row>
                 <ion-row *ngIf="showQty && currentLocationItems.hasOwnProperty(enteredData.item);">
-                    <ion-col>On-Hand Qty</ion-col>
-                    <ion-col>{{currentLocationItems[this.enteredData.item].QtyOnHand.value}}</ion-col>
+                    <ion-col col-7>On-Hand:</ion-col>
+                    <ion-col col-5>{{currentLocationItems[this.enteredData.item].QtyOnHand.value}}</ion-col>
                 </ion-row>
             </ion-col>
             <ion-col col-6 text-right>

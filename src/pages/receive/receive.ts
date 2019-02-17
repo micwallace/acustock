@@ -18,8 +18,9 @@
 
 import { Component } from '@angular/core';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
-import { IonicPage, NavController, LoadingController, AlertController, PopoverController, Events } from 'ionic-angular';
+import { IonicPage, NavController, LoadingController, AlertController, PopoverController, ModalController, Events } from 'ionic-angular';
 import { ReceiveProvider } from "../../providers/app/receive";
+import { ReceiveListPage } from "./list/receive-list";
 import { ReceiveShipmentPage } from "./shipment/receive-shipment";
 import { UtilsProvider } from "../../providers/core/utils";
 import { ReceivePopover } from "./receive-popover";
@@ -31,7 +32,7 @@ import { ReceivePopover } from "./receive-popover";
 })
 export class ReceivePage {
 
-    public receiptType = "shipment";
+    public receiptType = "transfer";
     public referenceNbr = "";
 
     constructor(public navCtrl:NavController,
@@ -41,6 +42,7 @@ export class ReceivePage {
                 public alertCtrl: AlertController,
                 public utils:UtilsProvider,
                 public popoverCtrl:PopoverController,
+                public modalCtrl:ModalController,
                 public events:Events) {
 
     }
@@ -65,8 +67,30 @@ export class ReceivePage {
         popover.present({ev:event});
     }
 
-    isActive(){
-        return this.navCtrl.getActive().instance instanceof ReceivePage;
+    openReceiveList(){
+        let loader = this.loadingCtrl.create({content: "Loading..."});
+        loader.present();
+
+        this.receiveProvider.getReceiveList(this.receiptType).then((receiveList)=>{
+
+            console.log(JSON.stringify(receiveList));
+
+            loader.dismiss();
+
+            let modal = this.modalCtrl.create(ReceiveListPage, {list: receiveList, type: this.receiptType});
+
+            modal.onDidDismiss(data => {
+                if (data && data.referenceNbr) {
+                    this.loadReceipt(data.referenceNbr);
+                }
+            });
+
+            modal.present();
+
+        }).catch((err)=> {
+            loader.dismiss();
+            this.utils.processApiError("Error", err.message, err, this.navCtrl);
+        });
     }
 
     loadReceipt(referenceNbr, isScan=false){

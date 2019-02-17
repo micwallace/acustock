@@ -76,6 +76,8 @@ export class AdjustmentProvider {
 
     public addPendingItem(location, itemId, qty, bookQty) {
 
+        qty = parseFloat(qty);
+
         var key = itemId + "#" + location; // Hopefully no one will ever use hash in their location names
 
         this.pendingItems[key] = {
@@ -107,7 +109,7 @@ export class AdjustmentProvider {
 
         if (this.pendingItems.hasOwnProperty(key)) {
 
-            var newVariance = qty -  this.pendingItems[key].BookQty;
+            var newVariance = qty - this.pendingItems[key].BookQty;
 
             if (newVariance == 0){
                 delete this.pendingItems[key];
@@ -250,6 +252,7 @@ export class AdjustmentProvider {
 
                     // flush pending items
                     this.pendingItems = {};
+                    this.pendingNumItems = 0;
                     this.pendingVariance = 0;
                     this.savePending();
 

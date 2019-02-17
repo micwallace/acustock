@@ -52,6 +52,7 @@ import { TransferListTab } from "../pages/bin-transfer/tabs/transfer-list";
 import { ReceiveProvider } from '../providers/app/receive';
 import { ReceivePage } from "../pages/receive/receive";
 import { ReceivePopover } from "../pages/receive/receive-popover";
+import { ReceiveListPage } from "../pages/receive/list/receive-list";
 import { ReceiveShipmentPage } from "../pages/receive/shipment/receive-shipment";
 import { ReceiveShipmentListTab } from "../pages/receive/shipment/tabs/list";
 import { ReceiveShipmentPendingTab } from "../pages/receive/shipment/tabs/pending";
@@ -140,6 +141,7 @@ export class MyErrorHandler implements ErrorHandler {
         BinLookupPage,
         ReceivePage,
         ReceivePopover,
+        ReceiveListPage,
         ReceiveShipmentPage,
         ReceiveShipmentListTab,
         ReceiveShipmentPendingTab,
@@ -197,6 +199,7 @@ export class MyErrorHandler implements ErrorHandler {
         BinLookupPage,
         ReceivePage,
         ReceivePopover,
+        ReceiveListPage,
         ReceiveShipmentPage,
         ReceiveShipmentListTab,
         ReceiveShipmentPendingTab,

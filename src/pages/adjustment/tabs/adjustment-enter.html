@@ -63,19 +63,23 @@
                 <ion-item no-padding>
                     <ion-label color="primary">Quantity:</ion-label>
                     <ion-input id="qty" #qty type="number" min="0" [(ngModel)]="enteredData.qty" (focus)="$event.target.select();"
-                               (keydown.enter)="nextItem(); $event.stopPropagation();" (keypress)="this.utils.limitKeyNumber($event); $event.stopPropagation();"></ion-input>
+                               (keydown.enter)="$event.target.blur();" (keypress)="this.utils.limitKeyNumber($event); $event.stopPropagation();"></ion-input>
                 </ion-item>
             </ion-col>
         </ion-row>
         <ion-row *ngIf="showQty">
             <ion-col col-6>
                 <ion-row>
-                    <ion-col col-6>Book Quantity:</ion-col>
-                    <ion-col col-6>{{enteredData.bookQty}}</ion-col>
+                    <ion-col col-7>Shelf Qty:</ion-col>
+                    <ion-col col-5>{{enteredData.shelfQty}}</ion-col>
                 </ion-row>
                 <ion-row>
-                    <ion-col col-6>Variance:</ion-col>
-                    <ion-col col-6>{{(enteredData.qty - enteredData.bookQty)}}</ion-col>
+                    <ion-col col-7>Shipped:</ion-col>
+                    <ion-col col-5>{{enteredData.shippedQty}}</ion-col>
+                </ion-row>
+                <ion-row>
+                    <ion-col col-7>Variance:</ion-col>
+                    <ion-col col-5>{{(enteredData.qty - (enteredData.shelfQty + enteredData.shippedQty))}}</ion-col>
                 </ion-row>
             </ion-col>
             <ion-col col-6 text-right>

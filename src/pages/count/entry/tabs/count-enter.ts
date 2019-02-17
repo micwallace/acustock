@@ -162,7 +162,6 @@ export class CountEntryEnterTab {
         this.showItem = false;
         this.showQty = false;
 
-        //this.locationInput.setFocus();
     }
 
     public showLoaderDelayed(message){

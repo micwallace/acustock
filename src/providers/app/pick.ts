@@ -627,6 +627,8 @@ export class PickProvider {
 
         // TODO: Move quantity validation into this function
 
+        data.qty = parseFloat(data.qty);
+
         var sugAlloc = JSON.parse(JSON.stringify(curAlloc));
 
         var pendingAlloc = this.getPendingAllocation(sugAlloc.LineNbr.value, sugAlloc.SplitLineNbr.value);

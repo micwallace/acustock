@@ -63,10 +63,14 @@ export class PickListTab {
                     text: 'Ok',
                     handler: data => {
 
-                        if (data.qty > this.pickProvider.getPendingItem(item.LineNbr.value).RemainingQty){
+                        let qty = parseFloat(data.qty);
+
+                        if (!qty) qty = 0;
+
+                        if (qty > this.pickProvider.getPendingItem(item.LineNbr.value).RemainingQty){
                             alert("The entered value exceed the required qty for this item.");
                         } else {
-                            this.pickProvider.updatePick(item.LineNbr.value, item.id, data.qty);
+                            this.pickProvider.updatePick(item.LineNbr.value, item.id, qty);
                         }
                     }
                 }

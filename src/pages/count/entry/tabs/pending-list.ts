@@ -62,10 +62,12 @@ export class CountEntryPendingTab {
                     text: 'Ok',
                     handler: data => {
 
-                        if (!data.qty)
+                        let qty = parseFloat(data.qty);
+
+                        if (!qty)
                             return this.countProvider.removeCount(item);
 
-                        this.countProvider.setCount(item, data.qty, false);
+                        this.countProvider.setCount(item, qty, false);
                     }
                 }
             ]

@@ -65,17 +65,19 @@ export class ReceiveShipmentPendingTab {
                     text: 'Ok',
                     handler: data => {
 
-                        if (!data.qty)
+                        let qty = parseFloat(data.qty);
+
+                        if (!qty)
                             return this.receiveProvider.removeReceiptItem(line, key);
 
                         var remQty = this.receiveProvider.getCommittedRemainingQty(line);
 
-                        if (remQty < data.qty){
-                            this.utils.showAlert("Error", "The entered quantity is " + data.qty + " but there is only " + remQty + " left to receive.");
+                        if (remQty < qty){
+                            this.utils.showAlert("Error", "The entered quantity is " + qty + " but there is only " + remQty + " left to receive.");
                             return false;
                         }
 
-                        this.receiveProvider.updateReceiptItem(line, key, data.qty);
+                        this.receiveProvider.updateReceiptItem(line, key, qty);
                     }
                 }
             ]

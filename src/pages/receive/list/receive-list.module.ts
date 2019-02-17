@@ -16,27 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { UserguidePage } from "./userguide/userguide";
-declare function require(moduleName: string): any;
-const { version : appVersion, versionType: versionType } = require('../../../package.json');
+import { NgModule } from '@angular/core';
+import { IonicPageModule } from 'ionic-angular';
+import { ReceiveListPage } from './receive-list';
 
-@IonicPage()
-@Component({
-    selector: 'page-about',
-    templateUrl: 'about.html',
+@NgModule({
+    imports: [
+        IonicPageModule.forChild(ReceiveListPage),
+    ],
 })
-export class AboutPage {
-
-    public appVersion;
-
-    constructor(public navCtrl:NavController, public navParams:NavParams) {
-        this.appVersion = appVersion + (versionType!="stable" ? versionType : "");
-    }
-
-    openUserguide(){
-        this.navCtrl.push(UserguidePage);
-    }
-
+export class ReceiveListModule {
 }

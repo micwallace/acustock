@@ -75,7 +75,7 @@
                 <ion-item no-padding>
                     <ion-label color="primary">Quantity:</ion-label>
                     <ion-input id="qty" #qty type="number" min="0" [(ngModel)]="enteredData.qty" (focus)="$event.target.select();"
-                               (keydown.enter)="addReceiptItem(); $event.stopPropagation();" (keypress)="this.utils.limitKeyNumber($event); $event.stopPropagation();"></ion-input>
+                               (keydown.enter)="$event.target.blur();" (keypress)="this.utils.limitKeyNumber($event); $event.stopPropagation();"></ion-input>
                 </ion-item>
                 <ion-label color="primary">Quantity Remaining: {{getRemainingQty()}}</ion-label>
             </ion-col>

@@ -55,6 +55,20 @@ export class ReceiveProvider {
 
     }
 
+    public getReceiveList(type){
+
+        switch(type){
+            case "purchase":
+                return this.api.getPurchaseOrderList();
+
+            case "transfer":
+                return this.api.getTransferList();
+
+            case "shipment":
+                return this.api.getReceiptShipmentsList();
+        }
+    }
+
     public loadReceipt(referenceNbr, type) {
 
         return new Promise((resolve, reject)=> {
@@ -334,6 +348,8 @@ export class ReceiveProvider {
 
         if (!sourceLine)
             return;
+
+        data.qty = parseFloat(data.qty);
 
         if (!this.pendingItems.hasOwnProperty(sourceLine.LineNbr))
             this.pendingItems[sourceLine.LineNbr] = {
