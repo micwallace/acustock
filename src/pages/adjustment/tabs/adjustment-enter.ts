@@ -87,10 +87,10 @@ export class AdjustmentEnterTab {
 
             this.showLoaderDelayed("Checking book quantities..");
 
-            this.adjustmentProvider.validateBookQtys().then((res)=>{
+            this.adjustmentProvider.validateBookQtys().then((res:any)=>{
 
                 this.dismissLoader().then(()=>{
-                    if (res > 0){
+                    if (res.length > 0){
                         this.utils.showAlert("Error", "Some pending items were removed from the adjustment because their book quantity had changed.");
                     }
                 });
@@ -306,13 +306,13 @@ export class AdjustmentEnterTab {
 
     addAdjustmentItem(isScan=false) {
 
-        if (this.enteredData.qty - (this.enteredData.shelfQty + this.enteredData.shippedQty) == 0){
+        if (this.enteredData.qty - this.enteredData.shelfQty == 0){
             this.utils.showAlert("No Variance", "This item does not have any variance and will not be added to the list");
             this.utils.playPromptSound(isScan);
             return;
         }
 
-        this.adjustmentProvider.addPendingItem(this.enteredData.location, this.enteredData.item, this.enteredData.qty, (this.enteredData.shelfQty + this.enteredData.shippedQty));
+        this.adjustmentProvider.addPendingItem(this.enteredData.location, this.enteredData.item, this.enteredData.qty, this.enteredData.shelfQty);
     }
 
     clearAdjustments(){

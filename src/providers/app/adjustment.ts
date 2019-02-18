@@ -43,7 +43,6 @@ export class AdjustmentProvider {
     private loadPending() {
         var pending = JSON.parse(localStorage.getItem("unconfirmed_adjustments"));
         if (pending) {
-            // TODO: recalc current quantity
             this.pendingItems = pending;
             this.calcTotalQuantities();
         }
@@ -172,6 +171,7 @@ export class AdjustmentProvider {
                 }
 
                 this.savePending();
+                this.calcTotalQuantities();
 
                 resolve(removed);
 
@@ -194,7 +194,9 @@ export class AdjustmentProvider {
             availability[locations[index]] = {};
 
             for (var i in res){
-                availability[locations[index]][res[i].InventoryID.value] = res[i].QtyOnHand.value;
+                let shelfQty = res[i].QtyOnHand.value;
+                shelfQty -= res[i].QtySOShipped.value ? res[i].QtySOShipped.value : 0;
+                availability[locations[index]][res[i].InventoryID.value] = shelfQty;
             }
 
             index++;
