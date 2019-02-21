@@ -204,7 +204,10 @@ export class PickTab {
         var item = this.pickProvider.getSuggestedItem(this.currentLocationIndex, this.currentItemIndex);
 
         if (!item) {
-            this.currentLocationIndex = 0;
+
+            if (this.currentLocationIndex >= this.pickProvider.pickList.length)
+                this.currentLocationIndex = 0;
+
             this.currentItemIndex = 0;
             return this.pickProvider.getSuggestedItem(this.currentLocationIndex, this.currentItemIndex);
         }
@@ -438,16 +441,21 @@ export class PickTab {
 
             // The item scanned is not the current item. Check if it's on the picklist and update the current allocation.
             if (item.InventoryID.value != curItem.InventoryID.value) {
+
+                if (!this.pickProvider.prefs.getPreference('pick_item_seek')){
+                    this.setItemErrorCallback("Wrong Item", {message: "The item ("+item.InventoryID.value+") is not the one required ("+curItem.InventoryID.value+")."});
+                    return;
+                }
+
                 // Search the picklist for the item & load the best match
                 var allocIndexes = this.pickProvider.getBestFitAllocation(item.InventoryID.value, this.enteredData.location);
 
                 if (allocIndexes == null){
                     this.showQty = false;
                     this.enteredData.item = "";
-                    this.enteredData.qty = 0;
                     this.utils.playFailedSound(isScan);
                     this.dismissLoader().then(()=> {
-                        this.utils.showAlert("Error", "The item does not exist on the pick list or has already been picked.");
+                        this.setItemErrorCallback("Wrong Item", {message: "The item ("+item.InventoryID.value+") does not exist on the pick list or has already been picked."});
                     });
                     return;
                 }
@@ -497,12 +505,13 @@ export class PickTab {
 
     }
 
-    private setItemErrorCallback(err, isScan){
+    private setItemErrorCallback(err, isScan, title=null){
         this.showQty = false;
         this.enteredData.item = "";
         this.utils.playFailedSound(isScan);
         this.dismissLoader().then(()=>{
-            this.utils.showAlert("Error", err.message, {exception: err});
+            var exception = Object.keys(err).length > 1 ? {exception: err} : null;
+            this.utils.showAlert((title ? title : "Error"), err.message, exception);
         });
     }
 
@@ -620,7 +629,7 @@ export class PickTab {
         return true;
     }
 
-    addPick(isScan=false) {
+    addPick(isConfirm=false) {
 
         for (var i in this.enteredData) {
             if (this.enteredData[i] == "") {
@@ -652,7 +661,7 @@ export class PickTab {
             return false;
         }
 
-        console.log(JSON.stringify(this.enteredData));
+        //console.log(JSON.stringify(this.enteredData));
 
         var data = {
             location: this.enteredData.location,
@@ -669,7 +678,7 @@ export class PickTab {
 
         this.resetForm((newAlloc != null && curAlloc.LocationID.value == newAlloc.LocationID.value));
 
-        if (!newAlloc) {
+        if (!isConfirm && !newAlloc) {
             let alert = this.alertCtrl.create({
                 title: "Picking Complete",
                 message: "All items have been picked, would you like to confirm them?",
@@ -725,7 +734,7 @@ export class PickTab {
     confirmPicks() {
 
         if (this.enteredData.item != "" &&  this.enteredData.location != "" && this.enteredData.qty > 0) {
-            if (!this.addPick())
+            if (!this.addPick(true))
                 return;
         }
 
@@ -752,7 +761,7 @@ export class PickTab {
                     {
                         text: "Yes",
                         handler: ()=> {
-                            this.doConfirmPicks(true);
+                            this.removeItemsConfirmation();
                         }
                     }
                 ]
@@ -764,6 +773,28 @@ export class PickTab {
             this.doConfirmPicks(false);
         }
 
+    }
+
+    removeItemsConfirmation(){
+
+        let alert = this.alertCtrl.create({
+            title: "Remove Unpicked",
+            message: "Are you sure?",
+            buttons: [
+                {
+                    text: "Cancel",
+                    role: "cancel"
+                },
+                {
+                    text: "Yes",
+                    handler: ()=> {
+                        this.doConfirmPicks(true);
+                    }
+                }
+            ]
+        });
+
+        alert.present();
     }
 
     doConfirmPicks(removeUnpicked){
@@ -821,7 +852,7 @@ export class PickTab {
                 this.ngZone.run(()=> {
                     // check if quantity is set. If it is then save the current entry
                     if (barcodeText != this.enteredData.location && this.enteredData.item != "" && this.enteredData.qty > 0) {
-                        if (!this.addPick(true))
+                        if (!this.addPick())
                             return;
                     }
 
@@ -841,7 +872,7 @@ export class PickTab {
                         this.setItem(item.InventoryID.value, true, function(){
                             // If the completed quantity is reached let's automatically move to the next suggested pick
                             if (ctx.getTotalRemainingQty() - ctx.enteredData.qty == 0) {
-                                return ctx.addPick(true);
+                                return ctx.addPick();
                             } else {
                                 if (callback != null)
                                     callback();
@@ -865,14 +896,14 @@ export class PickTab {
 
                         // If the completed quantity is reached let's automatically move to the next suggested pick
                         if (this.getTotalRemainingQty() - this.enteredData.qty == 0) {
-                            return this.addPick(true);
+                            return this.addPick();
                         }
 
                         if (callback != null)
                             callback();
 
                     } else {
-                        if (this.addPick(true))
+                        if (this.addPick())
                             this.setItem(item.InventoryID.value, true, callback);
                     }
 

@@ -37,7 +37,7 @@
                     <ion-label color="primary">{{group.title}}</ion-label>
                 </ion-item-divider>
                 <ion-item *ngFor="let pref of group.preferences">
-                    <ion-label>{{pref.title}}</ion-label>
+                    <ion-label (click)="showCaptionToast(pref);">{{pref.title}}</ion-label>
 
                     <ion-input *ngIf="['text', 'password', 'url', 'number'].indexOf(pref.type) > -1"
                                placeholder="{{pref.placeholder}}" type="{{pref.type}}"

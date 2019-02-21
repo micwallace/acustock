@@ -67,6 +67,7 @@ export class PreferencesProvider {
                     key: "connection_company",
                     min_key: "cpy",
                     title: "Company ID",
+                    caption: "The company ID (tenant) that should be used for the connection.",
                     type: "text",
                     placeholder: "",
                     def_value: "Company"
@@ -86,9 +87,10 @@ export class PreferencesProvider {
                 {
                     key: "device",
                     min_key: "dev",
+                    caption: "The device name is used for picking assignment and in transaction descriptions.",
                     title: "Device Name",
                     type: "text",
-                    def_value: "Device 1"
+                    def_value: ""
                 }
             ]
         },
@@ -114,6 +116,7 @@ export class PreferencesProvider {
                     key: "cache_prime_items",
                     min_key: "cpi",
                     title: "Prime Item Cache",
+                    caption: "This setting determines whether items should be cached when the application starts.",
                     type: "select",
                     options: [
                         {label: "Load all", value: "full"},
@@ -141,6 +144,7 @@ export class PreferencesProvider {
                     key: "cache_item_warehouse",
                     min_key: "cwh",
                     title: "Cache Item Warehouse",
+                    caption: "Cache warehouse specific item options, such as default receiving locations.",
                     type: "select",
                     options: [
                         {label: "With Item Cache", value: "withitems"},
@@ -158,7 +162,7 @@ export class PreferencesProvider {
                     min_key: "ss",
                     title: "Scanner Success Sound",
                     type: "select",
-                    def_value: "success-1",
+                    def_value: "success-3",
                     options: PreferencesProvider.successSounds
                 },
                 {
@@ -166,7 +170,7 @@ export class PreferencesProvider {
                     min_key: "ps",
                     title: "Prompt Sound",
                     type: "select",
-                    def_value: "success-3",
+                    def_value: "success-1",
                     options: PreferencesProvider.successSounds
                 },
                 {
@@ -219,6 +223,15 @@ export class PreferencesProvider {
                     key: "pick_assign_check",
                     min_key: "pac",
                     title: "Double-check assignment",
+                    caption: "When the start picking button is pressed, reload the pick status from the server.",
+                    type: "toggle",
+                    def_value: false
+                },
+                {
+                    key: "pick_item_seek",
+                    min_key: "pis",
+                    title: "Scan any item",
+                    caption: "If the scanned item is not the current one, check the whole pick list for the item.",
                     type: "toggle",
                     def_value: false
                 }

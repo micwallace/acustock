@@ -174,9 +174,11 @@ export class PickProvider {
 
         var inventoryIds = [];
 
-        for (var i in this.sourceIndex){
-            if (inventoryIds.indexOf(this.sourceIndex[i].InventoryID.value) === -1)
-                inventoryIds.push(this.sourceIndex[i].InventoryID.value);
+        for (let location of this.pickList){
+            for (let item of location.Items) {
+                if (inventoryIds.indexOf(item.InventoryID.value) === -1)
+                    inventoryIds.push(item.InventoryID.value);
+            }
         }
 
         this.cache.preloadItemLocations(inventoryIds);
@@ -264,7 +266,7 @@ export class PickProvider {
                 if (!item.Allocations[x].PickedQty.value)
                     item.Allocations[x].PickedQty.value = 0;
 
-                var shipmentAlloc = JSON.parse(JSON.stringify(item.Allocations[x]));
+                var shipmentAlloc = JSON.parse(JSON.stringify(item.Allocations[x])); // copy object
 
                 /*var pending = this.getPendingAllocation(pickItem.LineNbr.value, pickItem.SplitLineNbr.value);
 
@@ -463,7 +465,7 @@ export class PickProvider {
             };
         }
 
-        console.log(alloc);
+        //console.log(alloc);
 
         this.modifiedAllocations[alloc.LineNbr.value].Allocations[alloc.SplitLineNbr.value] = alloc;
     }
@@ -502,6 +504,11 @@ export class PickProvider {
         this.pickList = [];
 
         for (var y in pickList) {
+
+            pickList[y].Items.sort((a, b)=> {
+                return a.InventoryID.value.localeCompare(b.InventoryID.value);
+            });
+
             this.pickList.push(pickList[y]);
         }
 
@@ -715,7 +722,8 @@ export class PickProvider {
             this.pendingPicks[shipLineNum] = {
                 LineNbr: pick.LineNbr,
                 InventoryID: pick.InventoryID,
-                Allocations: []
+                Allocations: [],
+                ts: (new Date()).getTime()
             };
 
             this.pendingPicks[shipLineNum].PendingQty = pick.PendingQty;
@@ -724,6 +732,8 @@ export class PickProvider {
             this.pendingPicks[shipLineNum].Allocations.push(pick);
 
         } else {
+
+            this.pendingPicks[shipLineNum].ts = (new Date()).getTime();
 
             // try to find current allocation and update quantity
             var index = 0;

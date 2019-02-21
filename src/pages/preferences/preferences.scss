@@ -28,6 +28,19 @@ page-preferences {
     color: #777 !important;
   }
 
+  .item-input ion-label {
+    pointer-events:all !important;
+  }
+
+  ion-input .input-cover {
+    visibility:hidden !important;
+  }
+
+  ion-select .item-cover {
+    margin-left: 50%;
+    width: 50%;
+  }
+
 }
 
 .theme-dark {

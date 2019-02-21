@@ -139,7 +139,7 @@ export class SetupPage {
 
                 loader.dismiss();
 
-                if (this.prefs.getPreference("device") === this.prefs.getDefault("device")){
+                if (!this.prefs.getPreference("device")){
                     this.promptForDeviceName();
                 } else {
                     this.setupComplete();
@@ -172,7 +172,7 @@ export class SetupPage {
                         this.prefs.setPreference("warehouse", data);
 
                         alert.dismiss().then(()=>{
-                            if (this.prefs.getPreference("device") === this.prefs.getDefault("device")){
+                            if (!this.prefs.getPreference("device")){
                                 this.promptForDeviceName();
                             } else {
                                 this.setupComplete();

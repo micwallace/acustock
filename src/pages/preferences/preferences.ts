@@ -17,7 +17,7 @@
  */
 
 import { Component } from '@angular/core';
-import { IonicPage, Events, PopoverController, LoadingController, AlertController } from 'ionic-angular';
+import { IonicPage, Events, PopoverController, LoadingController, AlertController, ToastController } from 'ionic-angular';
 import { PreferencesProvider, CacheProvider } from '../../providers/providers'
 import { UtilsProvider } from "../../providers/core/utils";
 import { PreferencesPopover } from "./preferences-popover";
@@ -33,13 +33,16 @@ export class PreferencesPage {
     preferences;
     currentWarehouse = "";
 
+    curToast = null;
+
     constructor(public alertCtrl:AlertController,
                 public prefs:PreferencesProvider,
                 public loadingCtrl:LoadingController,
                 public events:Events,
                 public cache:CacheProvider,
                 public utils:UtilsProvider,
-                public popoverCtrl:PopoverController) {
+                public popoverCtrl:PopoverController,
+                public toastCtrl:ToastController) {
 
         this.preferences = prefs;
         this.currentWarehouse = prefs.getPreference('warehouse');
@@ -57,6 +60,23 @@ export class PreferencesPage {
     presentPopover(event) {
         let popover = this.popoverCtrl.create(PreferencesPopover);
         popover.present({ev:event});
+    }
+
+    showCaptionToast(pref){
+
+        if (!pref.caption)
+            return;
+
+        if (this.curToast)
+            this.curToast.dismiss();
+
+        this.curToast = this.toastCtrl.create({
+            message: pref.caption,
+            showCloseButton: true,
+            closeButtonText: "OK"
+        });
+
+        this.curToast.present();
     }
 
     getPreferenceOptions(pref) {

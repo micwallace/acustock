@@ -42,6 +42,27 @@ export class PickListTab {
         popover.present({ev:event});
     }
 
+    getPendingPicksKeyOrder(){
+
+        let sortArr = [];
+
+        for (let key in this.pickProvider.pendingPicks){
+            sortArr.push(this.pickProvider.pendingPicks[key]);
+        }
+
+        sortArr.sort((a, b)=>{
+            return a.ts < b.ts ? 1 : -1;
+        });
+
+        let keys = [];
+
+        for (let item of sortArr){
+            keys.push(item.LineNbr.value);
+        }
+
+        return keys;
+    }
+
     editPickItem(item) {
         let alertDialog = this.alertCtrl.create({
             title: 'Update Quantity',

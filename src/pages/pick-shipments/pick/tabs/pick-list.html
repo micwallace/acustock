@@ -40,7 +40,7 @@
             <ion-col col-5 text-right>Picked/Total</ion-col>
         </ion-row>
         <ion-list class="item-list">
-            <ion-item no-margin no-padding class="list-group" *ngFor="let key of objectKeys(pickProvider.pendingPicks)">
+            <ion-item no-margin no-padding class="list-group" *ngFor="let key of getPendingPicksKeyOrder();">
                 <ion-row class="item-group-header" no-margin>
                     <ion-col col-7>
                         <strong>{{pickProvider.pendingPicks[key].InventoryID.value}}</strong>
