@@ -80,6 +80,10 @@ export class SetupPage {
     }
 
     onBarcodeScan(barcodeText) {
+
+        // Actual barcode device detected, so lets turn off the camera scanner buttons.
+        this.prefs.setPreference('camera_scan', false);
+
         this.loadBarcodeConfiguration(barcodeText);
     }
 

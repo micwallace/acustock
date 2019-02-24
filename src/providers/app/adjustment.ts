@@ -220,7 +220,7 @@ export class AdjustmentProvider {
 
             var adjustment = {
                 Hold: {value: false},
-                Description: {value: "AcuStock Adjustment"},
+                Description: {value: "AcuStock Adjustment (device: "+this.prefs.getPreference('device')+")"},
                 Details: []
             };
 

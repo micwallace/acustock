@@ -47,7 +47,7 @@
                 </ion-label>
                 <ion-input [(ngModel)]="referenceNbr" name="receipt-number" autofocus type="text" placeholder=""
                            (keypress)="$event.stopPropagation();" (keydown.enter)="loadReceipt($event.target.value); $event.stopPropagation();"></ion-input>
-                <button type="button" ion-button icon-only item-right (click)="startCameraScanner()">
+                <button *ngIf="this.receiveProvider.prefs.getPreference('camera_scan')" type="button" ion-button icon-only item-right (click)="startCameraScanner()">
                     <ion-icon name="barcode"></ion-icon>
                 </button>
             </ion-item>
@@ -124,6 +124,9 @@
         <ion-row>
             <ion-col>
                 <button type="button" ion-button (click)="addReceipt()">Add Receipt</button>
+            </ion-col>
+            <ion-col *ngIf="receiveProvider.type == 'shipment' && receiveProvider.sourceDocument.Status.value == 'Confirmed'">
+                <button type="button" ion-button (click)="updateIN()">Update Inventory</button>
             </ion-col>
         </ion-row>
     </ion-grid>

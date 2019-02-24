@@ -34,7 +34,7 @@
         <ion-label>
             Enter or scan Item ID:
         </ion-label>
-        <button ion-button icon-only item-right (click)="scanBarcode();">
+        <button *ngIf="this.prefs.getPreference('camera_scan')" ion-button icon-only item-right (click)="scanBarcode();">
             <ion-icon name="barcode"></ion-icon>
         </button>
     </ion-item>
@@ -44,7 +44,7 @@
             <small [innerHTML]="attrs.data.Description.value | boldprefix:attrs.keyword"></small><br/>
             <small *ngIf="attrs.data.AlternateID" [innerHTML]="attrs.data.AlternateID | boldprefix:attrs.keyword"></small>
         </ng-template>
-        <ion-auto-complete id="item-select" [(ngModel)]="selectedItem" [dataProvider]="itemAutocompleteService" [options]="{debounce: 750}"
+        <ion-auto-complete id="item-select" [(ngModel)]="lookupProvider.item" [dataProvider]="itemAutocompleteService" [options]="{debounce: 750}"
                            [template]="listItem" (itemSelected)="loadItemLocations($event);" (keydown.enter)="loadItemByBarcode($event.target.value);"></ion-auto-complete>
     </div>
 </ion-header>
@@ -55,7 +55,7 @@
         <ion-col col-7 class="column-right">Available / On-Hand</ion-col>
     </ion-row>
     <ion-list class="item-list">
-        <ion-item class="list-item" no-padding tappable *ngFor="let location of itemLocations" (click)="openDetailsModal($event, location);">
+        <ion-item class="list-item" no-padding tappable *ngFor="let location of lookupProvider.itemLocations" (click)="openDetailsModal($event, location);">
             <ion-row>
                 <ion-col col-7><strong>{{location.Location.value}}</strong></ion-col>
                 <ion-col col-5 class="column-right">

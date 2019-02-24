@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Component, Renderer2, Inject } from '@angular/core';
 import { IonicPage, Events, PopoverController, LoadingController, AlertController, ToastController } from 'ionic-angular';
 import { PreferencesProvider, CacheProvider } from '../../providers/providers'
 import { UtilsProvider } from "../../providers/core/utils";
@@ -42,7 +43,9 @@ export class PreferencesPage {
                 public cache:CacheProvider,
                 public utils:UtilsProvider,
                 public popoverCtrl:PopoverController,
-                public toastCtrl:ToastController) {
+                public toastCtrl:ToastController,
+                @Inject(DOCUMENT) private document: Document,
+                private renderer: Renderer2) {
 
         this.preferences = prefs;
         this.currentWarehouse = prefs.getPreference('warehouse');
@@ -117,6 +120,16 @@ export class PreferencesPage {
                     this.preferences.setPreference("remember_password", true, true);
                 }
                 break;
+            case "text_size":
+                this.renderer.removeClass(this.document.body, 'text-size-18');
+                this.renderer.removeClass(this.document.body, 'text-size-20');
+
+                let sizeClass = this.preferences.getPreference('text_size');
+
+                if (sizeClass)
+                    this.renderer.addClass(this.document.body, sizeClass);
+
+                break;
             // TODO: Detect change of URL or company and retest connection.
         }
     }
@@ -183,7 +196,7 @@ export class PreferencesPage {
 
         }).then((result)=>{
 
-            console.log(JSON.stringify(result));
+            //console.log(JSON.stringify(result));
 
             //noinspection TypeScriptUnresolvedVariable
             Pro.deploy.extractUpdate((progress) => {
@@ -215,7 +228,8 @@ export class PreferencesPage {
     public loadCurrentChannel(){
         //noinspection TypeScriptUnresolvedVariable
         Pro.deploy.getConfiguration().then((config)=>{
-            this.updateChannel = config.channel;
+            if (config.channel)
+                this.updateChannel = config.channel;
             this.channelLoaded = true;
         }).catch((err)=>{
             // Silently fail

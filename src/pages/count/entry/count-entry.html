@@ -18,6 +18,6 @@
 
 <ion-tabs #tabs>
     <ion-tab [root]="tab1Root" [rootParams]="data" tabTitle="Enter" tabIcon="cube"></ion-tab>
-    <ion-tab [root]="tab2Root" [rootParams]="data" tabTitle="Pending" tabIcon="list-box" [tabBadge]="countProvider.totalPendingQty"></ion-tab>
     <ion-tab [root]="tab3Root" [rootParams]="data" tabTitle="List" tabIcon="list-box" [tabBadge]="countProvider.countPercent + '%'"></ion-tab>
+    <ion-tab [root]="tab2Root" [rootParams]="data" tabTitle="Pending" tabIcon="checkmark-circle" [tabBadge]="countProvider.totalPendingQty"></ion-tab>
 </ion-tabs>

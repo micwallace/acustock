@@ -19,7 +19,7 @@
 import { Component } from '@angular/core';
 import 'rxjs/add/operator/map'
 import { IonicPage, NavController, LoadingController, PopoverController, Events } from 'ionic-angular';
-import { Api, CacheProvider, ItemAutocompleteService, PreferencesProvider } from '../../providers/providers';
+import { Api, CacheProvider, ItemAutocompleteService, PreferencesProvider, LookupProvider } from '../../providers/providers';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { ItemLookupDetailsPage } from '../item-lookup-details/item-lookup-details';
 import { UtilsProvider } from "../../providers/core/utils";
@@ -33,11 +33,7 @@ import { LookupsPopover } from "../bin-lookup/lookups-popover";
 })
 export class ItemLookupPage {
 
-    itemLocations = [];
-
     loader = null;
-
-    selectedItem = null;
 
     constructor(public navCtrl:NavController,
                 public popoverCtrl:PopoverController,
@@ -45,6 +41,7 @@ export class ItemLookupPage {
                 public api:Api,
                 public loadingCtrl:LoadingController,
                 public barcodeScanner:BarcodeScanner,
+                public lookupProvider:LookupProvider,
                 public cache:CacheProvider,
                 public prefs:PreferencesProvider,
                 public utils:UtilsProvider,
@@ -69,42 +66,18 @@ export class ItemLookupPage {
     }
 
     loadItemLocations(item, isScan=false) {
-        //console.log(JSON.stringify(item));
+
         if (this.loader == null) {
             this.loader = this.loadingCtrl.create({content: "Loading..."});
             this.loader.present();
         }
 
-        this.api.getItemWarehouseLocations(item.InventoryID.value, this.prefs.getPreference('warehouse')).then((res:any) => {
+        this.lookupProvider.loadItemLocations(item).then(()=>{
 
-            this.cache.getBinList().then((bins:any)=>{
-
-                console.log(res);
-
-                console.log(bins);
-
-                for (let location of res) {
-                    for (let bin of bins) {
-                        if (location.Location.value == bin.LocationID.value) {
-                            location.LocDescription = bin.Description.value;
-                            break;
-                        }
-                    }
-                }
-
-                this.itemLocations = res;
-                console.log(JSON.stringify(res));
-                this.dismissLoader();
-
-            }).catch((err)=>{
-                this.dismissLoader().then(()=> {
-                    this.utils.processApiError("Error", err.message, err, this.navCtrl);
-                });
-            });
+            this.dismissLoader();
 
         }).catch((err) => {
 
-            //console.log(JSON.stringify(err));
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
                 this.utils.processApiError("Error", err.message, err, this.navCtrl);
@@ -133,12 +106,11 @@ export class ItemLookupPage {
 
         this.cache.getItemById(barcodeText).then((item:any) => {
 
-            this.selectedItem = item;
+            this.lookupProvider.item = item;
             this.loadItemLocations(item);
 
         }).catch((err) => {
 
-            this.selectedItem = null;
             this.utils.playFailedSound(true);
             this.dismissLoader().then(()=> {
                 this.utils.showAlert("Error", err.message, {exception: err});
@@ -164,7 +136,7 @@ export class ItemLookupPage {
     openDetailsModal(event, item) {
         // combine data and open details page
         //noinspection TypeScriptValidateTypes
-        this.navCtrl.push(ItemLookupDetailsPage, {data: Object.assign(item, this.selectedItem)});
+        this.navCtrl.push(ItemLookupDetailsPage, {data: Object.assign(item, this.lookupProvider.item)});
     }
 
 }

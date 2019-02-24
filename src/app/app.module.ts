@@ -34,7 +34,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { AutoCompleteModule } from 'ionic2-auto-complete';
 
-import { Api, CacheProvider, ItemAutocompleteService, LocationAutocompleteService, PickProvider, PreferencesProvider } from '../providers/providers';
+import { Api, CacheProvider, ItemAutocompleteService, LocationAutocompleteService, PickProvider, PreferencesProvider, LookupProvider } from '../providers/providers';
 import { HTTP } from '@ionic-native/http';
 import { HttpModule } from '@angular/http'
 import { ItemLookupDetailsPage } from "../pages/item-lookup-details/item-lookup-details";
@@ -231,6 +231,7 @@ export class MyErrorHandler implements ErrorHandler {
         CacheProvider,
         ItemAutocompleteService,
         LocationAutocompleteService,
+        LookupProvider,
         PickProvider,
         TransferProvider,
         CountProvider,

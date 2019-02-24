@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, ViewChild } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Component, ViewChild, Renderer2, Inject } from '@angular/core';
 import { IonicApp, Platform, Nav, LoadingController, AlertController } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -51,7 +52,9 @@ export class AcuStock {
                 public cache:CacheProvider,
                 public loadingCtrl:LoadingController,
                 public utils:UtilsProvider,
-                private ionicApp: IonicApp) {
+                private ionicApp: IonicApp,
+                @Inject(DOCUMENT) private document: Document,
+                private renderer: Renderer2) {
 
         platform.ready().then((readySrc) => {
 
@@ -121,6 +124,10 @@ export class AcuStock {
         }).catch((err) => {
 
         });
+    }
+
+    ngOnInit(){
+        this.renderer.addClass(this.document.body, this.prefs.getPreference('text_size'));
     }
 
     showedAlert = false;

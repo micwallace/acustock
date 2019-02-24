@@ -40,7 +40,7 @@
                 </ion-label>
                 <ion-input name="shipment-number" autofocus type="text" placeholder="" [ngModel]="shipmentNbr"
                            (keyup.enter)="loadShipment($event.target.value); $event.stopPropagation();" (keypress)="$event.stopPropagation();"></ion-input>
-                <button type="button" ion-button icon-only item-right (click)="startCameraScanner()">
+                <button *ngIf="this.pickProvider.prefs.getPreference('camera_scan')" type="button" ion-button icon-only item-right (click)="startCameraScanner()">
                     <ion-icon name="barcode"></ion-icon>
                 </button>
             </ion-item>

@@ -91,6 +91,14 @@ export class PreferencesProvider {
                     title: "Device Name",
                     type: "text",
                     def_value: ""
+                },
+                {
+                    key: "camera_scan",
+                    min_key: "csc",
+                    caption: "Whether or not the camera scanning button should be shown throughout the app.",
+                    title: "Camera Scanner",
+                    type: "toggle",
+                    def_value: true
                 }
             ]
         },
@@ -249,6 +257,18 @@ export class PreferencesProvider {
                     options: [
                         { label: "Light", value: "theme-light"},
                         { label: "Dark", value: "theme-dark"},
+                    ]
+                },
+                {
+                    key: "text_size",
+                    min_key: "tsz",
+                    title: "Text Size",
+                    type: "select",
+                    def_value: "",
+                    options: [
+                        { label: "Default", value: ""},
+                        { label: "Large (1.8rem)", value: "text-size-18"},
+                        { label: "Larger (2rem)", value: "text-size-20"},
                     ]
                 }
             ]

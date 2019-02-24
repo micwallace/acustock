@@ -292,6 +292,10 @@ export class Api {
         return this.postActionAndGetResult("Shipment/CorrectShipment", {entity: {ShipmentNbr: {value: shipmentNbr}}});
     }
 
+    updateIN(shipmentNbr){
+        return this.postActionAndGetResult("Shipment/UpdateIN", {entity: {ShipmentNbr: {value: shipmentNbr}}});
+    }
+
     getReceiptShipmentsList(){
         return this.get("Shipment?$filter=Operation eq 'Receipt' and Status ne 'Completed' and WarehouseID eq '" + this.prefs.getPreference("warehouse") + "'");
     }

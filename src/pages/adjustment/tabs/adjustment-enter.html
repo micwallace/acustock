@@ -34,7 +34,7 @@
 
 <ion-content padding style="position: relative;">
     <div>
-        <button type="button" ion-button small icon-only float-right (click)="startCameraScanner()">
+        <button *ngIf="this.adjustmentProvider.prefs.getPreference('camera_scan')" type="button" ion-button small icon-only float-right (click)="startCameraScanner()">
             <ion-icon name="barcode"></ion-icon>
         </button>
     </div>

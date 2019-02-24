@@ -415,9 +415,9 @@ export class ReceiveShipmentEnterTab {
             this.cache.flushItemLocationCache();
             this.events.publish("closeReceiveScreen");
 
-            console.log(res);
+            //console.log(res);
 
-            console.log(this.receiveProvider.transferShipment);
+            //console.log(this.receiveProvider.transferShipment);
 
             var msg;
             if (this.receiveProvider.type == "shipment"){

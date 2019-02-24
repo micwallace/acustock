@@ -40,7 +40,7 @@
                 </ion-label>
                 <ion-input [(ngModel)]="referenceNbr" name="receipt-number" autofocus type="text" placeholder=""
                            (keypress)="$event.stopPropagation();" (keydown.enter)="loadCount($event.target.value); $event.stopPropagation();"></ion-input>
-                <button type="button" ion-button icon-only item-right (click)="startCameraScanner()">
+                <button *ngIf="this.countProvider.prefs.getPreference('camera_scan')" type="button" ion-button icon-only item-right (click)="startCameraScanner()">
                     <ion-icon name="barcode"></ion-icon>
                 </button>
             </ion-item>

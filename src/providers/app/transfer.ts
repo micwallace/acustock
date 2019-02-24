@@ -167,7 +167,7 @@ export class TransferProvider {
                 WarehouseID: {value: warehouse},
                 ToWarehouseID: {value: warehouse},
                 Hold: {value: false},
-                Description: {value: "AcuStock Location Transfer"},
+                Description: {value: "AcuStock Location Transfer (device: "+this.prefs.getPreference('device')+")"},
                 Details: []
             };
 

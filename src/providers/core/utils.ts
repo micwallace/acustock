@@ -74,13 +74,16 @@ export class UtilsProvider {
             ]
         });
 
-        if (exception != null)
+        if (exception != null) {
             alert.addButton({
                 text: 'Email Diagnostics',
                 handler: () => {
                     this.sendDebugData(exception, additionalData);
                 }
             });
+
+            // TODO: Add pro error reporting
+        }
 
         alert.present();
 

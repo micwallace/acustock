@@ -19,7 +19,7 @@
 import { Component } from '@angular/core';
 import 'rxjs/add/operator/map'
 import { IonicPage, NavController, PopoverController, LoadingController, Events } from 'ionic-angular';
-import { Api, CacheProvider, LocationAutocompleteService, PreferencesProvider } from '../../providers/providers';
+import { Api, CacheProvider, LocationAutocompleteService, PreferencesProvider, LookupProvider } from '../../providers/providers';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { ItemLookupDetailsPage } from '../item-lookup-details/item-lookup-details'
 import { UtilsProvider } from "../../providers/core/utils";
@@ -33,11 +33,7 @@ import { LookupsPopover } from "./lookups-popover";
 })
 export class BinLookupPage {
 
-    binContents = [];
-
     loader = null;
-
-    selectedLocation = null;
 
     constructor(public navCtrl:NavController,
                 public popoverCtrl:PopoverController,
@@ -47,6 +43,7 @@ export class BinLookupPage {
                 public barcodeScanner:BarcodeScanner,
                 public cache:CacheProvider,
                 public prefs:PreferencesProvider,
+                public lookupProvider:LookupProvider,
                 public utils:UtilsProvider,
                 public events:Events) {
     }
@@ -68,16 +65,15 @@ export class BinLookupPage {
         popover.present({ev:event});
     }
 
-    loadBinContents(item, isScan=false) {
+    loadBinContents(location, isScan=false) {
 
         if (this.loader == null) {
             this.loader = this.loadingCtrl.create({content: "Loading..."});
             this.loader.present();
         }
 
-        this.api.getLocationContents(item.LocationID.value, this.prefs.getPreference('warehouse')).then((res:any) => {
+        this.lookupProvider.loadLocationItems(location).then(()=>{
 
-            this.binContents = res;
             this.dismissLoader();
 
         }).catch((err) => {
@@ -111,12 +107,11 @@ export class BinLookupPage {
 
         this.cache.getBinById(barcodeText).then((bin:any) => {
 
-            this.selectedLocation = bin;
+            this.lookupProvider.location = bin;
             this.loadBinContents(bin, true);
 
         }).catch((err) => {
 
-            this.selectedLocation = null;
             this.utils.playFailedSound(true);
             this.dismissLoader().then(()=> {
                 this.utils.processApiError("Error", err.message, err, this.navCtrl);

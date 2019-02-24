@@ -201,6 +201,7 @@ export class ReceiveProvider {
                             reject(err);
                         });
 
+                        return;
                     }
 
                     reject(err);
@@ -220,8 +221,6 @@ export class ReceiveProvider {
     private initialiseSource() {
 
         var receipts = JSON.parse(localStorage.getItem("unconfirmed_receipts"));
-
-        console.log("Saved receipts: "+localStorage.getItem("unconfirmed_receipts"));
 
         var id = this.sourceDocument.id;
 
@@ -373,7 +372,7 @@ export class ReceiveProvider {
 
         this.saveReceipts();
 
-        console.log(JSON.stringify(this.pendingItems));
+        //console.log(JSON.stringify(this.pendingItems));
     }
 
     public updateReceiptItem(line, key, newQty) {
@@ -651,7 +650,7 @@ export class ReceiveProvider {
 
         var data:any = {
             TransferNbr: this.sourceDocument.ReferenceNbr,
-            Description: {value: "AcuStock Transfer Receipt"},
+            Description: {value: "AcuStock Transfer Receipt (device: "+this.prefs.getPreference('device')+")"},
             Hold: {value: false},
             Details: []
         };
@@ -705,12 +704,10 @@ export class ReceiveProvider {
             data.Type = {value: "Receipt"};
             data.CreateBill = {value: false};
             data.Vendor = this.sourceDocument.Vendor;
-            data.VendorRef = {value: "AcuStock Receipt"};
-            console.log("Purchase receipt object");
+            data.VendorRef = {value: "AcuStock Receipt (device: "+this.prefs.getPreference('device')+")"};
         } else {
             data.Type = {value: "Transfer Receipt"};
             data.Warehouse = {value: warehouse};
-            console.log("Transfer purchase receipt object");
         }
 
         data.Details = [];
@@ -772,6 +769,10 @@ export class ReceiveProvider {
                 reject(err);
             });
         });
+    }
+
+    public updateIN(){
+        return this.api.updateIN(this.sourceDocument.ShipmentNbr.value);
     }
 
     public getErrorReportingData(){

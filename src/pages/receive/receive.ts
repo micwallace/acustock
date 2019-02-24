@@ -204,4 +204,37 @@ export class ReceivePage {
         this.navCtrl.push(ReceiveShipmentPage);
     }
 
+    updateIN(){
+
+        let dialog = this.alertCtrl.create({
+            title: 'Update Inventory',
+            message: 'This will create the issue document in Acumatica so stock levels are updated. This process cannot be reversed, are you sure?',
+            buttons: [
+                {
+                    text: 'Cancel',
+                    role: 'cancel',
+                    handler: () => {}
+                },
+                {
+                    text: 'OK',
+                    handler: () => {
+
+                        let loader = this.loadingCtrl.create({content: "Updating Inventory..."});
+                        loader.present();
+
+                        this.receiveProvider.updateIN().then(()=>{
+                            loader.dismiss();
+                        }).catch((err)=>{
+                            loader.dismiss().then(()=>{
+                                this.utils.processApiError("Error", err.message, err, this.navCtrl);
+                            });
+                        });
+                    }
+                }
+            ]
+        });
+
+        dialog.present();
+    }
+
 }

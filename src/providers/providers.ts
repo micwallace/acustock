@@ -20,6 +20,7 @@ import { Api } from './core/api';
 import { CacheProvider } from './core/cache';
 import { ItemAutocompleteService } from './ui/item-autocomplete';
 import { LocationAutocompleteService } from './ui/bin-autocomplete';
+import { LookupProvider } from './app/lookup';
 import { PickProvider } from './app/pick';
 import { TransferProvider } from './app/transfer';
 import { CountProvider } from './app/count';
@@ -35,5 +36,6 @@ export {
     PreferencesProvider,
     CountProvider,
     AdjustmentProvider,
-    TransferProvider
+    TransferProvider,
+    LookupProvider
 };

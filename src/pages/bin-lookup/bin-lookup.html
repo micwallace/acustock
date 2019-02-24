@@ -34,7 +34,7 @@
         <ion-label>
             Enter or scan location ID
         </ion-label>
-        <button ion-button icon-only item-right (click)="scanBarcode();">
+        <button *ngIf="this.prefs.getPreference('camera_scan')" ion-button icon-only item-right (click)="scanBarcode();">
             <ion-icon name="barcode"></ion-icon>
         </button>
     </ion-item>
@@ -43,7 +43,7 @@
             <span [innerHTML]="attrs.data.LocationID.value | boldprefix:attrs.keyword"></span><br/>
             <small [innerHTML]="attrs.data.Description.value | boldprefix:attrs.keyword"></small>
         </ng-template>
-        <ion-auto-complete [(ngModel)]="selectedLocation" [dataProvider]="binAutocompleteService"
+        <ion-auto-complete [(ngModel)]="lookupProvider.location" [dataProvider]="binAutocompleteService"
                            [template]="listItem" (itemSelected)="loadBinContents($event);" (keydown.enter)="loadItemByBarcode($event.target.value);"></ion-auto-complete>
     </div>
 </ion-header>
@@ -54,7 +54,7 @@
         <ion-col col-7 class="column-right">Available / On-Hand</ion-col>
     </ion-row>
     <ion-list class="item-list">
-        <ion-item class="list-item" no-padding tappable *ngFor="let item of binContents" (click)="openDetailsModal($event, item);">
+        <ion-item class="list-item" no-padding tappable *ngFor="let item of lookupProvider.locationItems" (click)="openDetailsModal($event, item);">
             <ion-row>
                 <ion-col col-7><strong>{{item.InventoryID.value}}</strong></ion-col>
                 <ion-col col-5 class="column-right">

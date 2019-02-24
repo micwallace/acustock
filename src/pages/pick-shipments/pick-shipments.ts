@@ -186,7 +186,7 @@ export class PickShipmentsPage {
 
             let alert = this.alertCtrl.create({
                 title: "Shipment Assigned",
-                message: "This shipment is already assigned to device "+this.pickProvider.currentShipment.PickDevice.value+". Would you like to release it and assign it to this device?",
+                message: "This shipment is already assigned to another device ("+this.pickProvider.currentShipment.PickDevice.value+"). Would you like to release it and assign it to this device?",
                 buttons: [
                     {
                         text: "No",
