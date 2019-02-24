@@ -59,7 +59,7 @@ export class LookupProvider {
                         }
                     }
 
-                    this.item = item.InventoryID.value;
+                    this.item = item;
                     this.itemLocations = res;
 
                     resolve();
@@ -76,13 +76,13 @@ export class LookupProvider {
         });
     }
 
-    loadLocationItems(item) {
+    loadLocationItems(location) {
 
         return new Promise((resolve, reject)=> {
 
-            this.api.getLocationContents(item.LocationID.value, this.prefs.getPreference('warehouse')).then((res:any) => {
+            this.api.getLocationContents(location.LocationID.value, this.prefs.getPreference('warehouse')).then((res:any) => {
 
-                this.location = item.LocationID.value;
+                this.location = location;
                 this.locationItems = res;
 
                 resolve();

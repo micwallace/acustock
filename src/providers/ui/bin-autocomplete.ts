@@ -38,10 +38,10 @@ export class LocationAutocompleteService implements AutoCompleteService {
 
             this.binList = res;
 
-            console.log(JSON.stringify(this.binList[0]));
+            //console.log(JSON.stringify(this.binList[0]));
 
         }).catch((err) => {
-            console.log("Error:" + JSON.stringify(err));
+            //console.log("Error:" + JSON.stringify(err));
         });
     }
 

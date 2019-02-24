@@ -38,10 +38,10 @@ export class ItemAutocompleteService implements AutoCompleteService {
 
             this.itemList = res;
 
-            console.log(JSON.stringify(this.itemList[0]));
+            //console.log(JSON.stringify(this.itemList[0]));
 
         }).catch((err) => {
-            console.log(JSON.stringify(err));
+            //console.log(JSON.stringify(err));
         });
     }
 
