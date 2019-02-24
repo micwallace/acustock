@@ -127,7 +127,9 @@ export class AcuStock {
     }
 
     ngOnInit(){
-        this.renderer.addClass(this.document.body, this.prefs.getPreference('text_size'));
+        let sizeClass = this.prefs.getPreference('text_size');
+        if (sizeClass)
+            this.renderer.addClass(this.document.body, sizeClass);
     }
 
     showedAlert = false;
