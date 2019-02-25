@@ -443,19 +443,19 @@ export class PickTab {
             if (item.InventoryID.value != curItem.InventoryID.value) {
 
                 if (!this.pickProvider.prefs.getPreference('pick_item_seek')){
-                    this.setItemErrorCallback("Wrong Item", {message: "The item ("+item.InventoryID.value+") is not the one required ("+curItem.InventoryID.value+")."});
+                    this.setItemErrorCallback({message: "The item ("+item.InventoryID.value+") is not the one required ("+curItem.InventoryID.value+")."}, isScan, "Wrong Item");
                     return;
                 }
 
                 // Search the picklist for the item & load the best match
-                var allocIndexes = this.pickProvider.getBestFitAllocation(item.InventoryID.value, this.enteredData.location);
+                let allocIndexes = this.pickProvider.getBestFitAllocation(item.InventoryID.value, this.enteredData.location);
 
                 if (allocIndexes == null){
                     this.showQty = false;
                     this.enteredData.item = "";
                     this.utils.playFailedSound(isScan);
                     this.dismissLoader().then(()=> {
-                        this.setItemErrorCallback("Wrong Item", {message: "The item ("+item.InventoryID.value+") does not exist on the pick list or has already been picked."});
+                        this.setItemErrorCallback({message: "The item ("+item.InventoryID.value+") does not exist on the pick list or has already been picked."}, isScan, "Wrong Item");
                     });
                     return;
                 }
