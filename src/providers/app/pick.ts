@@ -312,6 +312,7 @@ export class PickProvider {
                     InventoryID: item.InventoryID,
                     Description: item.Description,
                     LineNbr: item.LineNbr,
+                    SplitLineNbr: {value: "UNALLOCATED"},
                     LocationID: {value: ""},
                     LotSerialNbr: {value: ""},
                     Qty: {value: unallocated},
@@ -487,7 +488,7 @@ export class PickProvider {
 
                 var pickItem = item.Allocations[x];
 
-                var location = pickItem.LocationID.value;
+                var location = x == "UNALLOCATED" ? "(unassigned)" : pickItem.LocationID.value;
 
                 if (!pickList.hasOwnProperty(location))
                     pickList[location] = {
@@ -818,7 +819,7 @@ export class PickProvider {
         this.calculateQtys();
     }
 
-    public confirmPicks(removeUnpicked) {
+    public confirmPicks() {
 
         return new Promise((resolve, reject) => {
 
@@ -828,15 +829,11 @@ export class PickProvider {
             };
 
             if (["Open", "Assigned", "Partial", "Picked"].indexOf(this.currentShipment.PickStatus.value) > -1)
-                data.PickStatus = {value: ((removeUnpicked==false && this.unpickedQty > 0) ? "Partial" : "Picked")};
-
-            var pickedLineNums = [];
+                data.PickStatus = {value: (this.unpickedQty > 0 ? "Partial" : "Picked")};
 
             for (var i in this.pendingPicks) {
 
                 let lineNbr = parseInt(i);
-
-                pickedLineNums.push(lineNbr);
 
                 var item:any = {
                     LineNbr: {value: lineNbr},
@@ -844,8 +841,6 @@ export class PickProvider {
                 };
 
                 var alloc:any;
-
-                var totalPicked = 0;
 
                 var modified = this.modifiedAllocations.hasOwnProperty(i) ? this.modifiedAllocations[i].Allocations : {};
 
@@ -861,17 +856,16 @@ export class PickProvider {
 
                     var pickedQty = pendingAlloc.PickedQty.value + pendingAlloc.PendingQty;
 
-                    totalPicked += pickedQty;
-
                     alloc = {
                         LineNbr: {value: lineNbr},
                         // If the allocation is over-picked or we are removing unpicked items, set the quantity to picked quantity.
-                        Qty: {value: ((removeUnpicked || pendingAlloc.Qty.value < pickedQty) ? pickedQty : pendingAlloc.Qty.value)},
+                        Qty: {value: ((pendingAlloc.Qty.value < pickedQty) ? pickedQty : pendingAlloc.Qty.value)},
                         PickedQty: {value: pickedQty},
                         LocationID: pendingAlloc.LocationID
                     };
 
-                    if (pendingAlloc.hasOwnProperty("SplitLineNbr")) {
+                    if (pendingAlloc.hasOwnProperty("SplitLineNbr") && pendingAlloc.SplitLineNbr.value != "UNALLOCATED") {
+
                         alloc.SplitLineNbr = pendingAlloc.SplitLineNbr;
 
                         if (modified.hasOwnProperty(pendingAlloc.SplitLineNbr.value)) {
@@ -897,16 +891,17 @@ export class PickProvider {
 
                     var modAlloc = modified[y];
 
+                    if (modAlloc.SplitLineNbr.value == "UNALLOCATED")
+                        continue;
+
                     alloc = {
                         LineNbr: {value: lineNbr},
                         SplitLineNbr: modAlloc.SplitLineNbr,
-                        Qty: removeUnpicked ? modAlloc.PickedQty : modAlloc.Qty,
+                        Qty: modAlloc.Qty,
                     };
 
                     if (alloc.Qty.value == 0 || modAlloc.hasOwnProperty("delete"))
                         alloc["delete"] = true;
-
-                    totalPicked += modAlloc.PickedQty.value;
 
                     item.Allocations.push(alloc);
                 }
@@ -914,35 +909,10 @@ export class PickProvider {
                 // Combine pending picks along with the modified/deleted ones they are replacing
                 item.Allocations = item.Allocations.concat(allocs);
 
-                if (removeUnpicked)
-                    item.ShippedQty = {value: totalPicked};
-
-                console.log("Total picked for item line "+i+": "+totalPicked);
-
                 data.Details.push(item);
             }
 
-            if (removeUnpicked){
-                // Loop through shipment lines and add lines that don't have pending picks
-                for (let item of this.currentShipment.Details){
-
-                    if (pickedLineNums.indexOf(item.LineNbr.value) === -1){
-
-                        var itemUpdate = {
-                            LineNbr: item.LineNbr,
-                            ShippedQty: item.PickedQty,
-                        };
-
-                        // Delete whole line if there's none picked, otherwise reduce shipped qty to equal picked qty
-                        if (itemUpdate.ShippedQty.value === 0)
-                            itemUpdate['delete'] = true;
-
-                        data.Details.push(itemUpdate);
-                    }
-                }
-            }
-
-            //console.log("Submitting Picks");
+            console.log("Submitting Picks");
             console.log(JSON.stringify(data));
 
             this.lastRequest = data;
@@ -960,9 +930,106 @@ export class PickProvider {
             }).catch((err)=> {
                 err.message = "Failed to save picks. " + err.message;
                 reject(err);
+                console.log(JSON.stringify(err));
             });
         });
 
+    }
+
+    public removeUnpickedItems(){
+
+        return new Promise((resolve, reject) => {
+
+            var data:any = {
+                ShipmentNbr: this.currentShipment.ShipmentNbr,
+                PickStatus: {value: "Picked"},
+                Details: []
+            };
+
+            let curItems = JSON.parse(JSON.stringify(this.currentShipment.Details));
+
+            for (let item of curItems){
+
+                if (item.PickedQty.value == item.ShippedQty.value)
+                    continue;
+
+                let itemUpdate:any = {
+                    LineNbr: item.LineNbr,
+                    Allocations: []
+                };
+
+                if (item.PickedQty.value == 0){
+
+                    itemUpdate['delete'] = true;
+
+                } else {
+
+                    let totalPicked = 0;
+
+                    let deleted = [];
+
+                    for (var i = item.Allocations.length -1; i >= 0; i--){
+
+                        let alloc = item.Allocations[i];
+
+                        let allocUpdate:any = {
+                            LineNbr: item.LineNbr,
+                            SplitLineNbr: alloc.SplitLineNbr,
+                            LocationID: alloc.LocationID
+                        };
+
+                        totalPicked += alloc.PickedQty.value;
+
+                        if (alloc.PickedQty.value == 0){
+                            allocUpdate['delete'] = true;
+                            deleted.push(allocUpdate);
+                            continue;
+                        } else if (alloc.PickedQty.value < alloc.Qty.value) {
+                            allocUpdate.Qty = alloc.PickedQty;
+                        } else {
+                            allocUpdate.Qty = alloc.PickedQty;
+                            allocUpdate.PickedQty = alloc.PickedQty;
+                            itemUpdate.Allocations.push(allocUpdate);
+                            continue;
+                        }
+
+                        item.Allocations.splice(i, 1);
+
+                        itemUpdate.Allocations.push(allocUpdate);
+                    }
+
+                    /*if (item.Allocations.length === 1) {
+                        itemUpdate.LocationID = item.Allocations[0].LocationID;
+                        itemUpdate.PickedQty = item.Allocations[0].PickedQty;
+                    }*/
+
+                    itemUpdate.ShippedQty = {value: totalPicked};
+
+                    itemUpdate.Allocations =  itemUpdate.Allocations.concat(deleted);
+                }
+
+                data.Details.push(itemUpdate);
+            }
+
+            console.log("Removing unpicked items.");
+            console.log(JSON.stringify(data));
+
+            this.api.putShipment(data).then((res:any)=> {
+
+                this.currentShipment = res;
+
+                this.generateSourceList();
+                this.calculateQtys();
+
+                resolve(res);
+
+            }).catch((err)=> {
+                err.message = "Failed to remove unpicked items. " + err.message;
+                reject(err);
+                console.log(JSON.stringify(err));
+            });
+
+        });
     }
 
     public getErrorReportingData(){

@@ -37,7 +37,7 @@
     <ion-grid>
         <ion-row class="table-header">
             <ion-col col-9><strong>Locations / Item</strong></ion-col>
-            <ion-col col-3 text-right><strong>Qty</strong></ion-col>
+            <ion-col col-3 class="column-right"><strong>Qty</strong></ion-col>
         </ion-row>
         <ion-list no-margin no-padding class="item-list">
             <ion-item no-margin no-padding class="list-item" *ngFor="let key of objectKeys(countProvider.pendingCounts)" (click)="editCountItem(countProvider.pendingCounts[key]);">

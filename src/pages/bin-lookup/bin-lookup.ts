@@ -53,12 +53,13 @@ export class BinLookupPage {
     };
 
     ionViewDidLoad() {
+        this.events.unsubscribe('barcode:scan');
         this.events.subscribe('barcode:scan', this.barcodeScanHandler);
     }
 
-    ionViewWillUnload() {
+    /*ionViewWillUnload() {
         this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
-    }
+    }*/
 
     presentPopover(event) {
         let popover = this.popoverCtrl.create(LookupsPopover);

@@ -77,6 +77,8 @@ export class ReceiveShipmentEnterTab {
     };
 
     ionViewDidLoad() {
+
+        this.events.unsubscribe('barcode:scan');
         this.events.subscribe('barcode:scan', this.barcodeScanHandler);
 
         this.events.subscribe('receipts:confirm', ()=>{
@@ -120,7 +122,6 @@ export class ReceiveShipmentEnterTab {
     }
 
     ionViewWillUnload(){
-        this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
         this.events.unsubscribe('receipts:confirm');
         this.events.unsubscribe('receipts:clear');
         this.events.unsubscribe('receipts:open');

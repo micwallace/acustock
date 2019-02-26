@@ -80,6 +80,7 @@ export class PickTab {
 
     ionViewDidLoad() {
 
+        this.events.unsubscribe('barcode:scan');
         this.events.subscribe('barcode:scan', this.barcodeScanHandler);
 
         this.events.subscribe('picks:confirm', ()=>{
@@ -126,7 +127,6 @@ export class PickTab {
     }
 
     ionViewWillUnload(){
-        this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
         this.events.unsubscribe('picks:confirm');
         this.events.unsubscribe('picks:cancel');
         this.events.unsubscribe('picks:open');
@@ -541,7 +541,7 @@ export class PickTab {
                 var curBin = this.getSuggestedAllocation().LocationID.value;
 
                 // If the bin is not the suggested bin, prompt for override
-                if (curBin != enteredBin) {
+                if (curBin != "" && curBin != enteredBin) {
 
                     this.utils.playPromptSound(isScan);
 
@@ -742,7 +742,7 @@ export class PickTab {
             return this.utils.showAlert("Error",  "There are no picked items to commit.");
 
 
-        if (this.pickProvider.unpickedQty > 0){
+        /*if (this.pickProvider.unpickedQty > 0){
 
             let alert = this.alertCtrl.create({
                 title: "Unpicked Items",
@@ -769,9 +769,9 @@ export class PickTab {
 
             alert.present();
 
-        } else {
+        } else {*/
             this.doConfirmPicks(false);
-        }
+        //}
 
     }
 
@@ -802,10 +802,29 @@ export class PickTab {
         let loader = this.loadingCtrl.create({content: "Confirming picks..."});
         loader.present();
 
-        this.pickProvider.confirmPicks(removeUnpicked).then((res:any)=>{
-            loader.dismiss();
-            this.cache.flushItemLocationCache();
-            this.events.publish('closeModal');
+        this.pickProvider.confirmPicks().then((res:any)=>{
+
+            if (removeUnpicked){
+
+                loader.data.content = "Removing unpicked items...";
+
+                this.pickProvider.removeUnpickedItems().then(()=>{
+
+                    loader.dismiss();
+                    this.cache.flushItemLocationCache();
+                    this.events.publish('closeModal');
+
+                }).catch((err)=> {
+                    loader.dismiss();
+                    this.utils.processApiError("Error", err.message, err, this.navCtrl, this.pickProvider.getErrorReportingData());
+                });
+
+            } else {
+                loader.dismiss();
+                this.cache.flushItemLocationCache();
+                this.events.publish('closeModal');
+            }
+
         }).catch((err)=> {
             loader.dismiss();
             this.utils.processApiError("Error", err.message, err, this.navCtrl, this.pickProvider.getErrorReportingData());

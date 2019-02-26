@@ -73,6 +73,8 @@ export class CountEntryEnterTab {
     };
 
     ionViewDidLoad() {
+
+        this.events.unsubscribe('barcode:scan');
         this.events.subscribe('barcode:scan', this.barcodeScanHandler);
 
         this.events.subscribe('counts:commit', ()=>{
@@ -116,7 +118,6 @@ export class CountEntryEnterTab {
     }
 
     ionViewWillUnload(){
-        this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
         this.events.unsubscribe('counts:commit');
         this.events.unsubscribe('counts:clear');
         this.events.unsubscribe('counts:open');

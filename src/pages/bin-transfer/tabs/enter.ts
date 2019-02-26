@@ -74,6 +74,8 @@ export class EnterTab {
     }
 
     ionViewDidLoad(){
+
+        this.events.unsubscribe('barcode:scan');
         this.events.subscribe('barcode:scan', this.barcodeScanHandler);
 
         this.events.subscribe('transfers:commit', ()=>{
@@ -86,7 +88,6 @@ export class EnterTab {
     }
 
     ionViewWillUnload(){
-        this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
         this.events.unsubscribe('transfers:commit');
         this.events.unsubscribe('transfers:clear');
     }
