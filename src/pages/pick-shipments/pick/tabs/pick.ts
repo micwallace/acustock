@@ -244,6 +244,9 @@ export class PickTab {
     }
 
     nextItem() {
+
+        let curAlloc = this.getSuggestedAllocation();
+
         if (this.currentItemIndex + 1 < this.getSuggestedLocation().Items.length) {
 
             this.currentItemIndex++;
@@ -259,11 +262,15 @@ export class PickTab {
             this.currentItemIndex = 0;
         }
 
-        //console.log(this.currentLocationIndex + " / " + this.currentItemIndex);
-        //console.log(this.getSuggestedAllocation());
+        let newAlloc = this.getSuggestedAllocation();
+
+        this.resetForm((newAlloc != null && curAlloc.LocationID.value == newAlloc.LocationID.value));
     }
 
     previousItem() {
+
+        let curAlloc = this.getSuggestedAllocation();
+
         if (this.currentItemIndex - 1 > -1) {
 
             this.currentItemIndex--;
@@ -278,6 +285,10 @@ export class PickTab {
             this.currentLocationIndex = this.pickProvider.pickList.length - 1;
             this.currentItemIndex = this.getSuggestedLocation().Items.length - 1;
         }
+
+        let newAlloc = this.getSuggestedAllocation();
+
+        this.resetForm((newAlloc != null && curAlloc.LocationID.value == newAlloc.LocationID.value));
     }
 
     resetForm(keepLocation) {
@@ -913,9 +924,11 @@ export class PickTab {
 
                         this.utils.playScanSuccessSound();
 
-                        // If the completed quantity is reached let's automatically move to the next suggested pick
+                        // If the completed quantity is reached let's automatically add the pick & move to the next suggested item
                         if (this.getTotalRemainingQty() - this.enteredData.qty == 0) {
-                            return this.addPick();
+                            // play the prompt sound to indicate a new item is required.
+                            if (this.addPick())
+                                this.utils.playPromptSound();
                         }
 
                         if (callback != null)
