@@ -135,6 +135,21 @@ export class UtilsProvider {
             this.vibrate();
     }
 
+    public playCompletedSound(vibrate=false){
+
+        var key = this.prefs.getPreference("completed_sound");
+        if (key != ""){
+            UtilsProvider.playSound(key);
+        }
+
+        if (!vibrate)
+            return;
+
+        var vibrate:boolean = this.prefs.getPreference("alert_vibrate");
+        if (vibrate)
+            this.vibrate();
+    }
+
     public playFailedSound(vibrate=false){
 
         var key = this.prefs.getPreference("alert_sound");

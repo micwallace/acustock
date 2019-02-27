@@ -92,6 +92,16 @@ export class PickTab {
         });
 
         this.events.subscribe('picks:open', (indexes)=>{
+
+            if (this.enteredData.qty > 0){
+
+                if (this.currentLocationIndex == indexes[0] && this.currentItemIndex == indexes[1])
+                    return;
+
+                this.showItemChangeConfirm(()=>{ this.openPicklistItem(indexes) });
+                return;
+            }
+
             this.openPicklistItem(indexes);
         });
 
@@ -243,7 +253,13 @@ export class PickTab {
         return this.getSuggestedAllocation().TotalRemainingQty - this.getTotalPickedQty();
     }
 
-    nextItem() {
+    nextItem(confirmed=false) {
+
+        if (!confirmed && this.enteredData.qty > 0){
+
+            this.showItemChangeConfirm((confirmed)=>{ this.nextItem(confirmed); });
+            return;
+        }
 
         let curAlloc = this.getSuggestedAllocation();
 
@@ -267,7 +283,13 @@ export class PickTab {
         this.resetForm((newAlloc != null && curAlloc.LocationID.value == newAlloc.LocationID.value));
     }
 
-    previousItem() {
+    previousItem(confirmed=false) {
+
+        if (!confirmed && this.enteredData.qty > 0){
+
+            this.showItemChangeConfirm((confirmed)=>{ this.nextItem(confirmed); });
+            return;
+        }
 
         let curAlloc = this.getSuggestedAllocation();
 
@@ -289,6 +311,34 @@ export class PickTab {
         let newAlloc = this.getSuggestedAllocation();
 
         this.resetForm((newAlloc != null && curAlloc.LocationID.value == newAlloc.LocationID.value));
+    }
+
+    showItemChangeConfirm(callback){
+
+        // TODO: Update indexes after confirmation. Adding the pick means that the indexes may change.
+
+        let alert = this.alertCtrl.create({
+            title: "Confirm Current",
+            message: "You have entered a qty of "+this.enteredData.qty+" for the current item. Would you like to confirm or discard?",
+            buttons: [
+                {
+                    text: "Discard",
+                    handler: ()=> {
+                        callback(true);
+                    }
+                },
+                {
+                    text: "Confirm",
+                    handler: ()=> {
+                        if (this.addPick()){
+                            callback(true);
+                        }
+                    }
+                }
+            ]
+        });
+
+        alert.present();
     }
 
     resetForm(keepLocation) {
@@ -902,7 +952,9 @@ export class PickTab {
                         this.setItem(item.InventoryID.value, true, function(){
                             // If the completed quantity is reached let's automatically move to the next suggested pick
                             if (ctx.getTotalRemainingQty() - ctx.enteredData.qty == 0) {
-                                return ctx.addPick();
+                                // play the prompt sound to indicate a new item is required.
+                                if (ctx.addPick())
+                                    setTimeout(()=>{ ctx.utils.playCompletedSound(true); }, 800);
                             } else {
                                 if (callback != null)
                                     callback();
@@ -928,7 +980,7 @@ export class PickTab {
                         if (this.getTotalRemainingQty() - this.enteredData.qty == 0) {
                             // play the prompt sound to indicate a new item is required.
                             if (this.addPick())
-                                this.utils.playPromptSound();
+                                setTimeout(()=>{ this.utils.playCompletedSound(true); }, 800);
                         }
 
                         if (callback != null)

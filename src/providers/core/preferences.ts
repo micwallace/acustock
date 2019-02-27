@@ -174,6 +174,14 @@ export class PreferencesProvider {
                     options: PreferencesProvider.successSounds
                 },
                 {
+                    key: "completed_sound",
+                    min_key: "cs",
+                    title: "Completed Sound",
+                    type: "select",
+                    def_value: "success-4",
+                    options: PreferencesProvider.successSounds
+                },
+                {
                     key: "prompt_sound",
                     min_key: "ps",
                     title: "Prompt Sound",
