@@ -66,7 +66,7 @@ export class SetupPage {
     }
 
     public scanBarcode() {
-        this.barcodeScanner.scan().then((barcodeData) => {
+        this.barcodeScanner.scan({resultDisplayDuration:0}).then((barcodeData) => {
             // Success! Barcode data is here
             if (barcodeData.cancelled)
                 return;

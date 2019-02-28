@@ -88,7 +88,7 @@ export class BinLookupPage {
 
     public scanBarcode() {
 
-        this.barcodeScanner.scan().then((barcodeData) => {
+        this.barcodeScanner.scan({resultDisplayDuration:0}).then((barcodeData) => {
 
             if (barcodeData.cancelled)
                 return;

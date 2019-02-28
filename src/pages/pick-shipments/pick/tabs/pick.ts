@@ -98,6 +98,7 @@ export class PickTab {
                 if (this.currentLocationIndex == indexes[0] && this.currentItemIndex == indexes[1])
                     return;
 
+                // TODO: Update indexes after confirmation. Adding the pick means that the indexes may change.
                 this.showItemChangeConfirm(()=>{ this.openPicklistItem(indexes) });
                 return;
             }
@@ -105,35 +106,6 @@ export class PickTab {
             this.openPicklistItem(indexes);
         });
 
-        // Disable this for now. User can clear picks if they wish.
-        /*if (this.pickProvider.hasSavedPicks()) {
-
-            this.pickProvider.loadSavedPicks();
-
-            this.utils.playPromptSound();
-
-            let alert = this.alertCtrl.create({
-                title: "Load saved picks",
-                message: "There are unconfirmed picks available for this shipment. Do you want to continue from where you left off?",
-                buttons: [
-                    {
-                        text: "No",
-                        role: "cancel",
-                        handler: ()=> {
-                            this.pickProvider.clearSavedPicks();
-                        }
-                    },
-                    {
-                        text: "Yes",
-                        handler: ()=> {
-                            this.pickProvider.loadSavedPicks();
-                        }
-                    }
-                ]
-            });
-
-            alert.present();
-        }*/
     }
 
     ionViewWillUnload(){
@@ -315,8 +287,6 @@ export class PickTab {
 
     showItemChangeConfirm(callback){
 
-        // TODO: Update indexes after confirmation. Adding the pick means that the indexes may change.
-
         let alert = this.alertCtrl.create({
             title: "Confirm Current",
             message: "You have entered a qty of "+this.enteredData.qty+" for the current item. Would you like to confirm or discard?",
@@ -330,7 +300,17 @@ export class PickTab {
                 {
                     text: "Confirm",
                     handler: ()=> {
+
+                        let curLoc = this.currentLocationIndex;
+                        let curItem = this.currentItemIndex;
+
                         if (this.addPick()){
+
+                            if (callback === this.nextItem &&
+                                (curLoc != this.currentLocationIndex || curItem != this.currentItemIndex)){
+                                return; // No-op - the new suggested item is already the next one.
+                            }
+
                             callback(true);
                         }
                     }
@@ -803,7 +783,7 @@ export class PickTab {
             return this.utils.showAlert("Error",  "There are no picked items to commit.");
 
 
-        /*if (this.pickProvider.unpickedQty > 0){
+        if (this.pickProvider.unpickedQty > 0){
 
             let alert = this.alertCtrl.create({
                 title: "Unpicked Items",
@@ -830,9 +810,9 @@ export class PickTab {
 
             alert.present();
 
-        } else {*/
+        } else {
             this.doConfirmPicks(false);
-        //}
+        }
 
     }
 
@@ -896,7 +876,7 @@ export class PickTab {
 
         var context = this;
 
-        this.barcodeScanner.scan().then((barcodeData) => {
+        this.barcodeScanner.scan({resultDisplayDuration:0}).then((barcodeData) => {
             if (barcodeData.cancelled)
                 return;
 

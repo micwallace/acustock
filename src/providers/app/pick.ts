@@ -40,8 +40,6 @@ export class PickProvider {
 
     public pendingPicks = {};
 
-    public savedPicks = null;
-
     public totalQty = 0;
 
     public unpickedQty = 0;
@@ -143,13 +141,8 @@ export class PickProvider {
                 var id = this.currentShipment.ShipmentNbr.value;
 
                 if (picks && picks.hasOwnProperty(id)) {
-                    this.savedPicks = picks[id];
-                } else {
-                    this.savedPicks = null;
+                    this.pendingPicks = picks[id];
                 }
-
-                if (this.hasSavedPicks())
-                    this.loadSavedPicks();
 
                 this.generateSourceList();
 
@@ -789,17 +782,6 @@ export class PickProvider {
         this.calculateQtys();
     }
 
-    public hasSavedPicks() {
-        return this.savedPicks != null;
-    }
-
-    public loadSavedPicks() {
-        this.pendingPicks = this.savedPicks;
-        // This happens on shipment load now
-        //this.calculateQtys();
-        //this.generateSourceList();
-    }
-
     public clearSavedPicks() {
 
         this.pendingPicks = {};
@@ -812,8 +794,6 @@ export class PickProvider {
         delete picks[this.currentShipment.ShipmentNbr.value];
 
         localStorage.setItem("unconfirmed_picks", JSON.stringify(picks));
-
-        this.savedPicks = null;
 
         this.generateSourceList();
         this.calculateQtys();
@@ -898,6 +878,7 @@ export class PickProvider {
                         LineNbr: {value: lineNbr},
                         SplitLineNbr: modAlloc.SplitLineNbr,
                         Qty: modAlloc.Qty,
+                        LocationID: modAlloc.LocationID,
                     };
 
                     if (alloc.Qty.value == 0 || modAlloc.hasOwnProperty("delete"))
@@ -964,48 +945,28 @@ export class PickProvider {
 
                 } else {
 
-                    let totalPicked = 0;
+                    for (let alloc of item.Allocations){
 
-                    let deleted = [];
-
-                    for (var i = item.Allocations.length -1; i >= 0; i--){
-
-                        let alloc = item.Allocations[i];
+                        /**
+                         * For some reason explicitly deleting allocations isn't required when shipped qty is altered or deleted?
+                         * Who fucking knows but it seems like allocations are all removed and replaced with the new ones.
+                         * This is why SplitLineNbr isn't provided below.
+                         * Maybe the same thing happens when committing picks but I haven't seem it cause any erroneous behaviour...yet.
+                          */
+                        if (alloc.PickedQty.value == 0)
+                            continue;
 
                         let allocUpdate:any = {
                             LineNbr: item.LineNbr,
-                            SplitLineNbr: alloc.SplitLineNbr,
-                            LocationID: alloc.LocationID
+                            LocationID: alloc.LocationID,
+                            Qty: alloc.PickedQty,
+                            PickedQty: alloc.PickedQty
                         };
-
-                        totalPicked += alloc.PickedQty.value;
-
-                        if (alloc.PickedQty.value == 0){
-                            allocUpdate['delete'] = true;
-                            deleted.push(allocUpdate);
-                            continue;
-                        } else if (alloc.PickedQty.value < alloc.Qty.value) {
-                            allocUpdate.Qty = alloc.PickedQty;
-                        } else {
-                            allocUpdate.Qty = alloc.PickedQty;
-                            allocUpdate.PickedQty = alloc.PickedQty;
-                            itemUpdate.Allocations.push(allocUpdate);
-                            continue;
-                        }
-
-                        item.Allocations.splice(i, 1);
 
                         itemUpdate.Allocations.push(allocUpdate);
                     }
 
-                    /*if (item.Allocations.length === 1) {
-                        itemUpdate.LocationID = item.Allocations[0].LocationID;
-                        itemUpdate.PickedQty = item.Allocations[0].PickedQty;
-                    }*/
-
-                    itemUpdate.ShippedQty = {value: totalPicked};
-
-                    itemUpdate.Allocations =  itemUpdate.Allocations.concat(deleted);
+                    itemUpdate.ShippedQty = {value: 0}; // This makes it recalculate properly in that Acumatica
                 }
 
                 data.Details.push(itemUpdate);
