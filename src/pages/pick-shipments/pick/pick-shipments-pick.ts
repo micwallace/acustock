@@ -47,13 +47,15 @@ export class PickShipmentsPickPage {
 
     }
 
-    ionViewDidLoad(){
+    ionViewDidEnter(){
+        console.log("PickShipmentsPickPage Enter");
         this.events.subscribe('closeModal', () => {
             this.navCtrl.pop();
         });
     }
 
-    ionViewWillUnload(){
+    ionViewWillLeave(){
+        console.log("PickShipmentsPickPage Leave");
         this.events.unsubscribe('closeModal');
     }
 

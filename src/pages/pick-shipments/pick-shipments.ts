@@ -57,14 +57,10 @@ export class PickShipmentsPage {
         this.loadShipment(barcodeText, true);
     };
 
-    ionViewDidLoad() {
+    ionViewDidEnter() {
         this.events.unsubscribe('barcode:scan');
         this.events.subscribe('barcode:scan', this.barcodeScanHandler);
     }
-
-    /*ionViewWillUnload() {
-        this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
-    }*/
 
     presentPopover(event) {
         let popover = this.popoverCtrl.create(PickPopover);

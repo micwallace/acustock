@@ -41,13 +41,13 @@ export class ReceiveShipmentPage {
 
     }
 
-    ionViewDidLoad(){
+    ionViewDidEnter(){
         this.events.subscribe('closeReceiveScreen', () => {
             this.navCtrl.pop();
         });
     }
 
-    ionViewWillUnload(){
+    ionViewWillLeave(){
         this.events.unsubscribe('closeReceiveScreen');
     }
 

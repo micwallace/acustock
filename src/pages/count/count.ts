@@ -51,14 +51,10 @@ export class CountPage {
         this.onBarcodeScan(barcodeText)
     };
 
-    ionViewDidLoad() {
+    ionViewDidEnter() {
         this.events.unsubscribe('barcode:scan');
         this.events.subscribe('barcode:scan', this.barcodeScanHandler);
     }
-
-    /*ionViewWillUnload() {
-        this.events.unsubscribe('barcode:scan', this.barcodeScanHandler);
-    }*/
 
     presentPopover(event) {
         let popover = this.popoverCtrl.create(CountPopover);
