@@ -97,7 +97,7 @@ export class CacheProvider {
                     new Date().getTime() > (this.itemIndex[id].cache_ts + (this.prefs.getPreference("cache_expiry") * 1000))){
 
                     this.loadItemData(this.itemIndex[id].InventoryID.value, resolve, reject);
-
+                    return;
                 } else {
                     return resolve(this.itemIndex[id]);
                 }
