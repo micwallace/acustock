@@ -17,7 +17,7 @@
  */
 
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, NavController, Events, AlertController, PopoverController, Tabs } from 'ionic-angular';
+import { IonicPage, NavController, Events, AlertController, PopoverController, Tabs, App } from 'ionic-angular';
 import { AdjustmentProvider } from '../../../providers/app/adjustment'
 import { CacheProvider } from "../../../providers/core/cache";
 import { LoadingController } from "ionic-angular/index";
@@ -61,6 +61,7 @@ export class AdjustmentEnterTab {
 
     constructor(private zone:NgZone,
                 public navCtrl:NavController,
+                public appCtrl:App,
                 public adjustmentProvider:AdjustmentProvider,
                 public cache:CacheProvider,
                 public popoverCtrl:PopoverController,
@@ -357,7 +358,7 @@ export class AdjustmentEnterTab {
         }).catch((err)=> {
             this.dismissLoader();
             this.utils.playFailedSound();
-            this.utils.processApiError("Error", err.message, err, this.navCtrl, this.adjustmentProvider.getErrorReportingData());
+            this.utils.processApiError("Error", err.message, err, this.appCtrl.getRootNav(), this.adjustmentProvider.getErrorReportingData());
         });
     }
 

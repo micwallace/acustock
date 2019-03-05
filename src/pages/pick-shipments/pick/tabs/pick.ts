@@ -17,7 +17,7 @@
  */
 
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, NavController, Events, AlertController, LoadingController, PopoverController, ModalController, Tabs } from 'ionic-angular';
+import { IonicPage, NavController, Events, AlertController, LoadingController, PopoverController, ModalController, Tabs, App } from 'ionic-angular';
 import { PickProvider } from '../../../../providers/providers';
 import { CacheProvider } from "../../../../providers/core/cache";
 import { UtilsProvider } from "../../../../providers/core/utils";
@@ -57,6 +57,7 @@ export class PickTab {
     itemAvailability = {};
 
     constructor(public navCtrl:NavController,
+                public appCtrl:App,
                 public pickProvider:PickProvider,
                 public cache:CacheProvider,
                 public events:Events,
@@ -857,7 +858,7 @@ export class PickTab {
 
                 }).catch((err)=> {
                     loader.dismiss();
-                    this.utils.processApiError("Error", err.message, err, this.navCtrl, this.pickProvider.getErrorReportingData());
+                    this.utils.processApiError("Error", err.message, err, this.appCtrl.getRootNav(), this.pickProvider.getErrorReportingData());
                 });
 
             } else {
@@ -868,7 +869,7 @@ export class PickTab {
 
         }).catch((err)=> {
             loader.dismiss();
-            this.utils.processApiError("Error", err.message, err, this.navCtrl, this.pickProvider.getErrorReportingData());
+            this.utils.processApiError("Error", err.message, err, this.appCtrl.getRootNav(), this.pickProvider.getErrorReportingData());
         });
     }
 

@@ -17,7 +17,7 @@
  */
 
 import { Component, ViewChild, NgZone, } from '@angular/core';
-import { IonicPage, NavController, Events, AlertController, LoadingController, PopoverController, Tabs } from 'ionic-angular';
+import { IonicPage, NavController, Events, AlertController, LoadingController, PopoverController, Tabs, App } from 'ionic-angular';
 import { ReceiveProvider } from '../../../../providers/app/receive'
 import { CacheProvider } from "../../../../providers/core/cache";
 import { UtilsProvider } from "../../../../providers/core/utils";
@@ -57,6 +57,7 @@ export class ReceiveShipmentEnterTab {
 
     constructor(private zone:NgZone,
                 public navCtrl:NavController,
+                public appCtrl:App,
                 public receiveProvider:ReceiveProvider,
                 public cache:CacheProvider,
                 public events:Events,
@@ -433,7 +434,7 @@ export class ReceiveShipmentEnterTab {
         }).catch((err)=>{
             this.dismissLoader();
             this.utils.playFailedSound(false);
-            this.utils.processApiError("Error", err.message, err, this.navCtrl, this.receiveProvider.getErrorReportingData());
+            this.utils.processApiError("Error", err.message, err, this.appCtrl.getRootNav(), this.receiveProvider.getErrorReportingData());
         });
     }
 

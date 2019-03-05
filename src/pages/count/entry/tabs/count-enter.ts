@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, ViewChild, NgZone, Renderer } from '@angular/core';
-import { IonicPage, NavController, Events, AlertController, PopoverController, Tabs } from 'ionic-angular';
+import { Component, ViewChild, NgZone } from '@angular/core';
+import { IonicPage, NavController, Events, AlertController, PopoverController, Tabs, App } from 'ionic-angular';
 import { CountProvider } from '../../../../providers/app/count'
 import { CacheProvider } from "../../../../providers/core/cache";
 import { LoadingController } from "ionic-angular/index";
@@ -52,12 +52,12 @@ export class CountEntryEnterTab {
 
     constructor(private zone:NgZone,
                 public navCtrl:NavController,
+                public appCtrl:App,
                 public countProvider:CountProvider,
                 public cache:CacheProvider,
                 public events:Events,
                 public alertCtrl:AlertController,
                 public loadingCtrl:LoadingController,
-                public renderer:Renderer,
                 public utils:UtilsProvider,
                 public barcodeScanner:BarcodeScanner,
                 public popoverCtrl:PopoverController) {
@@ -327,7 +327,7 @@ export class CountEntryEnterTab {
                             }).catch((err)=>{
 
                                 this.dismissLoader().then(()=>{
-                                    this.utils.processApiError("Error", err.message, err, this.navCtrl);
+                                    this.utils.processApiError("Error", err.message, err, this.appCtrl.getRootNav());
                                 });
 
                                 this.utils.playFailedSound();
@@ -401,7 +401,7 @@ export class CountEntryEnterTab {
             //this.events.publish("closeReceiveScreen");
         }).catch((err)=>{
             this.dismissLoader();
-            this.utils.processApiError("Error", err.message, err, this.navCtrl, this.countProvider.getErrorReportingData());
+            this.utils.processApiError("Error", err.message, err, this.appCtrl.getRootNav(), this.countProvider.getErrorReportingData());
         });
     }
 
