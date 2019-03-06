@@ -17,10 +17,9 @@
  */
 
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, NavController, Events, AlertController, PopoverController, Tabs, App } from 'ionic-angular';
+import { IonicPage, NavController, Events, AlertController, PopoverController, Tabs, App, LoadingController } from 'ionic-angular';
 import { CountProvider } from '../../../../providers/app/count'
 import { CacheProvider } from "../../../../providers/core/cache";
-import { LoadingController } from "ionic-angular/index";
 import { UtilsProvider } from "../../../../providers/core/utils";
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { CountPopover } from "../../count-popover";
@@ -65,7 +64,7 @@ export class CountEntryEnterTab {
     }
 
     barcodeScanHandler = (barcodeText)=>{
-        var tabs: Tabs = this.navCtrl.parent;
+        let tabs: Tabs = this.navCtrl.parent;
         if (tabs.selectedIndex !== 0)
             tabs.select(0, {});
 
@@ -290,7 +289,7 @@ export class CountEntryEnterTab {
         return new Promise((resolve, reject)=>{
 
             // get count line based on the currently entered data
-            var line = this.countProvider.getCountLine(this.enteredData);
+            let line = this.countProvider.getCountLine(this.enteredData);
 
             if (line != null) {
                 this.currentSourceLine = line;
@@ -314,7 +313,7 @@ export class CountEntryEnterTab {
                             this.loader = this.loadingCtrl.create({content: "Adding line..."});
                             this.loader.present();
 
-                            this.countProvider.addNewCountLine(this.enteredData).then((res)=>{
+                            this.countProvider.addNewCountLine(this.enteredData).then((line)=>{
 
                                 this.currentSourceLine = line;
                                 this.showQty = true;
@@ -322,7 +321,7 @@ export class CountEntryEnterTab {
 
                                 this.dismissLoader();
 
-                                resolve(res);
+                                resolve(line);
 
                             }).catch((err)=>{
 
@@ -354,7 +353,7 @@ export class CountEntryEnterTab {
         if (this.currentSourceLine == null)
             return -1;
 
-        var key = this.currentSourceLine.InventoryID.value + "-" + this.currentSourceLine.LocationID.value;
+        let key = this.currentSourceLine.InventoryID.value + "-" + this.currentSourceLine.LocationID.value;
 
         return this.countProvider.getPendingQty(key);
     }
@@ -363,7 +362,7 @@ export class CountEntryEnterTab {
         if (this.currentSourceLine == null)
             return -1;
 
-        var key = this.currentSourceLine.InventoryID.value + "-" + this.currentSourceLine.LocationID.value;
+        let key = this.currentSourceLine.InventoryID.value + "-" + this.currentSourceLine.LocationID.value;
 
         return this.countProvider.getPendingQty(key);
     }
@@ -407,7 +406,7 @@ export class CountEntryEnterTab {
 
     startCameraScanner(){
 
-        var context = this;
+        let context = this;
 
         this.barcodeScanner.scan({resultDisplayDuration:0}).then((barcodeData) => {
             if (barcodeData.cancelled)
@@ -425,7 +424,7 @@ export class CountEntryEnterTab {
 
     onBarcodeScan(barcodeText, callback=null) {
 
-        console.log(barcodeText);
+        //console.log(barcodeText);
 
         this.zone.run(()=> {
 
@@ -435,6 +434,9 @@ export class CountEntryEnterTab {
             this.cache.getBinById(barcodeText).then((bin)=> {
 
                 this.dismissLoader();
+
+                if (barcodeText !== this.enteredData.location && this.enteredData.qty > 0)
+                    this.addCountItem();
 
                 this.setLocation(barcodeText, true, callback);
 
