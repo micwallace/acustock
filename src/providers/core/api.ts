@@ -365,7 +365,7 @@ export class Api {
     }
 
     getCountList(warehouse) {
-        return this.get("PhysicalInventoryReview?$filter=WarehouseID eq '"+warehouse+"'");
+        return this.get("PhysicalInventoryReview?$filter=Status eq 'Counting in Progress' and WarehouseID eq '"+warehouse+"'");
     }
 
     getCount(referenceNbr) {
