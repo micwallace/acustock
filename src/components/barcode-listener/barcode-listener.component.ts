@@ -39,19 +39,22 @@ export class BarcodeListenerComponent implements OnInit {
 
     }
 
+    keypressListener = (e)=>{
+        this.keypressHandler(e);
+    };
+
+    keydownListener = (e)=>{
+        if (this.outputString != "" && (e.key == "Enter" || e.key == "Tab"))
+            this.keypressHandler(e);
+    };
+
     ngOnInit() {
-        if (!this.listenersAdded) {
-            this.listenersAdded = true;
+        // Prevent addition of duplicate event listeners.
+        document.removeEventListener('keypress', this.keypressListener);
+        document.addEventListener('keypress', this.keypressListener);
 
-            document.addEventListener('keypress', (e)=> {
-                this.keypressHandler(e);
-            });
-
-            document.addEventListener('keydown', (e)=> {
-                if (this.outputString != "" && (e.key == "Enter" || e.key == "Tab"))
-                    this.keypressHandler(e);
-            });
-        }
+        document.removeEventListener('keypress', this.keydownListener);
+        document.addEventListener('keydown', this.keydownListener);
     }
 
     keypressHandler(e:any) {
