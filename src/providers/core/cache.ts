@@ -268,10 +268,10 @@ export class CacheProvider {
         }
     }
 
-    public getLocationItems(locationId){
+    public getLocationItems(locationId, noCache=false){
         return new Promise((resolve, reject)=>{
 
-            if (this.locationItems.hasOwnProperty(locationId))
+            if (!noCache && this.locationItems.hasOwnProperty(locationId))
                 return resolve(this.locationItems[locationId]);
 
             this.api.getLocationContents(locationId, this.prefs.getPreference('warehouse')).then((itemList:any)=> {
