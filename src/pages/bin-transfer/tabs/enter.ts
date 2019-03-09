@@ -178,7 +178,7 @@ export class EnterTab {
                 return;
             }
 
-            this.cache.getLocationItems(locId).then((itemIndex:any)=> {
+            this.cache.getLocationItems(locId, true).then((itemIndex:any)=> {
 
                 this.currentLocationItems = itemIndex;
 
