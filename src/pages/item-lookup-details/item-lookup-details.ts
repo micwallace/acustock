@@ -42,6 +42,17 @@ export class ItemLookupDetailsPage {
 
         this.item = navParams.get("data");
 
+        switch (this.item.LotSerialClassTracking.value){
+            case "N":
+                this.item.LotSerialClassTracking.value = "Not Tracked";
+                break;
+            case "L":
+                this.item.LotSerialClassTracking.value = "Lot";
+                break;
+            case "S":
+                this.item.LotSerialClassTracking.value = "Serial";
+                break;
+        }
         //console.log(JSON.stringify(this.data));
     }
 

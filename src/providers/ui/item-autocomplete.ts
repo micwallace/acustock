@@ -31,18 +31,7 @@ export class ItemAutocompleteService implements AutoCompleteService {
     labelAttribute = "label";
     formValueAttribute = "";
 
-    itemList = [];
-
     constructor(public cacheProvider:CacheProvider) {
-        this.cacheProvider.getItemList().then((res:any) => {
-
-            this.itemList = res;
-
-            //console.log(JSON.stringify(this.itemList[0]));
-
-        }).catch((err) => {
-            //console.log(JSON.stringify(err));
-        });
     }
 
     getResults(keyword:string) {
@@ -52,7 +41,7 @@ export class ItemAutocompleteService implements AutoCompleteService {
         if (keyword == "" || keyword.length < 3)
             return [];
 
-        return this.itemList.filter(
+        return this.cacheProvider.itemList.filter(
             (item:any) => {
                 //noinspection TypeScriptUnresolvedVariable
                 if (item.InventoryID.value.toLowerCase().indexOf(keyword) !== -1)

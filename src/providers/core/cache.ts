@@ -69,23 +69,6 @@ export class CacheProvider {
         return null;
     }
 
-    public getItemList() {
-
-        return new Promise((resolve, reject) => {
-
-            if (this.itemList == null) {
-                this.primeItemCache().then((res) => {
-                    resolve(this.itemList);
-                }).catch((err) => {
-                    reject(err);
-                });
-                return;
-            }
-
-            resolve(this.itemList);
-        });
-    }
-
     public getItemById(id, includeWhDetails=false) {
 
         return new Promise((resolve, reject)=> {
@@ -134,6 +117,7 @@ export class CacheProvider {
             }
 
             item.cache_ts = new Date().getTime();
+            item.Description.value = item.Description.value ? item.Description.value : "";
 
             this.addItemToIndex(item);
 
@@ -239,7 +223,12 @@ export class CacheProvider {
         if (!warehouse)
             return;
 
-        this.binList = warehouse.Locations;
+        this.binList = [];
+
+        for (let loc of warehouse.Locations){
+            loc.Description.value = loc.Description.value ? loc.Description.value : "";
+            this.binList.push(loc);
+        }
 
         // Order for pick sequencing
         this.binList.sort((a, b)=> {
@@ -429,6 +418,7 @@ export class CacheProvider {
 
                     for (var item of itemList){
                         item.cache_ts = ts;
+                        item.Description.value = item.Description.value ? item.Description.value : "";
                         this.addItemToIndex(item);
                     }
 
@@ -468,6 +458,7 @@ export class CacheProvider {
 
             for (var item of itemList){
                 item.cache_ts = ts;
+                item.Description.value = item.Description.value ? item.Description.value : "";
                 this.addItemToIndex(item);
             }
 
