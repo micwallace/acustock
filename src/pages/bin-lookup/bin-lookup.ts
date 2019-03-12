@@ -103,8 +103,10 @@ export class BinLookupPage {
 
     loadItemByBarcode(barcodeText) {
 
-        this.loader = this.loadingCtrl.create({content: "Loading..."});
-        this.loader.present();
+        if (this.loader == null) {
+            this.loader = this.loadingCtrl.create({content: "Loading..."});
+            this.loader.present();
+        }
 
         this.cache.getBinById(barcodeText).then((bin:any) => {
 

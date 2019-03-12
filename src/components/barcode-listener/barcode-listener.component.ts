@@ -18,6 +18,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { Events } from 'ionic-angular'
+import { PreferencesProvider } from "../../providers/core/preferences";
 
 @Component({
     selector: 'barcode-listener',
@@ -33,10 +34,14 @@ export class BarcodeListenerComponent implements OnInit {
     previousKey:string;
     outputString:string = '';
 
+    threshold = 30;
+
     listenersAdded = false;
 
-    constructor(public events: Events) {
-
+    constructor(public events: Events, public prefs:PreferencesProvider) {
+        let threshold = parseInt(this.prefs.getPreference("scan_threshold"));
+        if (threshold)
+            this.threshold = threshold;
     }
 
     keypressListener = (e)=>{
@@ -77,11 +82,11 @@ export class BarcodeListenerComponent implements OnInit {
         //if either the current time diff is less than 15, or the current time diff is less than 15
         //and the previous time diff was greater than 15. This is in the case where there is certainly a longer
         //period between scans
-        if ((this.currentTimeDiff <= 25) || (this.currentTimeDiff <= 25 && this.previousTimeDiff >= 28)) {
+        if ((this.currentTimeDiff <= this.threshold) || (this.currentTimeDiff <= this.threshold && this.previousTimeDiff > this.threshold)) {
             //We must initially evaluate the previous and current time diffs. This is how we know a scan has started,
             //because the second time diff will be very low, while the first will be very high, because a human cannot scan
             //something is less than 15 milliseconds
-            if (this.currentTimeDiff <= 25 && this.previousTimeDiff >= 28) {
+            if (this.currentTimeDiff <= this.threshold && this.previousTimeDiff > (this.threshold + 4)) {
                 this.outputString = '';
                 this.outputString += this.previousKey;
                 this.outputString += this.currentKey;
@@ -89,8 +94,8 @@ export class BarcodeListenerComponent implements OnInit {
 
             //If they are both less than 15, we know we are beyond the first characters,
             //and we may start only adding the current character. Also, the current code cannot
-            //be Enter, because that is when we need to emit the outputString
-            if (this.currentTimeDiff <= 25 && this.previousTimeDiff <= 25 && e.key != 'Enter' && e.key != 'Tab') {
+            //be Enter/Tab, because that is when we need to emit the outputString
+            if (this.currentTimeDiff <= this.threshold && this.previousTimeDiff <= this.threshold && e.key != 'Enter' && e.key != 'Tab') {
                 this.outputString += this.currentKey;
                 // This prevents active element such as buttons from triggering their click event when the enter key is pressed.
                 (document.activeElement as HTMLElement).blur();
@@ -98,7 +103,7 @@ export class BarcodeListenerComponent implements OnInit {
 
             //If we are in the middle of the scan and the code is 13, we can stop adding to the
             //outputString and emit it instead. We must then set is back to empty for the next scan.
-            if (this.currentTimeDiff <= 25 && this.previousTimeDiff <= 25 && (e.key == 'Enter' || e.key == 'Tab') && this.outputString !== '') {
+            if (this.currentTimeDiff <= this.threshold && this.previousTimeDiff <= this.threshold && (e.key == 'Enter' || e.key == 'Tab') && this.outputString !== '') {
                 this.events.publish('barcode:scan', this.outputString);
                 this.outputString = '';
             }

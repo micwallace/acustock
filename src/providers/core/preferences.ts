@@ -91,14 +91,6 @@ export class PreferencesProvider {
                     title: "Device Name",
                     type: "text",
                     def_value: ""
-                },
-                {
-                    key: "camera_scan",
-                    min_key: "csc",
-                    caption: "Whether or not the camera scanning button should be shown throughout the app.",
-                    title: "Camera Scanner",
-                    type: "toggle",
-                    def_value: true
                 }
             ]
         },
@@ -251,6 +243,27 @@ export class PreferencesProvider {
                     type: "toggle",
                     def_value: false
                 }
+            ]
+        },
+        {
+            title: "Scanning",
+            preferences: [
+                {
+                    key: "camera_scan",
+                    min_key: "csc",
+                    caption: "Whether or not the camera scanning button should be shown throughout the app.",
+                    title: "Camera Scanner",
+                    type: "toggle",
+                    def_value: true
+                },
+                {
+                    key: "scan_threshold",
+                    min_key: "sct",
+                    caption: "This is used for hardware barcode scanners. You may need to increase this if you are using a slower scanner such as one connected via bluetooth.",
+                    title: "Scan Threshold (ms)",
+                    type: "text",
+                    def_value: 40
+                },
             ]
         },
         {
