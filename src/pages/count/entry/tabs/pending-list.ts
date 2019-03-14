@@ -75,7 +75,7 @@ export class CountEntryPendingTab {
         alertDialog.present();
     }
 
-    removeReceiptItem(line) {
+    removeCountItem(line) {
         let alert = this.alertCtrl.create({
             title: 'Remove Count',
             message: 'Are you sure you want to remove this item?',

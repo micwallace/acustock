@@ -40,7 +40,7 @@
             <ion-col col-3 class="column-right"><strong>Qty</strong></ion-col>
         </ion-row>
         <ion-list no-margin no-padding class="item-list">
-            <ion-item no-margin no-padding class="list-item" *ngFor="let key of objectKeys(countProvider.pendingCounts)" (click)="editCountItem(countProvider.pendingCounts[key]);">
+            <ion-item tappable no-margin no-padding class="list-item" *ngFor="let key of objectKeys(countProvider.pendingCounts)" (click)="editCountItem(countProvider.pendingCounts[key]);">
                 <ion-row class="item-group-header" no-margin>
                     <ion-col col-3>
                         <strong style="display: block;">{{countProvider.pendingCounts[key].InventoryID.value}}</strong>
