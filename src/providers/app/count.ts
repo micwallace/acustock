@@ -237,6 +237,9 @@ export class CountProvider {
 
         if (this.pendingCounts.hasOwnProperty(key)) {
             delete this.pendingCounts[key];
+
+            this.calculateTotals();
+            this.savePendingCounts();
         }
     }
 
