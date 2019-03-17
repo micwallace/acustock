@@ -239,6 +239,9 @@ export class PickProvider {
 
             var item = this.currentShipment.Details[i];
 
+            if (this.isNonStock(item))
+                continue;
+
             if (!item.PickedQty.value)
                 item.PickedQty.value = 0;
 
@@ -523,6 +526,10 @@ export class PickProvider {
         for (var i = 0; i < this.currentShipment.Details.length; i++) {
 
             var item = this.currentShipment.Details[i];
+
+            if (this.isNonStock(item))
+                continue;
+
             this.totalQty += item.ShippedQty.value;
             pickedQty += item.PickedQty.value;
         }
@@ -536,6 +543,19 @@ export class PickProvider {
         }
 
         this.unpickedQty = this.totalQty - pickedQty;
+    }
+
+    isNonStock(item){
+
+        if (!item.hasOwnProperty("ItemType"))
+            return false;
+
+        console.log(item.ItemType.value);
+
+        if (["Non-Stock Item", "Labor", "Service", "Charge", "Expense"].indexOf(item.ItemType.value) > -1)
+            return true;
+
+        return false;
     }
 
     getSuggestedLocation(index) {
@@ -930,6 +950,9 @@ export class PickProvider {
             let curItems = JSON.parse(JSON.stringify(this.currentShipment.Details));
 
             for (let item of curItems){
+
+                if (this.isNonStock(item))
+                    continue;
 
                 if (item.PickedQty.value == item.ShippedQty.value)
                     continue;

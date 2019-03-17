@@ -388,7 +388,18 @@ export class CacheProvider {
             });
         }
 
-        setInterval(()=>{ this.primeItemCache(); }, (this.prefs.getPreference("cache_refresh_items") * 1000));
+        // Check if cache refresh is due every 2 minutes because when the app is asleep the timer doesn't run.
+        setInterval(()=>{
+
+            let now = (new Date()).getTime();
+
+            if (now > (this.itemCacheTs + (this.prefs.getPreference("cache_refresh_items") * 1000))){
+                // Prevent multiple loads if prime takes longer than 5 minutes.
+                this.itemCacheTs = now;
+                this.primeItemCache();
+            }
+
+        }, 120000);
     }
 
     private loadFailed(toast, err) {
@@ -466,11 +477,13 @@ export class CacheProvider {
 
             if (itemList.length < limit){
 
-                resolve();
                 this.itemCachePrimed = true;
                 this.itemCacheTs = ts;
 
                 console.log("Item batch load "+skip+" to "+(skip+itemList.length)+" completed");
+
+                resolve();
+
             } else {
 
                 skip += limit;

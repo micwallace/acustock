@@ -107,10 +107,11 @@ export class PreferencesProvider {
                         {label: "1 Hour", value: 3600},
                         {label: "2 Hours", value: 7200},
                         {label: "4 Hours", value: 14400},
+                        {label: "6 Hours", value: 21600},
                         {label: "8 Hours", value: 28800},
                         {label: "12 Hours", value: 43200},
                     ],
-                    def_value: 14400
+                    def_value: 21600
                 },
                 {
                     key: "cache_prime_items",
@@ -135,10 +136,11 @@ export class PreferencesProvider {
                         {label: "1 Hour", value: 3600},
                         {label: "2 Hours", value: 7200},
                         {label: "4 Hours", value: 14400},
+                        {label: "6 Hours", value: 21600},
                         {label: "8 Hours", value: 28800},
                         {label: "12 Hours", value: 43200},
                     ],
-                    def_value:14400
+                    def_value: 14400
                 },
                 {
                     key: "cache_item_warehouse",
