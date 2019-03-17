@@ -42,13 +42,13 @@ export class CountEntryPendingTab {
 
     editCountItem(item) {
 
-        let alertDialog = this.alertCtrl.create({
+        let alert = this.alertCtrl.create({
             title: 'Update Quantity',
             inputs: [
                 {
                     name: 'qty',
                     placeholder: 'Quantity',
-                    value: item.BookQty.value
+                    value: item.PendingQty
                 }
             ],
             buttons: [
@@ -72,10 +72,12 @@ export class CountEntryPendingTab {
                 }
             ]
         });
-        alertDialog.present();
+
+        alert.present();
     }
 
-    removeReceiptItem(line) {
+    removeCountItem(line) {
+
         let alert = this.alertCtrl.create({
             title: 'Remove Count',
             message: 'Are you sure you want to remove this item?',
@@ -94,6 +96,7 @@ export class CountEntryPendingTab {
                 }
             ]
         });
+
         alert.present();
     }
 

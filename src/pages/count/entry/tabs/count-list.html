@@ -40,7 +40,7 @@
             <ion-col col-6 class="column-right"><strong>Counted/Book Qty</strong></ion-col>
         </ion-row>
         <ion-list no-margin no-padding class="item-list">
-            <ion-item no-margin no-padding class="list-item" *ngFor="let key of objectKeys(countProvider.countIndex)" (click)="openCountItem(countProvider.countIndex[key]);">
+            <ion-item tappable no-margin no-padding class="list-item" *ngFor="let key of objectKeys(countProvider.countIndex)" (click)="openCountItem(countProvider.countIndex[key]);">
                 <ion-row class="item-group-header" no-margin>
                     <ion-col col-8><strong>{{countProvider.countIndex[key].InventoryID.value}}</strong></ion-col>
                     <ion-col col-4 class="column-right">{{countProvider.getCountedQty(key)}} / {{countProvider.getBookQty(key)}}</ion-col>

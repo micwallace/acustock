@@ -227,7 +227,6 @@ export class CountProvider {
             this.pendingCounts[key].PendingQty = qty;
         }
 
-        this.calculateTotals();
         this.savePendingCounts();
     }
 
@@ -237,6 +236,8 @@ export class CountProvider {
 
         if (this.pendingCounts.hasOwnProperty(key)) {
             delete this.pendingCounts[key];
+
+            this.savePendingCounts();
         }
     }
 
@@ -246,7 +247,11 @@ export class CountProvider {
         if (!receipts)
             receipts = {};
 
-        receipts[this.physicalCount.ReferenceNbr.value] = this.pendingCounts;
+        if (Object.keys(this.pendingCounts).length > 0) {
+            receipts[this.physicalCount.ReferenceNbr.value] = this.pendingCounts;
+        } else {
+            delete receipts[this.physicalCount.ReferenceNbr.value];
+        }
 
         localStorage.setItem("unconfirmed_counts", JSON.stringify(receipts));
 
