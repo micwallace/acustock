@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Events } from 'ionic-angular'
 import { PreferencesProvider } from "../../providers/core/preferences";
 
@@ -25,7 +25,7 @@ import { PreferencesProvider } from "../../providers/core/preferences";
     templateUrl: 'barcode-listener.component.html'
 })
 
-export class BarcodeListenerComponent implements OnInit {
+export class BarcodeListenerComponent implements OnInit, OnDestroy {
 
     currentTime = 0;
     currentTimeDiff = 0;
@@ -54,12 +54,13 @@ export class BarcodeListenerComponent implements OnInit {
     };
 
     ngOnInit() {
-        // Prevent addition of duplicate event listeners.
-        document.removeEventListener('keypress', this.keypressListener);
         document.addEventListener('keypress', this.keypressListener);
-
-        document.removeEventListener('keypress', this.keydownListener);
         document.addEventListener('keydown', this.keydownListener);
+    }
+
+    ngOnDestroy() {
+        document.removeEventListener('keypress', this.keypressListener);
+        document.removeEventListener('keydown', this.keydownListener);
     }
 
     keypressHandler(e:any) {
