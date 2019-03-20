@@ -244,6 +244,14 @@ export class PreferencesProvider {
                     caption: "If the scanned item is not the current one, check the whole pick list for the item.",
                     type: "toggle",
                     def_value: false
+                },
+                {
+                    key: "pick_scan_complete",
+                    min_key: "psc",
+                    title: "Scan auto complete",
+                    caption: "When scanning, if the number of required items is reached, automatically add the item to the pending list and move to the next item.",
+                    type: "toggle",
+                    def_value: true
                 }
             ]
         },

@@ -113,7 +113,7 @@
         <ion-row>
             <ion-col col-6>
                 <ion-row *ngIf="showQty && itemAvailability.hasOwnProperty(enteredData.location);">
-                    <ion-col col-7>Available:</ion-col>
+                    <ion-col col-7>Avail.:</ion-col>
                     <ion-col col-5>{{this.itemAvailability[this.enteredData.location].QtyAvailable.value}}</ion-col>
                 </ion-row>
                 <ion-row *ngIf="showQty && itemAvailability.hasOwnProperty(enteredData.location);">

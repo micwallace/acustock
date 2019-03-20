@@ -931,11 +931,20 @@ export class PickTab {
                         var ctx = this;
 
                         this.setItem(item.InventoryID.value, true, function(){
-                            // If the completed quantity is reached let's automatically move to the next suggested pick
+
+                            // If the completed quantity is reached let's automatically add the pick & move to the next suggested item if the preference is enabled.
+                            // Otherwise just play the completed sound to notify the user.
                             if (ctx.getTotalRemainingQty() - ctx.enteredData.qty == 0) {
-                                // play the prompt sound to indicate a new item is required.
-                                if (ctx.addPick())
-                                    setTimeout(()=>{ ctx.utils.playCompletedSound(true); }, 800);
+
+                                if (ctx.pickProvider.prefs.getPreference('pick_scan_complete')) {
+
+                                    if (ctx.addPick())
+                                        setTimeout(() => { ctx.utils.playCompletedSound(true); }, 500);
+
+                                } else {
+                                    setTimeout(() => { ctx.utils.playCompletedSound(true); }, 500);
+                                }
+
                             } else {
                                 if (callback != null)
                                     callback();
@@ -957,17 +966,30 @@ export class PickTab {
 
                         this.utils.playScanSuccessSound();
 
-                        // If the completed quantity is reached let's automatically add the pick & move to the next suggested item
+                        // If the completed quantity is reached let's automatically add the pick & move to the next suggested item if the preference is enabled.
+                        // Otherwise just play the completed sound to notify the user.
                         if (this.getTotalRemainingQty() - this.enteredData.qty == 0) {
-                            // play the prompt sound to indicate a new item is required.
-                            if (this.addPick())
-                                setTimeout(()=>{ this.utils.playCompletedSound(true); }, 800);
+
+                            if (ctx.pickProvider.prefs.getPreference('pick_scan_complete')) {
+
+                                if (this.addPick())
+                                    setTimeout(() => { this.utils.playCompletedSound(true); }, 500);
+
+                            } else {
+                                setTimeout(() => { this.utils.playCompletedSound(true); }, 500);
+                            }
                         }
 
                         if (callback != null)
                             callback();
 
                     } else {
+                        // If item seek is disabled, show wrong item error here in order to keep the current enteredData values.
+                        if (!this.pickProvider.prefs.getPreference('pick_item_seek')){
+                            this.utils.showAlert("Wrong Item", "The item ("+item.InventoryID.value+") is not the one required ("+this.enteredData.item+").");
+                            return;
+                        }
+
                         if (this.addPick())
                             this.setItem(item.InventoryID.value, true, callback);
                     }
