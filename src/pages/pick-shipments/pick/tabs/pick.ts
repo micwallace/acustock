@@ -928,7 +928,7 @@ export class PickTab {
 
                     if (this.enteredData.item == "" || this.enteredData.qty == 0) {
 
-                        var ctx = this;
+                        let ctx = this;
 
                         this.setItem(item.InventoryID.value, true, function(){
 
@@ -970,7 +970,7 @@ export class PickTab {
                         // Otherwise just play the completed sound to notify the user.
                         if (this.getTotalRemainingQty() - this.enteredData.qty == 0) {
 
-                            if (ctx.pickProvider.prefs.getPreference('pick_scan_complete')) {
+                            if (this.pickProvider.prefs.getPreference('pick_scan_complete')) {
 
                                 if (this.addPick())
                                     setTimeout(() => { this.utils.playCompletedSound(true); }, 500);

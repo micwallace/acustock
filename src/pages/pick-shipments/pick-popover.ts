@@ -19,17 +19,22 @@
 import { Component } from '@angular/core';
 import { ViewController, NavController, App } from "ionic-angular";
 import { UserguidePage } from "../about/userguide/userguide";
+import { PreferencesProvider } from "../../providers/core/preferences";
 
 @Component({
     template: `
     <ion-list no-margin>
-      <button ion-item (click)="openUserguide()">About Picking</button>
+        <button ion-item (click)="openUserguide()">About Picking</button>
+        <ion-item>
+            <ion-label>Scan auto complete</ion-label>
+            <ion-toggle [(ngModel)]="prefs.preferences['pick_scan_complete']"></ion-toggle>
+        </ion-item>
     </ion-list>
   `
 })
 export class PickPopover {
 
-    constructor(public viewCtrl: ViewController, public navCtrl:NavController, public app:App) {
+    constructor(public viewCtrl: ViewController, public navCtrl:NavController, public app:App, public prefs:PreferencesProvider) {
 
     }
 
