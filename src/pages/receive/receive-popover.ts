@@ -33,6 +33,10 @@ import {UserguidePage} from "../about/userguide/userguide";
             <ion-label>Keep Location</ion-label>
             <ion-toggle [(ngModel)]="prefs.preferences['receipt_keep_loc']"></ion-toggle>
         </ion-item>
+        <ion-item>
+            <ion-label>Scan auto complete</ion-label>
+            <ion-toggle [(ngModel)]="prefs.preferences['receipt_scan_complete']"></ion-toggle>
+        </ion-item>
     </ion-list>
   `
 })

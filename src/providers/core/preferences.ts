@@ -260,9 +260,25 @@ export class PreferencesProvider {
             preferences: [
                 {
                     key: "receipt_keep_loc",
-                    min_key: "pac",
+                    min_key: "rkl",
                     title: "Keep last location",
                     caption: "Keep the last scanned location rather than setting the specified/suggested location for each item.",
+                    type: "toggle",
+                    def_value: true
+                },
+                {
+                    key: "receipt_scan_complete",
+                    min_key: "rsc",
+                    title: "Scan auto complete",
+                    caption: "When scanning, if the number of required items is reached, automatically add the item to the pending list and move to the next item.",
+                    type: "toggle",
+                    def_value: true
+                },
+                {
+                    key: "receipt_confirm_new",
+                    min_key: "rcn",
+                    title: "New item confirm",
+                    caption: "When scanning, if the item is not the one currently being entered, confirm before adding the current one to the pending list.",
                     type: "toggle",
                     def_value: true
                 }

@@ -441,6 +441,7 @@ export class ReceiveShipmentEnterTab {
     }
 
     confirmReceipts() {
+
         if (this.enteredData.item != "" &&  this.enteredData.location != "" && this.enteredData.qty > 0) {
             if (!this.addReceiptItem())
                 return;
@@ -448,6 +449,36 @@ export class ReceiveShipmentEnterTab {
 
         if (this.receiveProvider.pendingQty == 0)
             return this.utils.showAlert("Error", "Add some items to the receipt list first.");
+
+        if ((this.receiveProvider.receivedQty + this.receiveProvider.pendingQty) < this.receiveProvider.totalQty){
+
+            let alert = this.alertCtrl.create({
+                title: "Not completed",
+                message: "There are still remaining items, are you sure you want to commit?",
+                buttons: [
+                    {
+                        text: "Cancel",
+                        role: "cancel"
+                    },
+                    {
+                        text: "OK",
+                        handler: ()=> {
+                            alert.dismiss();
+                            this.commitPendingReceipts();
+                        }
+                    }
+                ]
+            });
+
+            alert.present();
+
+            return;
+        }
+
+        this.commitPendingReceipts();
+    }
+
+    commitPendingReceipts(){
 
         this.loader = this.loadingCtrl.create({content: "Submitting Receipts..."});
         this.loader.present();
@@ -517,7 +548,14 @@ export class ReceiveShipmentEnterTab {
                     this.dismissLoader();
 
                     if (this.enteredData.item == "" || this.enteredData.qty == 0) {
-                        this.setItem(item.InventoryID.value, true, callback);
+
+                        this.setItem(item.InventoryID.value, true, ()=>{
+
+                            if ((this.getRemainingQty() - this.enteredData.qty) <= 0)
+                                setTimeout(() => { this.utils.playCompletedSound(true); }, 500);
+
+                            callback();
+                        });
                         return;
                     }
 
@@ -534,8 +572,13 @@ export class ReceiveShipmentEnterTab {
 
                         // If the completed quantity is reached let's automatically add the receipt item
                         if ((this.getRemainingQty() - this.enteredData.qty) <= 0) {
-                            if (!this.addReceiptItem(true))
-                                return;
+
+                            if (this.receiveProvider.prefs.getPreference('receipt_scan_complete')) {
+                                if (!this.addReceiptItem(true))
+                                    return;
+                            }
+
+                            setTimeout(() => { this.utils.playCompletedSound(true); }, 500);
                         }
 
                         this.utils.playScanSuccessSound();
@@ -544,10 +587,36 @@ export class ReceiveShipmentEnterTab {
                             callback();
 
                     } else {
-                        if (this.addReceiptItem(true))
-                            this.setItem(item.InventoryID.value, true, callback);
 
+                        if (!this.receiveProvider.prefs.getPreference('receipt_confirm_new')) {
+
+                            if (this.addReceiptItem(true))
+                                this.setItem(item.InventoryID.value, true, callback);
+                            return;
+                        }
+
+                        let alert = this.alertCtrl.create({
+                            title: "New item",
+                            message: "The scanned item is different to the currently entered one. Add to pending list and continue?",
+                            buttons: [
+                                {
+                                    text: "Cancel",
+                                    role: "cancel"
+                                },
+                                {
+                                    text: "OK",
+                                    handler: ()=> {
+                                        alert.dismiss();
+                                        if (this.addReceiptItem(true))
+                                            this.setItem(item.InventoryID.value, true, callback);
+                                    }
+                                }
+                            ]
+                        });
+
+                        alert.present();
                     }
+
                 }).catch((err) => {
                     this.dismissLoader();
                     this.utils.showAlert("Error", err.message);

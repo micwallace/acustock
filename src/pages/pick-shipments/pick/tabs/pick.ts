@@ -938,12 +938,12 @@ export class PickTab {
 
                                 if (ctx.pickProvider.prefs.getPreference('pick_scan_complete')) {
 
-                                    if (ctx.addPick())
-                                        setTimeout(() => { ctx.utils.playCompletedSound(true); }, 500);
+                                    if (!ctx.addPick())
+                                        return;
 
-                                } else {
-                                    setTimeout(() => { ctx.utils.playCompletedSound(true); }, 500);
                                 }
+
+                                setTimeout(() => { ctx.utils.playCompletedSound(true); }, 500);
 
                             } else {
                                 if (callback != null)
@@ -972,12 +972,12 @@ export class PickTab {
 
                             if (this.pickProvider.prefs.getPreference('pick_scan_complete')) {
 
-                                if (this.addPick())
-                                    setTimeout(() => { this.utils.playCompletedSound(true); }, 500);
+                                if (!this.addPick())
+                                    return;
 
-                            } else {
-                                setTimeout(() => { this.utils.playCompletedSound(true); }, 500);
                             }
+
+                            setTimeout(() => { this.utils.playCompletedSound(true); }, 500);
                         }
 
                         if (callback != null)
