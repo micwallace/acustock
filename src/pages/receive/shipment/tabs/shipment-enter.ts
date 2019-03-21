@@ -222,7 +222,9 @@ export class ReceiveShipmentEnterTab {
 
         this.currentSourceLine = null;
 
-        this.cache.getItemById(itemId, true).then((item:any)=> {
+        let loadReceiptLoc = this.enteredData.location == "" || !this.receiveProvider.prefs.getPreference('receipt_keep_loc');
+
+        this.cache.getItemById(itemId, loadReceiptLoc).then((item:any)=> {
 
             // validate item against source document
             if (receiptLine == null) {
@@ -252,19 +254,22 @@ export class ReceiveShipmentEnterTab {
                 this.utils.playScanSuccessSound();
 
             // Set default location
-            if (receiptLine.hasOwnProperty("LocationID")){
-                this.setLocation(receiptLine.LocationID);
-                return;
-            } else {
-                var warehouseDetails = this.cache.getItemWarehouseDetails(item);
-                if (warehouseDetails && warehouseDetails.hasOwnProperty("DefaultReceiptLocationID")){
-                    this.setLocation(warehouseDetails.DefaultReceiptLocationID.value);
+            if (loadReceiptLoc) {
+
+                if (receiptLine.hasOwnProperty("LocationID")) {
+                    this.setLocation(receiptLine.LocationID);
                     return;
                 } else {
-                    var warehouse = this.cache.getCurrentWarehouse();
-                    if (warehouse && warehouse.hasOwnProperty("ReceivingLocationID")){
-                        this.setLocation(warehouse.ReceivingLocationID.value);
+                    let warehouseDetails = this.cache.getItemWarehouseDetails(item);
+                    if (warehouseDetails && warehouseDetails.hasOwnProperty("DefaultReceiptLocationID")) {
+                        this.setLocation(warehouseDetails.DefaultReceiptLocationID.value);
                         return;
+                    } else {
+                        let warehouse = this.cache.getCurrentWarehouse();
+                        if (warehouse && warehouse.hasOwnProperty("ReceivingLocationID")) {
+                            this.setLocation(warehouse.ReceivingLocationID.value);
+                            return;
+                        }
                     }
                 }
             }

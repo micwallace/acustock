@@ -256,6 +256,19 @@ export class PreferencesProvider {
             ]
         },
         {
+            title: "Receiving",
+            preferences: [
+                {
+                    key: "receipt_keep_loc",
+                    min_key: "pac",
+                    title: "Keep last location",
+                    caption: "Keep the last scanned location rather than setting the specified/suggested location for each item.",
+                    type: "toggle",
+                    def_value: true
+                }
+            ]
+        },
+        {
             title: "Scanning",
             preferences: [
                 {

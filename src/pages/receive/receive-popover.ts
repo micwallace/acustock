@@ -24,11 +24,15 @@ import {UserguidePage} from "../about/userguide/userguide";
 @Component({
     template: `
     <ion-list no-margin>
-      <button ion-item (click)="openUserguide()">About Receipts</button>
-      <ion-item>
-        <ion-label>Release Receipts</ion-label>
-        <ion-toggle [(ngModel)]="prefs.preferences['release_receipts']"></ion-toggle>
-      </ion-item>
+        <button ion-item (click)="openUserguide()">About Receipts</button>
+        <ion-item>
+            <ion-label>Release Receipts</ion-label>
+            <ion-toggle [(ngModel)]="prefs.preferences['release_receipts']"></ion-toggle>
+        </ion-item>
+        <ion-item>
+            <ion-label>Keep Location</ion-label>
+            <ion-toggle [(ngModel)]="prefs.preferences['receipt_keep_loc']"></ion-toggle>
+        </ion-item>
     </ion-list>
   `
 })
