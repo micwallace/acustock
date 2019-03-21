@@ -17,12 +17,13 @@
  */
 
 import { Component, ViewChild, NgZone, } from '@angular/core';
-import { IonicPage, NavController, Events, AlertController, LoadingController, PopoverController, Tabs, App } from 'ionic-angular';
+import { IonicPage, NavController, Events, AlertController, LoadingController, PopoverController, Tabs, App, ModalController } from 'ionic-angular';
 import { ReceiveProvider } from '../../../../providers/app/receive'
 import { CacheProvider } from "../../../../providers/core/cache";
 import { UtilsProvider } from "../../../../providers/core/utils";
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { ReceivePopover } from "../../receive-popover";
+import { LocationSelectorModal } from "../../../../components/location-selector-modal/location-selector-modal";
 /**
  * Generated class for the PickShipmentsPickPage page.
  *
@@ -65,7 +66,8 @@ export class ReceiveShipmentEnterTab {
                 public loadingCtrl:LoadingController,
                 public popoverCtrl:PopoverController,
                 public utils:UtilsProvider,
-                public barcodeScanner:BarcodeScanner) {
+                public barcodeScanner:BarcodeScanner,
+                public modalCtrl:ModalController) {
 
     }
 
@@ -284,6 +286,39 @@ export class ReceiveShipmentEnterTab {
             this.enteredData.item = "";
             this.utils.playFailedSound(isScan);
             this.dismissLoader().then(()=> {
+                this.utils.showAlert("Error", err.message, {exception: err});
+            });
+        });
+    }
+
+    public openLocationSelector(){
+
+        this.showLoaderDelayed("Loading item locations...");
+
+        // TODO: disable caching here?
+        this.cache.getItemLocations(this.enteredData.item).then((locations)=>{
+
+            this.dismissLoader();
+
+            let locArr = [];
+
+            for (let i in locations){
+                locArr.push(locations[i]);
+            }
+
+            let modal = this.modalCtrl.create(LocationSelectorModal, {
+                locations: locArr
+            }, {cssClass: 'location-selector'});
+
+            modal.onDidDismiss((data)=>{
+                if (data)
+                    this.setLocation(data.location);
+            });
+
+            modal.present();
+
+        }).catch((err)=>{
+            this.dismissLoader().then(()=>{
                 this.utils.showAlert("Error", err.message, {exception: err});
             });
         });

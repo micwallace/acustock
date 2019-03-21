@@ -280,10 +280,10 @@ export class CacheProvider {
         });
     }
 
-    public getItemLocations(itemId){
+    public getItemLocations(itemId, noCache=false){
         return new Promise((resolve, reject)=>{
 
-            if (this.itemLocations.hasOwnProperty(itemId))
+            if (!noCache && this.itemLocations.hasOwnProperty(itemId))
                 return resolve(this.itemLocations[itemId]);
 
             this.api.getItemWarehouseLocations(itemId, this.prefs.getPreference('warehouse')).then((locationList:any)=> {

@@ -66,6 +66,9 @@
                     <ion-label color="primary">To Bin:</ion-label>
                     <ion-input id="location" #location type="text" [(ngModel)]="enteredData.location"
                                (change)="setLocation();" (keypress)="$event.stopPropagation();"></ion-input>
+                    <button type="button" ion-button icon-only item-right (click)="openLocationSelector();">
+                        <ion-icon name="list"></ion-icon>
+                    </button>
                 </ion-item>
             </ion-col>
         </ion-row>
