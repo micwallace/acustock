@@ -353,7 +353,7 @@ export class ReceiveShipmentEnterTab {
                 return;
             }
 
-            if (this.enteredData.item != "" && this.enteredData.qty > 0) {
+            if (this.enteredData.item != "" && this.enteredData.qty == 0) {
                 this.showQty = true;
                 this.enteredData.qty = 1;
             }
