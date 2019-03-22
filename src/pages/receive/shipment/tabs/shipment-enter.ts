@@ -554,7 +554,8 @@ export class ReceiveShipmentEnterTab {
                             if ((this.getRemainingQty() - this.enteredData.qty) <= 0)
                                 setTimeout(() => { this.utils.playCompletedSound(true); }, 500);
 
-                            callback();
+                            if (callback != null)
+                                callback();
                         });
                         return;
                     }
