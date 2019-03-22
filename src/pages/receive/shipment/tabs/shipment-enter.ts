@@ -50,7 +50,6 @@ export class ReceiveShipmentEnterTab {
 
     currentSourceLine = null;
 
-    showLocation = false;
     showQty = false;
 
     loader = null;
@@ -167,9 +166,7 @@ export class ReceiveShipmentEnterTab {
 
         this.currentSourceLine = null;
 
-        this.showLocation = false;
         this.showQty = false;
-
     }
 
     public showLoaderDelayed(message){
@@ -245,7 +242,6 @@ export class ReceiveShipmentEnterTab {
             }
 
             this.currentSourceLine = receiptLine;
-            this.showLocation = true;
 
             if (this.enteredData.location != "") {
                 this.showQty = true;
@@ -273,6 +269,11 @@ export class ReceiveShipmentEnterTab {
                             return;
                         }
                     }
+                }
+            } else {
+                if (this.enteredData.location != "") {
+                    this.showQty = true;
+                    this.enteredData.qty = 1;
                 }
             }
 
@@ -352,7 +353,7 @@ export class ReceiveShipmentEnterTab {
                 return;
             }
 
-            if (this.enteredData.item != "") {
+            if (this.enteredData.item != "" && this.enteredData.qty > 0) {
                 this.showQty = true;
                 this.enteredData.qty = 1;
             }
