@@ -98,6 +98,30 @@ export class EnterTab {
         popover.present({ev:event});
     }
 
+    cancelForm(){
+
+        let alert = this.alertCtrl.create({
+            title: "Cancel",
+            message: "Are you sure you want to cancel the current item?",
+            buttons: [
+                {
+                    text: "No",
+                    role: "cancel",
+                    handler: ()=> {
+                    }
+                },
+                {
+                    text: "Yes",
+                    handler: ()=> {
+                        this.resetForm();
+                    }
+                }
+            ]
+        });
+
+        alert.present();
+    }
+
     resetForm() {
 
         this.enteredData = {
@@ -384,7 +408,7 @@ export class EnterTab {
         if (Object.keys(this.transferProvider.pendingItems).length > 0) {
 
             let alert = this.alertCtrl.create({
-                title: "Cancel Transfers",
+                title: "Clear Transfers",
                 message: "Are you sure you want to clear all pending transfers?",
                 buttons: [
                     {

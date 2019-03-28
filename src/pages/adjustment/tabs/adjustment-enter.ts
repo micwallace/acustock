@@ -116,6 +116,30 @@ export class AdjustmentEnterTab {
         popover.present({ev:event});
     }
 
+    cancelForm(){
+
+        let alert = this.alertCtrl.create({
+            title: "Cancel",
+            message: "Are you sure you want to cancel the current item?",
+            buttons: [
+                {
+                    text: "No",
+                    role: "cancel",
+                    handler: ()=> {
+                    }
+                },
+                {
+                    text: "Yes",
+                    handler: ()=> {
+                        this.resetForm();
+                    }
+                }
+            ]
+        });
+
+        alert.present();
+    }
+
     resetForm() {
 
         this.enteredData = {
@@ -321,7 +345,7 @@ export class AdjustmentEnterTab {
         if (Object.keys(this.adjustmentProvider.pendingItems).length > 0) {
 
             let alert = this.alertCtrl.create({
-                title: "Cancel Adjustments",
+                title: "Clear Adjustments",
                 message: "Are you sure you want to clear all pending adjustments?",
                 buttons: [
                     {

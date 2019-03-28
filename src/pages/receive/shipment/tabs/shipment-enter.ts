@@ -139,7 +139,7 @@ export class ReceiveShipmentEnterTab {
         if (this.receiveProvider.pendingQty > 0) {
 
             let alert = this.alertCtrl.create({
-                title: "Cancel Receipts",
+                title: "Clear Receipts",
                 message: "Are you sure you want to clear all pending receipt items?",
                 buttons: [
                     {
@@ -157,6 +157,30 @@ export class ReceiveShipmentEnterTab {
 
             alert.present();
         }
+    }
+
+    cancelForm(){
+
+        let alert = this.alertCtrl.create({
+            title: "Cancel",
+            message: "Are you sure you want to cancel the current item?",
+            buttons: [
+                {
+                    text: "No",
+                    role: "cancel",
+                    handler: ()=> {
+                    }
+                },
+                {
+                    text: "Yes",
+                    handler: ()=> {
+                        this.resetForm();
+                    }
+                }
+            ]
+        });
+
+        alert.present();
     }
 
     resetForm(clearLocation=false) {

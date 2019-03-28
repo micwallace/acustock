@@ -86,7 +86,7 @@
 
         <ion-row *ngIf="showQty">
             <ion-col text-right>
-                <button type="button" align-self-end ion-button small (click)="resetForm()">Cancel</button>
+                <button type="button" align-self-end ion-button small (click)="cancelForm()" style="margin-left: 10px;">Cancel</button>
                 <button type="button" align-self-end ion-button small (click)="addReceiptItem()">OK</button>
             </ion-col>
         </ion-row>
@@ -97,7 +97,7 @@
         <ion-row>
             <ion-col text-right>
                 <button type="button" ion-button small (click)="clearReceipts()">Clear</button>
-                <button type="button" ion-button small (click)="confirmReceipts()">Confirm</button>
+                <button type="button" ion-button small (click)="confirmReceipts()">Commit</button>
             </ion-col>
         </ion-row>
     </ion-toolbar>

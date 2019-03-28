@@ -88,8 +88,8 @@ export class PickTab {
             this.confirmPicks();
         });
 
-        this.events.subscribe('picks:cancel', ()=>{
-            this.cancelPicks();
+        this.events.subscribe('picks:clear', ()=>{
+            this.clearPicks();
         });
 
         this.events.subscribe('picks:open', (indexes)=>{
@@ -111,7 +111,7 @@ export class PickTab {
 
     ionViewWillUnload(){
         this.events.unsubscribe('picks:confirm');
-        this.events.unsubscribe('picks:cancel');
+        this.events.unsubscribe('picks:clear');
         this.events.unsubscribe('picks:open');
     }
 
@@ -322,7 +322,31 @@ export class PickTab {
         alert.present();
     }
 
-    resetForm(keepLocation) {
+    cancelForm(){
+
+        let alert = this.alertCtrl.create({
+            title: "Cancel",
+            message: "Are you sure you want to cancel the current item?",
+            buttons: [
+                {
+                    text: "No",
+                    role: "cancel",
+                    handler: ()=> {
+                    }
+                },
+                {
+                    text: "Yes",
+                    handler: ()=> {
+                        this.resetForm();
+                    }
+                }
+            ]
+        });
+
+        alert.present();
+    }
+
+    resetForm(keepLocation=false) {
 
         if (!keepLocation) {
             this.enteredData.location = "";
@@ -744,12 +768,12 @@ export class PickTab {
         return true;
     }
 
-    cancelPicks() {
+    clearPicks() {
 
         if (Object.keys(this.pickProvider.pendingPicks).length > 0) {
 
             let alert = this.alertCtrl.create({
-                title: "Cancel Picks",
+                title: "Clear Picks",
                 message: "Are you sure you want to clear all pending picks?",
                 buttons: [
                     {

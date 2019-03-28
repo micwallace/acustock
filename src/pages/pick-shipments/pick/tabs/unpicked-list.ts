@@ -53,8 +53,8 @@ export class UnpickedListTab {
         this.events.publish('picks:confirm');
     }
 
-    cancelPicks(){
-        this.events.publish('picks:cancel');
+    clearPicks(){
+        this.events.publish('picks:clear');
     }
 
 }

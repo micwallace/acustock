@@ -132,7 +132,7 @@ export class CountEntryEnterTab {
         if (Object.keys(this.countProvider.pendingCounts).length > 0) {
 
             let alert = this.alertCtrl.create({
-                title: "Cancel Counts",
+                title: "Clear Counts",
                 message: "Are you sure you want to clear all pending count items?",
                 buttons: [
                     {
@@ -150,6 +150,30 @@ export class CountEntryEnterTab {
 
             alert.present();
         }
+    }
+
+    cancelForm(){
+
+        let alert = this.alertCtrl.create({
+            title: "Cancel",
+            message: "Are you sure you want to cancel the current item?",
+            buttons: [
+                {
+                    text: "No",
+                    role: "cancel",
+                    handler: ()=> {
+                    }
+                },
+                {
+                    text: "Yes",
+                    handler: ()=> {
+                        this.resetForm();
+                    }
+                }
+            ]
+        });
+
+        alert.present();
     }
 
     resetForm() {
