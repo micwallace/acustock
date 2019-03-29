@@ -55,6 +55,7 @@ export class PickTab {
     loaderTimer = null; // Use this to prevent loader popping up for cached items/locations
 
     itemAvailability = {};
+    itemAvailabilityItem = null;
 
     constructor(public navCtrl:NavController,
                 public appCtrl:App,
@@ -528,6 +529,11 @@ export class PickTab {
 
                 this.currentLocationIndex = allocIndexes[0];
                 this.currentItemIndex = allocIndexes[1];
+            }
+
+            // Reload item availability if required. This happens when an item is entered that is different from the
+            // suggested one (above), or if the location is the same as the last suggested item (setLocation not executed).
+            if (this.itemAvailabilityItem != this.enteredData.item){
 
                 this.verifyLocation(isScan).then((res)=>{
 
@@ -539,12 +545,12 @@ export class PickTab {
                     this.setItemErrorCallback(err, isScan);
                 });
 
-                return;
+            } else {
+
+                this.dismissLoader();
+
+                this.setItemSuccessCallback(itemId, isScan, callback);
             }
-
-            this.dismissLoader();
-
-            this.setItemSuccessCallback(itemId, isScan, callback);
 
         }).catch((err)=> {
             this.setItemErrorCallback(err, isScan);
@@ -594,6 +600,7 @@ export class PickTab {
                 this.dismissLoader();
 
                 this.itemAvailability = res;
+                this.itemAvailabilityItem = itemId;
 
                 // Validate bin has available qty
                 var onhandQty = this.itemAvailability.hasOwnProperty(enteredBin) ? this.itemAvailability[enteredBin].QtyOnHand.value : 0;
