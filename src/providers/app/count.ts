@@ -70,8 +70,8 @@ export class CountProvider {
 
                 console.log(JSON.stringify(res));
 
-                var curWarehouse = this.prefs.getPreference('warehouse');
-                var warehouse = res.WarehouseID.value;
+                let curWarehouse = this.prefs.getPreference('warehouse');
+                let warehouse = res.WarehouseID.value;
 
                 if (warehouse !== curWarehouse) {
                     reject({message:"Physical Count #" + referenceNbr + " was found but belongs to warehouse " + warehouse + ", not the currently selected warehouse which is " + curWarehouse});
@@ -82,9 +82,9 @@ export class CountProvider {
                 this.generateIndex();
                 this.calculateTotals();
 
-                var counts = JSON.parse(localStorage.getItem("unconfirmed_counts"));
+                let counts = JSON.parse(localStorage.getItem("unconfirmed_counts"));
 
-                var id = this.physicalCount.ReferenceNbr.value;
+                let id = this.physicalCount.ReferenceNbr.value;
 
                 if (counts && counts.hasOwnProperty(id)) {
                     this.savedCounts = counts[id];
@@ -108,11 +108,11 @@ export class CountProvider {
 
         this.countIndex = {};
 
-        for (var i = 0; i < this.physicalCount.Details.length; i++){
+        for (let i = 0; i < this.physicalCount.Details.length; i++){
 
-            var line = this.physicalCount.Details[i];
+            let line = this.physicalCount.Details[i];
 
-            var key = line.InventoryID.value + "-" + line.LocationID.value;
+            let key = line.InventoryID.value + "-" + line.LocationID.value;
 
             this.countIndex[key] = line;
 
@@ -125,7 +125,7 @@ export class CountProvider {
         this.totalCountedQty = 0;
         this.totalPendingQty = 0;
 
-        for (var i in this.countIndex){
+        for (let i in this.countIndex){
 
             this.totalBookQty += this.countIndex[i].BookQuantity.value;
 
@@ -133,7 +133,7 @@ export class CountProvider {
                 this.totalCountedQty += this.countIndex[i].PhysicalQuantity.value;
         }
 
-        for (i in this.pendingCounts){
+        for (let i in this.pendingCounts){
             this.totalCountedQty += this.pendingCounts[i].PendingQty;
             this.totalPendingQty += this.pendingCounts[i].PendingQty
         }
@@ -143,7 +143,7 @@ export class CountProvider {
 
     public getCountLine(data){
 
-        var key = data.item + "-" + data.location;
+        let key = data.item + "-" + data.location;
 
         if (!this.countIndex.hasOwnProperty(key))
             return null;
@@ -154,7 +154,8 @@ export class CountProvider {
     public addNewCountLine(data){
 
         return new Promise((resolve, reject)=> {
-            var countData = {
+
+            let countData = {
                 ReferenceNbr: this.physicalCount.ReferenceNbr,
                 Details: [{
                     InventoryID: {value: data.item},
@@ -168,7 +169,7 @@ export class CountProvider {
                 this.generateIndex();
                 this.calculateTotals();
 
-                var key = data.item + "-" + data.location;
+                let key = data.item + "-" + data.location;
 
                 if (!this.countIndex.hasOwnProperty(key))
                     reject({message: "Could not locate count object in index."});
@@ -186,7 +187,7 @@ export class CountProvider {
         if (!this.countIndex.hasOwnProperty(key))
             return 0;
 
-        var counted = 0;
+        let counted = 0;
 
         if (this.countIndex[key].PhysicalQuantity.hasOwnProperty('value'))
             counted = this.countIndex[key].PhysicalQuantity.value;
@@ -214,7 +215,7 @@ export class CountProvider {
 
         qty = parseFloat(qty);
 
-        var key = countLine.InventoryID.value + "-" + countLine.LocationID.value;
+        let key = countLine.InventoryID.value + "-" + countLine.LocationID.value;
 
         if (!this.pendingCounts.hasOwnProperty(key)) {
             this.pendingCounts[key] = countLine;
@@ -232,7 +233,7 @@ export class CountProvider {
 
     public removeCount(countLine){
 
-        var key = countLine.InventoryID.value + "-" + countLine.LocationID.value;
+        let key = countLine.InventoryID.value + "-" + countLine.LocationID.value;
 
         if (this.pendingCounts.hasOwnProperty(key)) {
             delete this.pendingCounts[key];
@@ -242,7 +243,8 @@ export class CountProvider {
     }
 
     public savePendingCounts() {
-        var receipts = JSON.parse(localStorage.getItem("unconfirmed_counts"));
+
+        let receipts = JSON.parse(localStorage.getItem("unconfirmed_counts"));
 
         if (!receipts)
             receipts = {};
@@ -270,7 +272,8 @@ export class CountProvider {
     }
 
     public clearSavedCounts() {
-        var receipts = JSON.parse(localStorage.getItem("unconfirmed_counts"));
+
+        let receipts = JSON.parse(localStorage.getItem("unconfirmed_counts"));
 
         if (!receipts)
             return;
@@ -288,42 +291,57 @@ export class CountProvider {
 
         return new Promise((resolve, reject)=> {
 
-            // TODO: Refresh count from server to prevent collision?
-
-            var data = {
-                ReferenceNbr: this.physicalCount.ReferenceNbr,
-                Details: []
-            };
-
-            for (var i in this.pendingCounts){
-
-                var line = this.pendingCounts[i];
-
-                if (!line.PhysicalQuantity.hasOwnProperty('value'))
-                    line.PhysicalQuantity.value = 0;
-
-                line.PhysicalQuantity.value += line.PendingQty;
-                delete line.PendingQty;
-
-                data.Details.push(line);
-            }
-
-            this.lastRequest = data;
-
-            this.api.putCount(data).then((res)=>{
+            this.api.getCount(this.physicalCount.ReferenceNbr.value).then((res:any)=>{
 
                 this.physicalCount = res;
                 this.generateIndex();
-
-                this.pendingCounts = {};
-                this.clearSavedCounts();
-
                 this.calculateTotals();
 
-                resolve(true);
+                let data = {
+                    ReferenceNbr: this.physicalCount.ReferenceNbr,
+                    Details: []
+                };
+
+                for (let i in this.pendingCounts){
+
+                    let line = this.pendingCounts[i];
+
+                    // Get physical count line from count index.
+                    let key = line.InventoryID.value + "-" + line.LocationID.value;
+
+                    line.PhysicalQuantity = this.countIndex[key].PhysicalQuantity;
+
+                    if (!line.PhysicalQuantity.hasOwnProperty('value'))
+                        line.PhysicalQuantity.value = 0;
+
+                    line.PhysicalQuantity.value += line.PendingQty;
+                    delete line.PendingQty;
+
+                    data.Details.push(line);
+                }
+
+                this.lastRequest = data;
+
+                this.api.putCount(data).then((res)=>{
+
+                    this.physicalCount = res;
+                    this.generateIndex();
+
+                    this.pendingCounts = {};
+                    this.clearSavedCounts();
+
+                    this.calculateTotals();
+
+                    resolve(true);
+                }).catch((err)=>{
+                    reject(err);
+                });
+
             }).catch((err)=>{
+                err.message = "Physical Count count not be reloaded: " + err.message;
                 reject(err);
             });
+
         });
     }
 

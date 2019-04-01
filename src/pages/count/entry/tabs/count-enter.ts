@@ -281,6 +281,8 @@ export class CountEntryEnterTab {
 
             this.dismissLoader();
 
+            this.enteredData.item = item.InventoryID.value;
+
             if (this.enteredData.location != "") {
 
                 this.setCountLine(isScan).then(()=> {
