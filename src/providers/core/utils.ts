@@ -65,7 +65,7 @@ export class UtilsProvider {
 
         let alert = this.alertCtrl.create({
             title: title,
-            subTitle: message,
+            message: message,
             buttons: [
                 {
                     text: 'Dismiss',
