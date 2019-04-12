@@ -94,7 +94,7 @@ export class BarcodeListenerComponent implements OnInit, OnDestroy {
             //If they are both less than 15, we know we are beyond the first characters,
             //and we may start only adding the current character. Also, the current code cannot
             //be Enter/Tab, because that is when we need to emit the outputString
-            if (this.currentTimeDiff <= this.threshold && this.previousTimeDiff <= this.threshold && e.key != 'Enter' && e.key != 'Tab') {
+            if (this.currentTimeDiff <= this.threshold && this.previousTimeDiff <= this.threshold && !BarcodeListenerComponent.isDelimiterKey(e)) {
                 this.outputString += this.currentKey;
                 // This prevents active element such as buttons from triggering their click event when the enter key is pressed.
                 (document.activeElement as HTMLElement).blur();
@@ -102,7 +102,7 @@ export class BarcodeListenerComponent implements OnInit, OnDestroy {
 
             //If we are in the middle of the scan and the code is 13, we can stop adding to the
             //outputString and emit it instead. We must then set is back to empty for the next scan.
-            if (this.currentTimeDiff <= this.threshold && this.previousTimeDiff <= this.threshold && (e.key == 'Enter' || e.key == 'Tab') && this.outputString !== '') {
+            if (this.currentTimeDiff <= this.threshold && this.previousTimeDiff <= this.threshold && BarcodeListenerComponent.isDelimiterKey(e) && this.outputString !== '') {
                 this.events.publish('barcode:scan', this.outputString);
                 this.outputString = '';
             }
@@ -111,5 +111,12 @@ export class BarcodeListenerComponent implements OnInit, OnDestroy {
 
     }
 
+    static isDelimiterKey(keyevent){
+
+        if (keyevent.key == 'Enter' || keyevent.which == 13)
+            return true;
+
+        return keyevent.key == 'Tab' || keyevent.which == 9;
+    }
 
 }
