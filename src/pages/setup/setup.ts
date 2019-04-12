@@ -41,6 +41,9 @@ export class SetupPage {
     ionViewDidLoad() {
         if (typeof this.navParams.get('firstTime') !== 'undefined')
             this.firsTimeSetup = this.navParams.get('firstTime');
+
+        this.events.unsubscribe('barcode:scan');
+        this.events.subscribe('barcode:scan', (barcodeText)=>{ this.onBarcodeScan(barcodeText); });
     }
 
     showPreferences() {

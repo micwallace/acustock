@@ -47,7 +47,7 @@ export class BarcodeListenerComponent implements OnInit, OnDestroy {
     };
 
     keydownListener = (e)=>{
-        if (this.outputString != "" && (e.key == "Enter" || e.key == "Tab"))
+        if (this.outputString != "" && BarcodeListenerComponent.isDelimiterKey(e))
             this.keypressHandler(e);
     };
 

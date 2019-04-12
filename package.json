@@ -59,8 +59,7 @@
   },
   "devDependencies": {
     "@ionic/app-scripts": "3.1.8",
-    "@ionic/cli-plugin-cordova": "1.6.2",
-    "ionic": "4.0.1",
+    "ionic": "^3.15.0",
     "typescript": "2.4.2"
   },
   "description": "An Ionic project",
@@ -71,9 +70,7 @@
       "cordova-plugin-dialogs": {},
       "cordova-plugin-whitelist": {},
       "cordova-plugin-advanced-http": {},
-      "cordova-android-support-gradle-release": {
-        "ANDROID_SUPPORT_VERSION": "27.+"
-      },
+      "cordova-android-support-gradle-release": {},
       "cordova-plugin-vibration": {},
       "cordova-plugin-email-composer": {},
       "cordova-plugin-ionic-webview": {
