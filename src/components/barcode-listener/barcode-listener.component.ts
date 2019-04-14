@@ -34,7 +34,7 @@ export class BarcodeListenerComponent implements OnInit, OnDestroy {
     previousKey:string;
     outputString:string = '';
 
-    threshold = 30;
+    threshold = 40;
 
     constructor(public events: Events, public prefs:PreferencesProvider) {
         let threshold = parseInt(this.prefs.getPreference("scan_threshold"));
