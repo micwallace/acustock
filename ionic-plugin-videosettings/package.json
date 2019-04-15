@@ -1,0 +1,31 @@
+{
+  "name": "ionic-plugin-videosettings",
+  "version": "0.1.17",
+  "description": "\n\t\tThis plugin control Android WebSettings on the WebView for video\n\t",
+  "cordova": {
+    "id": "ionic-plugin-videosettings",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jugalkishor-sujal/ionic-plugin-videosettings.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=2.3.0"
+    }
+  ],
+  "author": "",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/jugalkishor-sujal/ionic-plugin-videosettings/issues"
+  },
+  "homepage": "https://github.com/jugalkishor-sujal/ionic-plugin-videosettings#readme"
+}

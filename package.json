@@ -86,7 +86,7 @@
         "APP_ID": "cb4667f2",
         "CHANNEL_NAME": "Production",
         "UPDATE_API": "https://api.ionicjs.com",
-        "UPDATE_METHOD": "background",
+        "UPDATE_METHOD": "none",
         "MAX_STORE": "2",
         "MIN_BACKGROUND_DURATION": "30"
       }
