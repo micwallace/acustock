@@ -1,4 +1,4 @@
-package com.simplec.phonegap.plugins.videosettings;
+package ionic.plugins.videosettings;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
