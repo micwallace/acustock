@@ -3,7 +3,7 @@
     <name>AcuStock</name>
     <description>Mobile stock management for Acumatica</description>
     <author email="michael@wallaceit.com.au" href="http://wallaceit.com.au/">Michael Wallace</author>
-    <content original-src="index.html" src="http://192.168.36.95:8100" />
+    <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -109,7 +109,6 @@
         <variable name="MAX_STORE" value="2" />
         <variable name="MIN_BACKGROUND_DURATION" value="30" />
     </plugin>
-    <allow-navigation href="http://192.168.36.95:8100" sessionid="07459c3f" />
     <engine name="browser" spec="~5.0.4" />
     <engine name="android" spec="~7.1.4" />
 </widget>
