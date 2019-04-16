@@ -29,6 +29,7 @@ import { SetupPageModule } from '../pages/setup/setup.module';
 
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { Vibration } from '@ionic-native/vibration';
+import { NativeAudio } from "@ionic-native/native-audio";
 import { EmailComposer } from '@ionic-native/email-composer';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -240,6 +241,7 @@ export class MyErrorHandler implements ErrorHandler {
         ReceiveProvider,
         AdjustmentProvider,
         Vibration,
+        NativeAudio,
         EmailComposer,
         IonicErrorHandler,
         { provide: ErrorHandler, useClass: MyErrorHandler }

@@ -18,9 +18,10 @@
 
 import { Injectable } from '@angular/core';
 import { PreferencesProvider } from "./preferences";
-import { AlertController, NavController } from "ionic-angular";
+import { AlertController, NavController, Platform } from "ionic-angular";
 import { Vibration } from '@ionic-native/vibration';
 import { EmailComposer } from '@ionic-native/email-composer';
+import { NativeAudio } from "@ionic-native/native-audio";
 //import { LoginPage } from "../../pages/login/login";
 //import { SetupPage } from "../../pages/setup/setup";
 
@@ -33,10 +34,21 @@ import { EmailComposer } from '@ionic-native/email-composer';
 @Injectable()
 export class UtilsProvider {
 
+    private audioMode = "html";
+
+    private preloadedSounds = {};
+
     constructor(public prefs:PreferencesProvider,
                 public vibration:Vibration,
                 public alertCtrl: AlertController,
-                public emailComposer:EmailComposer) {
+                public emailComposer:EmailComposer,
+                public platform:Platform,
+                public nativeAudio:NativeAudio) {
+
+        this.platform.ready().then(() => {
+            if (this.platform.is('cordova'))
+                this.audioMode = "native";
+        });
     }
 
     public processApiError(title, message, exception, navCtrl:NavController=null, additionalData=null){
@@ -116,7 +128,7 @@ export class UtilsProvider {
 
         var key = this.prefs.getPreference("success_sound");
         if (key != ""){
-            UtilsProvider.playSound(key);
+            this.playSound(key);
         }
     }
 
@@ -124,7 +136,7 @@ export class UtilsProvider {
 
         var key = this.prefs.getPreference("prompt_sound");
         if (key != ""){
-            UtilsProvider.playSound(key);
+            this.playSound(key);
         }
 
         if (!vibrate)
@@ -139,7 +151,7 @@ export class UtilsProvider {
 
         var key = this.prefs.getPreference("completed_sound");
         if (key != ""){
-            UtilsProvider.playSound(key);
+            this.playSound(key);
         }
 
         if (!vibrate)
@@ -154,7 +166,7 @@ export class UtilsProvider {
 
         var key = this.prefs.getPreference("alert_sound");
         if (key != ""){
-            UtilsProvider.playSound(key);
+            this.playSound(key);
         }
 
         if (!vibrate)
@@ -165,11 +177,43 @@ export class UtilsProvider {
             this.vibrate();
     }
 
-    public static playSound(key){
+    public playSound(key){
 
-        var audio = new Audio("assets/sounds/" + key + ".mp3");
+        let path = "assets/sounds/" + key + ".mp3";
 
-        audio.play();
+        if (this.audioMode == "html") {
+
+            var audio = new Audio(path);
+
+            audio.play();
+
+        } else {
+
+            if (this.preloadedSounds.hasOwnProperty(key)) {
+
+                this.nativeAudio.play(key).then((res) => {
+                    //console.log(res);
+                }, (err) => {
+                    console.log(err);
+                });
+
+            } else {
+
+                this.nativeAudio.preloadSimple(key, path).then((res)=>{
+
+                    this.preloadedSounds[key] = true;
+
+                    this.nativeAudio.play(key).then((res) => {
+                        //console.log(res);
+                    }, (err) => {
+                        console.log(err);
+                    });
+
+                }, (err) => {
+                    console.log(err);
+                });
+            }
+        }
     }
 
     public vibrate(){

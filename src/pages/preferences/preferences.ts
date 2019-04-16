@@ -136,7 +136,7 @@ export class PreferencesPage {
 
     onSelectOptionClick(key, value){
         if (["success_sound", "completed_sound", "alert_sound", "prompt_sound"].indexOf(key) > -1){
-            UtilsProvider.playSound(value);
+            this.utils.playSound(value);
         }
     }
 
