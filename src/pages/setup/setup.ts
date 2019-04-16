@@ -95,20 +95,25 @@ export class SetupPage {
         try {
             var values = JSON.parse(barcodeText);
 
-            if (values) {
-                for (var i in values) {
-
-                    if (this.prefs.preferences.hasOwnProperty(i)) {
-
-                        this.prefs.setPreference(i, values[i]);
-
-                    } else if (this.prefs.minMap.hasOwnProperty(i)){
-
-                        this.prefs.setPreference(this.prefs.minMap[i], values[i]);
-                    }
-                }
-                this.prefs.savePreferences();
+            if (values == null || typeof values !== 'object'){
+                this.utils.playFailedSound(true);
+                this.utils.showAlert("Error", "Invalid configuration barcode.");
+                return;
             }
+
+            for (var i in values) {
+
+                if (this.prefs.preferences.hasOwnProperty(i)) {
+
+                    this.prefs.setPreference(i, values[i]);
+
+                } else if (this.prefs.minMap.hasOwnProperty(i)){
+
+                    this.prefs.setPreference(this.prefs.minMap[i], values[i]);
+                }
+            }
+
+            this.prefs.savePreferences();
 
             this.utils.playScanSuccessSound();
 
