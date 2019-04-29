@@ -46,7 +46,7 @@ export class UtilsProvider {
                 public nativeAudio:NativeAudio) {
 
         this.platform.ready().then(() => {
-            if (this.platform.is('cordova'))
+            if (this.platform.is('cordova') && this.prefs.getPreference('native_audio'))
                 this.audioMode = "native";
         });
     }

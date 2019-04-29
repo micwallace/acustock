@@ -197,6 +197,13 @@ export class PreferencesProvider {
                     title: "Alert & Prompt Vibrate",
                     type: "toggle",
                     def_value: true
+                },
+                {
+                    key: "native_audio",
+                    min_key: "na",
+                    title: "Use Native Audio",
+                    type: "toggle",
+                    def_value: true
                 }
             ]
         },
