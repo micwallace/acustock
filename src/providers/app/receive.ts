@@ -456,7 +456,8 @@ export class ReceiveProvider {
 
                     loader.data.content = "Confirming Shipment...";
 
-                    this.api.confirmShipment(data.ShipmentNbr.value).then((res)=> {
+                    // stupid API deletes notes if they are not provided with PUT/POST requests
+                    this.api.confirmShipment(data.ShipmentNbr.value, data.note).then((res)=> {
 
                         this.postConfirmSuccess();
 
@@ -585,12 +586,13 @@ export class ReceiveProvider {
 
     private getShipmentUpdateObject() {
 
-        var data:any = {
+        let data:any = {
             ShipmentNbr: this.sourceDocument.ShipmentNbr,
+            note: this.sourceDocument.note, // stupid API deletes notes if they are not provided with PUT requests
             Details: []
         };
 
-        var item:any;
+        let item:any;
 
         for (var i in this.sourceIndex) {
 
@@ -763,7 +765,8 @@ export class ReceiveProvider {
                 return;
             }
 
-            this.api.correctShipment(this.sourceDocument.ShipmentNbr.value).then(()=> {
+            // stupid API deletes notes if they are not provided with PUT/POST requests
+            this.api.correctShipment(this.sourceDocument.ShipmentNbr.value, this.sourceDocument.note).then(()=> {
                 resolve();
             }).catch((err)=> {
                 reject(err);

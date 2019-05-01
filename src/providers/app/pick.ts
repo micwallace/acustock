@@ -210,6 +210,7 @@ export class PickProvider {
 
             var data = {
                 ShipmentNbr: this.currentShipment.ShipmentNbr,
+                note: this.currentShipment.note, // stupid API deletes notes if they are not provided with PUT requests
                 PickStatus: {value: "Assigned"},
                 PickDevice: {value: this.prefs.getPreference("device")}
             };
@@ -825,6 +826,7 @@ export class PickProvider {
 
             var data:any = {
                 ShipmentNbr: this.currentShipment.ShipmentNbr,
+                note: this.currentShipment.note, // stupid API deletes notes if they are not provided with PUT requests
                 Details: []
             };
 
@@ -943,6 +945,7 @@ export class PickProvider {
 
             var data:any = {
                 ShipmentNbr: this.currentShipment.ShipmentNbr,
+                note: this.currentShipment.note, // stupid API deletes notes if they are not provided with PUT requests
                 PickStatus: {value: "Picked"},
                 Details: []
             };

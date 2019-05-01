@@ -284,12 +284,12 @@ export class Api {
         return this.put("Shipment"+(expand ? "?$expand=" + expand : ""), data, {});
     }
 
-    confirmShipment(shipmentNbr){
-        return this.postActionAndGetResult("Shipment/ConfirmShipment", {entity: {ShipmentNbr: {value: shipmentNbr}}});
+    confirmShipment(shipmentNbr, note){
+        return this.postActionAndGetResult("Shipment/ConfirmShipment", {entity: {ShipmentNbr: {value: shipmentNbr}, note: note}});
     }
 
-    correctShipment(shipmentNbr){
-        return this.postActionAndGetResult("Shipment/CorrectShipment", {entity: {ShipmentNbr: {value: shipmentNbr}}});
+    correctShipment(shipmentNbr, note){
+        return this.postActionAndGetResult("Shipment/CorrectShipment", {entity: {ShipmentNbr: {value: shipmentNbr}, note: note}});
     }
 
     updateIN(shipmentNbr){
