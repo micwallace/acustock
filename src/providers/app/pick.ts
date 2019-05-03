@@ -839,6 +839,7 @@ export class PickProvider {
 
                 var item:any = {
                     LineNbr: {value: lineNbr},
+                    InventoryID: this.pendingPicks[i].InventoryID, // InventoryID not needed but good for debugging data.
                     Allocations: []
                 };
 
@@ -962,6 +963,7 @@ export class PickProvider {
 
                 let itemUpdate:any = {
                     LineNbr: item.LineNbr,
+                    InventoryID: item.InventoryID, // InventoryID not needed but good for debugging data.
                     Allocations: []
                 };
 
@@ -1000,6 +1002,8 @@ export class PickProvider {
 
             console.log("Removing unpicked items.");
             console.log(JSON.stringify(data));
+
+            this.lastRequest = data;
 
             this.api.putShipment(data).then((res:any)=> {
 
