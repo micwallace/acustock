@@ -452,7 +452,6 @@ export class ReceiveShipmentEnterTab {
                     {
                         text: "OK",
                         handler: ()=> {
-                            alert.dismiss();
                             this.confirmReceipts();
                         }
                     }
@@ -509,13 +508,9 @@ export class ReceiveShipmentEnterTab {
         this.loader.present();
 
         this.receiveProvider.confirmReceipts(this.loader).then((res:any)=>{
+
             this.dismissLoader();
             this.cache.flushItemLocationCache();
-            this.events.publish("closeReceiveScreen");
-
-            //console.log(res);
-
-            //console.log(this.receiveProvider.transferShipment);
 
             var msg;
             if (this.receiveProvider.type == "shipment"){
@@ -526,7 +521,10 @@ export class ReceiveShipmentEnterTab {
                     " was successfully created" + (res.released ? " and released" : "");
             }
 
-            this.utils.showAlert("Receipt Successful", msg);
+            this.utils.showAlert("Receipt Successful", msg).onDidDismiss(()=>{
+                this.events.publish("closeReceiveScreen");
+            });
+
         }).catch((err)=>{
             this.dismissLoader();
             this.utils.playFailedSound(false);

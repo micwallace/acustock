@@ -203,7 +203,7 @@ export class PreferencesProvider {
                     min_key: "na",
                     title: "Use Native Audio",
                     type: "toggle",
-                    def_value: true
+                    def_value: false
                 }
             ]
         },

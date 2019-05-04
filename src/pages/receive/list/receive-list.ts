@@ -87,4 +87,14 @@ export class ReceiveListPage {
         return 0;
     }
 
+    getOrderNumbers(receipt){
+
+        if (this.type !== "shipment" || !receipt.hasOwnProperty('Orders'))
+            return "";
+
+        return "- " + receipt.Orders.map((item)=>{
+            return item.OrderNbr.value;
+        }).join(", ");
+    }
+
 }

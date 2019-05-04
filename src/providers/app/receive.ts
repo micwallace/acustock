@@ -457,7 +457,7 @@ export class ReceiveProvider {
                     loader.data.content = "Confirming Shipment...";
 
                     // stupid API deletes notes if they are not provided with PUT/POST requests
-                    this.api.confirmShipment(data.ShipmentNbr.value, data.note).then((res)=> {
+                    this.api.confirmShipment(data.ShipmentNbr.value, data.note).then((confRes)=> {
 
                         this.postConfirmSuccess();
 

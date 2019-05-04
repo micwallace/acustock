@@ -297,7 +297,7 @@ export class Api {
     }
 
     getReceiptShipmentsList(){
-        return this.get("Shipment?$filter=Operation eq 'Receipt' and Status ne 'Completed' and WarehouseID eq '" + this.prefs.getPreference("warehouse") + "'");
+        return this.get("Shipment?$expand=Orders&$filter=Operation eq 'Receipt' and Status ne 'Completed' and WarehouseID eq '" + this.prefs.getPreference("warehouse") + "'");
     }
 
     getTransferList(){

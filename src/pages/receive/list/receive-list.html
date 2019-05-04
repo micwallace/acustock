@@ -37,11 +37,11 @@
 
 <ion-content padding>
     <ion-list class="item-list">
-        <ion-item no-margin no-padding class="list-item" *ngFor="let receipt of receiveList" (click)="openReceipt(receipt);">
+        <ion-item no-margin no-padding tappable class="list-item" *ngFor="let receipt of receiveList" (click)="openReceipt(receipt);">
             <ion-row no-margin>
-                <ion-col col-8>
+                <ion-col col-8 style="display: block;">
                     <div>
-                        <strong>{{getReferenceNumber(receipt)}}</strong><br/>
+                        <strong>{{getReferenceNumber(receipt)}} {{getOrderNumbers(receipt)}}</strong><br/>
                         <small>{{receipt.Description?.value}}</small>
                     </div>
                 </ion-col>

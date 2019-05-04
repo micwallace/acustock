@@ -38,7 +38,7 @@
 <ion-content padding>
     <ion-grid>
         <ion-list class="item-list">
-            <ion-item no-margin no-padding class="list-item" *ngFor="let ship of pickProvider.shipmentList; let i = index" (click)="openShipment(ship.ShipmentNbr.value, i);">
+            <ion-item no-margin no-padding tappable class="list-item" *ngFor="let ship of pickProvider.shipmentList; let i = index" (click)="openShipment(ship.ShipmentNbr.value, i);">
                 <ion-row no-margin>
                     <ion-col col-8>
                         <div>
