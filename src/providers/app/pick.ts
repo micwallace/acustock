@@ -548,15 +548,10 @@ export class PickProvider {
 
     isNonStock(item){
 
-        if (!item.hasOwnProperty("ItemType"))
+        if (!item.hasOwnProperty("InventoryType"))
             return false;
 
-        console.log(item.ItemType.value);
-
-        if (["Non-Stock Item", "Labor", "Service", "Charge", "Expense"].indexOf(item.ItemType.value) > -1)
-            return true;
-
-        return false;
+        return ["Non-Stock Item", "Labor", "Service", "Charge", "Expense"].indexOf(item.InventoryType.value) > -1;
     }
 
     getSuggestedLocation(index) {
