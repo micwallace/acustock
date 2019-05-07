@@ -101,15 +101,15 @@ export class SetupPage {
                 return;
             }
 
-            for (var i in values) {
+            for (let i in values) {
 
-                if (this.prefs.preferences.hasOwnProperty(i)) {
-
-                    this.prefs.setPreference(i, values[i]);
-
-                } else if (this.prefs.minMap.hasOwnProperty(i)){
+                if (this.prefs.minMap.hasOwnProperty(i)){
 
                     this.prefs.setPreference(this.prefs.minMap[i], values[i]);
+
+                } else if (this.prefs.preferences.hasOwnProperty(i)) {
+
+                    this.prefs.setPreference(i, values[i]);
                 }
             }
 

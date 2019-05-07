@@ -38,7 +38,11 @@ export class QRPage {
 
         var minPrefs = {};
 
-        for (var i in this.prefs.preferences){
+        for (let i in this.prefs.preferences){
+
+            if (i == "device") // Do not include device name in QR code
+                continue;
+
             var key = this.prefs.minMap.hasOwnProperty(i) ? this.prefs.minMap[i] : i;
             minPrefs[key] = this.prefs.preferences[i];
         }
