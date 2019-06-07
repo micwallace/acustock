@@ -60,6 +60,9 @@ export class PickShipmentsPage {
     ionViewDidEnter() {
         this.events.unsubscribe('barcode:scan');
         this.events.subscribe('barcode:scan', this.barcodeScanHandler);
+
+        if (this.pickProvider.currentShipment != null)
+            this.shipmentNbr = this.pickProvider.currentShipment.ShipmentNbr.value;
     }
 
     presentPopover(event) {

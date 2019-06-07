@@ -163,6 +163,8 @@ export class CountProvider {
                 }]
             };
 
+            this.lastRequest = countData;
+
             this.api.putCount(countData).then((res)=>{
 
                 this.physicalCount = res;

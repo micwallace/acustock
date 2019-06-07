@@ -156,7 +156,7 @@ export class TransferProvider {
         this.savePending();
     }
 
-    public commitTransfer(loadingCtrl:any) {
+    public commitTransfer(loadingCtrl:any, description:string) {
 
         return new Promise((resolve, reject) => {
 
@@ -167,7 +167,7 @@ export class TransferProvider {
                 WarehouseID: {value: warehouse},
                 ToWarehouseID: {value: warehouse},
                 Hold: {value: false},
-                Description: {value: "AcuStock Location Transfer (device: "+this.prefs.getPreference('device')+")"},
+                Description: {value: "AcuStock Transfer (device: "+this.prefs.getPreference('device')+")" + (description!="" ? " - "+description : "")},
                 Details: []
             };
 

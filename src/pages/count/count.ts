@@ -48,12 +48,15 @@ export class CountPage {
         if (!(this.navCtrl.getActive().instance instanceof CountPage))
             return;
 
-        this.onBarcodeScan(barcodeText)
+        this.onBarcodeScan(barcodeText);
     };
 
     ionViewDidEnter() {
         this.events.unsubscribe('barcode:scan');
         this.events.subscribe('barcode:scan', this.barcodeScanHandler);
+
+        if (this.countProvider.physicalCount != null)
+            this.referenceNbr = this.countProvider.physicalCount.ReferenceNbr.value;
     }
 
     presentPopover(event) {

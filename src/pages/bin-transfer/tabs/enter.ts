@@ -17,10 +17,9 @@
  */
 
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, NavController, Events, AlertController, PopoverController, Tabs, App } from 'ionic-angular';
+import { IonicPage, NavController, Events, AlertController, PopoverController, LoadingController, Tabs, App } from 'ionic-angular';
 import { TransferProvider } from '../../../providers/app/transfer'
 import { CacheProvider } from "../../../providers/core/cache";
-import { LoadingController } from "ionic-angular/index";
 import { UtilsProvider } from "../../../providers/core/utils";
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { TransferPopover } from "../transfer-popover";
@@ -173,7 +172,7 @@ export class EnterTab {
         });
     }
 
-    setLocation(locId, isScan, callback=null) {
+    setLocation(locId=null, isScan=false, callback=null) {
 
         if (locId) {
             this.enteredData.location = locId;
@@ -242,7 +241,7 @@ export class EnterTab {
 
     }
 
-    setToLocation(locId, isScan, callback=null) {
+    setToLocation(locId=null, isScan=false, callback=null) {
 
 
         if (locId) {
@@ -295,7 +294,7 @@ export class EnterTab {
         });
     }
 
-    setItem(itemId, isScan=false, callback=null) {
+    setItem(itemId=null, isScan=false, callback=null) {
 
         if (itemId) {
             this.enteredData.item = itemId;
@@ -403,6 +402,43 @@ export class EnterTab {
         this.showQty = false;
     }
 
+    addAllBinContents() {
+
+        let alert = this.alertCtrl.create({
+            title: "Add All Items",
+            message: "Transfer all remaining items in " + this.enteredData.location + " to " + this.enteredData.toLocation + "? <br/>Items already on the pending list will be skipped.",
+            buttons: [
+                {
+                    text: "Cancel",
+                    role: "cancel"
+                },
+                {
+                    text: "Yes",
+                    handler: ()=> {
+
+                        for (let i in this.currentLocationItems){
+
+                            let item = this.currentLocationItems[i];
+
+                            let curPendingQty = this.transferProvider.getItemLocPendingQty(this.enteredData.location, item.InventoryID.value);
+
+                            let shippedQty = item.QtySOShipped ? item.QtySOShipped.value : 0;
+
+                            let addQty = item.QtyOnHand.value - curPendingQty - shippedQty;
+
+                            if (addQty < 1)
+                                continue;
+
+                            this.transferProvider.addPendingItem(this.enteredData.location, this.enteredData.toLocation, item.InventoryID.value, addQty, item.QtyOnHand.value);
+                        }
+                    }
+                }
+            ]
+        });
+
+        alert.present();
+    }
+
     clearTransfers(){
 
         if (Object.keys(this.transferProvider.pendingItems).length > 0) {
@@ -434,18 +470,42 @@ export class EnterTab {
         if (this.transferProvider.pendingQty == 0)
             return this.utils.showAlert("Error", "Add some items to the transfer list first.");
 
-        this.loader = this.loadingCtrl.create({content: "Submitting Transfers..."});
-        this.loader.present();
+        let alert = this.alertCtrl.create({
+            title: "Commit Transfers",
+            message: "Add a description to the transfer or click OK to continue",
+            inputs: [
+                {
+                    name: 'description',
+                    placeholder: 'Description'
+                }
+            ],
+            buttons: [
+                {
+                    text: "Cancel",
+                    role: "cancel"
+                },
+                {
+                    text: "OK",
+                    handler: (data)=> {
 
-        this.transferProvider.commitTransfer(this.loader).then((res:any)=> {
-            this.dismissLoader();
-            this.cache.flushItemLocationCache();
-            this.utils.showAlert("Transfer Successful", "Transfer #" + res.ReferenceNbr.value + " was successfully created" + (res.released ? " and released" : ""));
-        }).catch((err)=> {
-            this.dismissLoader();
-            this.utils.playFailedSound();
-            this.utils.processApiError("Error", err.message, err, this.appCtrl.getRootNav(), this.transferProvider.getErrorReportingData());
+                        this.loader = this.loadingCtrl.create({content: "Submitting Transfers..."});
+                        this.loader.present();
+
+                        this.transferProvider.commitTransfer(this.loader, data.description).then((res:any)=> {
+                            this.dismissLoader();
+                            this.cache.flushItemLocationCache();
+                            this.utils.showAlert("Transfer Successful", "Transfer #" + res.ReferenceNbr.value + " was successfully created" + (res.released ? " and released" : ""));
+                        }).catch((err)=> {
+                            this.dismissLoader();
+                            this.utils.playFailedSound();
+                            this.utils.processApiError("Error", err.message, err, this.appCtrl.getRootNav(), this.transferProvider.getErrorReportingData());
+                        });
+                    }
+                }
+            ]
         });
+
+        alert.present();
     }
 
     startCameraScanner(){

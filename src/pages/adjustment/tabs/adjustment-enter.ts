@@ -17,10 +17,9 @@
  */
 
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, NavController, Events, AlertController, PopoverController, Tabs, App } from 'ionic-angular';
+import { IonicPage, NavController, Events, AlertController, PopoverController, LoadingController, Tabs, App } from 'ionic-angular';
 import { AdjustmentProvider } from '../../../providers/app/adjustment'
 import { CacheProvider } from "../../../providers/core/cache";
-import { LoadingController } from "ionic-angular/index";
 import { UtilsProvider } from "../../../providers/core/utils";
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import {AdjustmentPopover} from "../adjustment-popover";
@@ -372,18 +371,42 @@ export class AdjustmentEnterTab {
         if (this.adjustmentProvider.pendingNumItems == 0)
             return this.utils.showAlert("Error", "Add some items to the adjustment list first.");
 
-        this.loader = this.loadingCtrl.create({content: "Submitting Adjustments..."});
-        this.loader.present();
+        let alert = this.alertCtrl.create({
+            title: "Commit Adjustments",
+            message: "Add a description to the adjustment or click OK to continue",
+            inputs: [
+                {
+                    name: 'description',
+                    placeholder: 'Description'
+                }
+            ],
+            buttons: [
+                {
+                    text: "Cancel",
+                    role: "cancel"
+                },
+                {
+                    text: "OK",
+                    handler: (data)=> {
 
-        this.adjustmentProvider.commitAdjustment(this.loader).then((res:any)=> {
-            this.dismissLoader();
-            this.cache.flushItemLocationCache();
-            this.utils.showAlert("Adjustment Successful", "Adjustment #" + res.ReferenceNbr.value + " was successfully created" + (res.released ? " and released" : ""));
-        }).catch((err)=> {
-            this.dismissLoader();
-            this.utils.playFailedSound();
-            this.utils.processApiError("Error", err.message, err, this.appCtrl.getRootNav(), this.adjustmentProvider.getErrorReportingData());
+                        this.loader = this.loadingCtrl.create({content: "Submitting Adjustments..."});
+                        this.loader.present();
+
+                        this.adjustmentProvider.commitAdjustment(this.loader, data.description).then((res:any)=> {
+                            this.dismissLoader();
+                            this.cache.flushItemLocationCache();
+                            this.utils.showAlert("Adjustment Successful", "Adjustment #" + res.ReferenceNbr.value + " was successfully created" + (res.released ? " and released" : ""));
+                        }).catch((err)=> {
+                            this.dismissLoader();
+                            this.utils.playFailedSound();
+                            this.utils.processApiError("Error", err.message, err, this.appCtrl.getRootNav(), this.adjustmentProvider.getErrorReportingData());
+                        });
+                    }
+                }
+            ]
         });
+
+        alert.present();
     }
 
     startCameraScanner(){

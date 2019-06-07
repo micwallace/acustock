@@ -1,10 +1,10 @@
 {
-  "name": "AcuStock",
-  "version": "1.2.9",
+  "name": "acustock",
+  "version": "1.2.10",
   "versionType": "stable",
   "minAcumaticaVersion": "1.2.2",
   "author": "Michael Wallace",
-  "homepage": "https://wallaceit.com.au/",
+  "homepage": "https://acustock.wallaceit.com.au/",
   "private": true,
   "scripts": {
     "clean": "ionic-app-scripts clean",

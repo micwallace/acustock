@@ -330,7 +330,10 @@ export class CountEntryEnterTab {
                 buttons: [
                     {
                         text: "No",
-                        role: "cancel"
+                        role: "cancel",
+                        handler: ()=> {
+                            this.enteredData.item = "";
+                        }
                     },
                     {
                         text: "Yes",
@@ -352,7 +355,7 @@ export class CountEntryEnterTab {
                             }).catch((err)=>{
 
                                 this.dismissLoader().then(()=>{
-                                    this.utils.processApiError("Error", err.message, err, this.appCtrl.getRootNav());
+                                    this.utils.processApiError("Error", err.message, err, this.appCtrl.getRootNav(), this.countProvider.getErrorReportingData());
                                 });
 
                                 this.utils.playFailedSound();

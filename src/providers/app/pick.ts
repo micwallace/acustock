@@ -30,7 +30,7 @@ import { PreferencesProvider } from "../core/preferences";
 @Injectable()
 export class PickProvider {
 
-    public currentShipment;
+    public currentShipment = null;
 
     public sourceIndex = {};
 

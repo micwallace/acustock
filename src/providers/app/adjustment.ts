@@ -194,6 +194,9 @@ export class AdjustmentProvider {
             availability[locations[index]] = {};
 
             for (var i in res){
+                if (!res.hasOwnProperty(i))
+                    continue;
+
                 let shelfQty = res[i].QtyOnHand.value;
                 shelfQty -= res[i].QtySOShipped.value ? res[i].QtySOShipped.value : 0;
                 availability[locations[index]][res[i].InventoryID.value] = shelfQty;
@@ -212,7 +215,7 @@ export class AdjustmentProvider {
         });
     }
 
-    public commitAdjustment(loadingCtrl:any) {
+    public commitAdjustment(loadingCtrl:any, description:string) {
 
         return new Promise((resolve, reject) => {
 
@@ -220,7 +223,7 @@ export class AdjustmentProvider {
 
             var adjustment = {
                 Hold: {value: false},
-                Description: {value: "AcuStock Adjustment (device: "+this.prefs.getPreference('device')+")"},
+                Description: {value: "AcuStock Adjustment (device: "+this.prefs.getPreference('device')+")" + (description!="" ? " - "+description : "")},
                 Details: []
             };
 

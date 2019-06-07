@@ -236,13 +236,13 @@ export class Api {
     getItemWarehouseLocations(itemId:string, warehouse:string) {
         var warehouseFilter = warehouse ? " and Warehouse eq '" + warehouse + "'" : "";
 
-        return this.get("InventoryLocations?$filter=InventoryID eq '" + itemId + "'" + warehouseFilter);
+        return this.get("InventoryLocations?$filter=InventoryID eq '" + itemId + "' and QtyOnHand gt 0M" + warehouseFilter);
     }
 
     getLocationContents(locationId:string, warehouse:string) {
         var warehouseFilter = warehouse ? " and Warehouse eq '" + warehouse + "'" : "";
 
-        return this.get("InventoryLocations?$filter=Location eq '" + locationId + "'" + warehouseFilter);
+        return this.get("InventoryLocations?$filter=Location eq '" + locationId + "' and QtyOnHand gt 0M" + warehouseFilter);
     }
 
     getItemAllocationInfo(itemId:string, warehouseId:string, locationId:string){

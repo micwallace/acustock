@@ -69,6 +69,22 @@ export class ReceiveProvider {
         }
     }
 
+    public getCurrentReferenceNbr(){
+
+        switch(this.type){
+            case "purchase":
+                return this.sourceDocument.OrderNbr.value;
+
+            case "transfer":
+                return (this.transferShipment != null ? this.transferShipment.ShipmentNbr.value : this.sourceDocument.ReferenceNbr.value);
+
+            case "shipment":
+                return this.sourceDocument.ShipmentNbr.value;
+        }
+
+        return "";
+    }
+
     public loadReceipt(referenceNbr, type) {
 
         return new Promise((resolve, reject)=> {

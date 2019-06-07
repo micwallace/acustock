@@ -94,7 +94,7 @@ export class UtilsProvider {
                 }
             });
 
-            // TODO: Add pro error reporting
+            // TODO: Add ionic pro error reporting
         }
 
         alert.present();
@@ -104,7 +104,7 @@ export class UtilsProvider {
 
     public sendDebugData(exception, additionalData){
 
-        var errorData = {exception: exception, additionalData: additionalData};
+        let errorData = {exception: exception, additionalData: additionalData};
 
         this.emailComposer.isAvailable().then(() =>{
 
@@ -113,7 +113,11 @@ export class UtilsProvider {
                     'base64:error-information.json//' + btoa(JSON.stringify(errorData))
                 ],
                 subject: 'AcuStock Error Report',
-                body: (exception.hasOwnProperty('exception') ? 'Error Summary: ' + exception.exception.message + '<br/>' : '') + 'Additional Information:',
+                body: (exception.hasOwnProperty('message') ? 'Error Summary: ' + exception.message + '<br/>' : '') +
+                        '<br/>Additional Information:' +
+                        '<br/>Device: ' + this.prefs.getPreference('device') +
+                        '<br/>Company: ' + this.prefs.getPreference('connection_company') +
+                        '<br/>Warehouse: ' + this.prefs.getPreference('warehouse'),
                 isHtml: true
             };
 

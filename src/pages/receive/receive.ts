@@ -51,12 +51,17 @@ export class ReceivePage {
         if (!(this.navCtrl.getActive().instance instanceof ReceivePage))
             return;
 
-        this.onBarcodeScan(barcodeText)
+        this.onBarcodeScan(barcodeText);
     };
 
     ionViewDidEnter() {
         this.events.unsubscribe('barcode:scan');
         this.events.subscribe('barcode:scan', this.barcodeScanHandler);
+
+        if (this.receiveProvider.sourceDocument != null){
+            this.receiptType = this.receiveProvider.type;
+            this.referenceNbr = this.receiveProvider.getCurrentReferenceNbr();
+        }
     }
 
     presentPopover(event) {
