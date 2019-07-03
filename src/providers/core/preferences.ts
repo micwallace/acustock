@@ -292,6 +292,27 @@ export class PreferencesProvider {
             ]
         },
         {
+            title: "Notifications",
+            preferences: [
+                {
+                    key: "error_email",
+                    min_key: "nee",
+                    caption: "The default email address to send diagnostic reports to.",
+                    title: "Diagnostic Email",
+                    type: "text",
+                    def_value: ""
+                },
+                {
+                    key: "service_email",
+                    min_key: "nse",
+                    caption: "The default email address to send customer service notifications.",
+                    title: "Customer Service Email",
+                    type: "text",
+                    def_value: ""
+                },
+            ]
+        },
+        {
             title: "Scanning",
             preferences: [
                 {

@@ -109,8 +109,9 @@ export class UtilsProvider {
         this.emailComposer.isAvailable().then(() =>{
 
             let email = {
+                to: this.prefs.getPreference('error_email'),
                 attachments: [
-                    'base64:error-information.json//' + btoa(JSON.stringify(errorData))
+                    'base64:error-information.json//' + btoa(JSON.stringify(errorData, Object.getOwnPropertyNames(errorData)))
                 ],
                 subject: 'AcuStock Error Report',
                 body: (exception.hasOwnProperty('message') ? 'Error Summary: ' + exception.message + '<br/>' : '') +
@@ -118,6 +119,40 @@ export class UtilsProvider {
                         '<br/>Device: ' + this.prefs.getPreference('device') +
                         '<br/>Company: ' + this.prefs.getPreference('connection_company') +
                         '<br/>Warehouse: ' + this.prefs.getPreference('warehouse'),
+                isHtml: true
+            };
+
+            this.emailComposer.open(email);
+
+        }).catch((err)=>{
+            this.showAlert("Email not available", "The email composer plugin is not available on this platform: "+JSON.stringify(err));
+        });
+    }
+
+    public sendShortShipNotification(shortShipData){
+
+        this.emailComposer.isAvailable().then(() =>{
+
+            let body = "Hello,<br/><br/>The following items on shipment "+shortShipData.shipment+
+                        " were not available in the warehouse and are from orders with the \"ship complete\" shipping rule. " +
+                "If you want the shipment to proceed, please change the order and line level shipping rule to either backorder allowed or cancel remainder and notify the warehouse.<br/><br/>";
+
+            body += "Order Nbr.".padEnd(16, '\u00A0') + "Inventory ID".padEnd(28, '\u00A0') + "Descr.".padEnd(44, '\u00A0') + "Qty. Requested".padEnd(20, '\u00A0') + "Qty. Not Available<br/>";
+
+            for (let i in shortShipData.items){
+
+                if (!shortShipData.items.hasOwnProperty(i))
+                    continue;
+
+                let item = shortShipData.items[i];
+
+                body += item.order.padEnd(16, '\u00A0') + item.item.padEnd(28, '\u00A0') + item.description.padEnd(44, '\u00A0') + item.qty.toString().padEnd(20, '\u00A0') + item.qty_left+"<br/>";
+            }
+
+            let email = {
+                to: this.prefs.getPreference('service_email'),
+                subject: 'AcuStock Items not available for shipment #'+shortShipData.shipment,
+                body: body,
                 isHtml: true
             };
 

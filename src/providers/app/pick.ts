@@ -948,19 +948,49 @@ export class PickProvider {
 
             let curItems = JSON.parse(JSON.stringify(this.currentShipment.Details));
 
+            let remItems = {};
+
+            let shipCompleteOrders = [];
+
+            for (let order of this.currentShipment.Orders){
+
+                if (order.ShippingRule && order.ShippingRule.value && order.ShippingRule.value == "Ship Complete")
+                    shipCompleteOrders.push(order.OrderNbr.value);
+            }
+
             for (let item of curItems){
 
                 if (this.isNonStock(item))
                     continue;
 
-                if (item.PickedQty.value == item.ShippedQty.value)
+                // Checking if shipped quantity > 0 will mean that items with no allocations are also removed.
+                if (item.ShippedQty.value > 0 && item.PickedQty.value == item.ShippedQty.value)
                     continue;
 
                 let itemUpdate:any = {
+                    note: item.note,
                     LineNbr: item.LineNbr,
                     InventoryID: item.InventoryID, // InventoryID not needed but good for debugging data.
                     Allocations: []
                 };
+
+                // Keep track of items removed in order to send notification
+                if (item.ShippedQty.value > 0 && shipCompleteOrders.indexOf(item.OrderNbr.value) > -1) {
+
+                    let key = item.OrderNbr.value + "-" + item.InventoryID.value;
+
+                    if (!remItems.hasOwnProperty(key))
+                        remItems[key] = {
+                            order: item.OrderNbr.value,
+                            item: item.InventoryID.value,
+                            description: item.Description.value,
+                            qty: 0,
+                            qty_left: 0,
+                        };
+
+                    remItems[key].qty += item.ShippedQty.value;
+                    remItems[key].qty_left += (item.ShippedQty.value - item.PickedQty.value);
+                }
 
                 if (item.PickedQty.value == 0){
 
@@ -995,8 +1025,8 @@ export class PickProvider {
                 data.Details.push(itemUpdate);
             }
 
-            console.log("Removing unpicked items.");
-            console.log(JSON.stringify(data));
+            //console.log("Removing unpicked items.");
+            //console.log(JSON.stringify(data));
 
             this.lastRequest = data;
 
@@ -1007,7 +1037,10 @@ export class PickProvider {
                 this.generateSourceList();
                 this.calculateQtys();
 
-                resolve(res);
+                resolve({
+                    shipment: this.currentShipment.ShipmentNbr.value,
+                    items: remItems
+                });
 
             }).catch((err)=> {
                 err.message = "Failed to remove unpicked items. " + err.message;

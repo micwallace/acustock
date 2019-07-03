@@ -272,7 +272,7 @@ export class Api {
         return this.get("InventoryLotSerials" + (filter.length ? "?$filter=" + filter.join(" and ") : ""));
     }
 
-    getShipment(shipmentNbr, expand = "Details,Details/Allocations") {
+    getShipment(shipmentNbr, expand = "Details,Details/Allocations,Orders") {
         return this.get("Shipment/" + shipmentNbr + "?"+(expand ? "$expand=" + expand : ""));
     }
 
@@ -280,7 +280,7 @@ export class Api {
         return this.get("ShipmentList?$filter=WarehouseID eq '" + this.prefs.getPreference("warehouse") + "'");
     }
 
-    putShipment(data, expand = "Details,Details/Allocations") {
+    putShipment(data, expand = "Details,Details/Allocations,Orders") {
         return this.put("Shipment"+(expand ? "?$expand=" + expand : ""), data, {});
     }
 

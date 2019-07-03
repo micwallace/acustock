@@ -881,10 +881,40 @@ export class PickTab {
 
                 loader.data.content = "Removing unpicked items...";
 
-                this.pickProvider.removeUnpickedItems().then(()=>{
+                this.pickProvider.removeUnpickedItems().then((shortShipData:any)=>{
 
                     loader.dismiss();
                     this.cache.flushItemLocationCache();
+
+                    if (Object.keys(shortShipData.items).length > 0){
+
+                        let alert = this.alertCtrl.create({
+                            title: "Short Ship",
+                            message: "Some items that were removed from the shipment have the \"Ship Complete\" shipping rule. " +
+                                        "Would you like to send a notification to the customer service team?",
+                            buttons: [
+                                {
+                                    text: "No",
+                                    role: "cancel",
+                                    handler: ()=> {
+                                        this.events.publish('closeModal');
+                                    }
+                                },
+                                {
+                                    text: "Yes",
+                                    handler: ()=> {
+                                        this.utils.sendShortShipNotification(shortShipData);
+                                        this.events.publish('closeModal');
+                                    }
+                                }
+                            ]
+                        });
+
+                        alert.present();
+
+                        return;
+                    }
+
                     this.events.publish('closeModal');
 
                 }).catch((err)=> {
