@@ -45,9 +45,7 @@ The customisation project repository can be found [here](https://github.com/micw
 
 To start, download the latest customisation project package from here:
 
-[Acumatica v2018+](https://acustock.wallaceit.com.au/downloads/AcuStock.1.1.1.zip)
-
-[Acumatica 6](https://acustock.wallaceit.com.au/downloads/AcuStock.1.0.2-Acumatica-6.10.zip)
+[Acumatica v2018+](https://acustock.wallaceit.com.au/downloads/AcuStock.1.2.3.zip)
 
 Once downloaded, use the following steps to import and publish the customisation.
 
