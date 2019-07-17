@@ -35,7 +35,7 @@ export class CountEntryEnterTab {
     @ViewChild('item') itemInput;
     @ViewChild('qty') qtyInput;
 
-    enteredData = {
+    enteredData:any = {
         location: "",
         item: "",
         qty: 0
@@ -85,9 +85,39 @@ export class CountEntryEnterTab {
         });
 
         this.events.subscribe('counts:open', (item)=>{
-            this.enteredData.location = item.LocationID.value;
-            this.enteredData.item = item.InventoryID.value;
-            this.setCountLine().then();
+
+            if (this.enteredData.location == item.LocationID.value &&
+                this.enteredData.item == item.InventoryID.value)
+                return;
+
+            if (this.showQty){
+                let alert = this.alertCtrl.create({
+                    title: "Confirm current",
+                    message: "Would you like to confirm changes to the current count item?",
+                    buttons: [
+                        {
+                            text: "Discard",
+                            role: "cancel",
+                            handler: ()=> {
+                                this.openCountLine(item);
+                            }
+                        },
+                        {
+                            text: "Confirm",
+                            handler: ()=> {
+                                if (this.addCountItem()){
+                                    this.openCountLine(item);
+                                }
+                            }
+                        }
+                    ]
+                });
+
+                alert.present();
+                return;
+            }
+
+            this.openCountLine(item);
         });
 
         if (this.countProvider.hasSavedCounts()) {
@@ -125,6 +155,12 @@ export class CountEntryEnterTab {
     presentPopover(event) {
         let popover = this.popoverCtrl.create(CountPopover);
         popover.present({ev:event});
+    }
+
+    openCountLine(item){
+        this.enteredData.location = item.LocationID.value;
+        this.enteredData.item = item.InventoryID.value;
+        this.setCountLine().then();
     }
 
     clearCounts(){
@@ -397,14 +433,25 @@ export class CountEntryEnterTab {
     }
 
     nextLocation() {
-        if (this.enteredData.item != "" && this.enteredData.qty > 0) {
+        if (this.showQty) {
             this.addCountItem();
         }
     }
 
     addCountItem() {
 
-        //this.countProvider.addItemCount(this.enteredData, this.currentSourceLine);
+        // validate item
+        if (isNaN(this.enteredData.qty) || this.enteredData.qty == ""){
+            this.utils.showAlert("Error", "Please enter shelf quantity for the item.");
+            return false;
+        }
+
+        // In case quantity was scanned as a barcode
+        if (this.enteredData.qty > 1000000000){
+            this.utils.showAlert("Error", "Mmmm that quantity doesn't seem right. Did you scan a barcode into the quantity field?");
+            return false;
+        }
+
         this.countProvider.setCount(this.currentSourceLine, this.enteredData.qty);
 
         this.resetForm();
@@ -465,7 +512,8 @@ export class CountEntryEnterTab {
                 this.dismissLoader();
 
                 if (barcodeText !== this.enteredData.location && this.enteredData.qty > 0)
-                    this.addCountItem();
+                    if (!this.addCountItem())
+                        return;
 
                 this.setLocation(barcodeText, true, callback);
 
@@ -490,7 +538,8 @@ export class CountEntryEnterTab {
                             callback();
 
                     } else {
-                        this.addCountItem();
+                        if (!this.addCountItem())
+                            return;
 
                         this.setItem(item.InventoryID.value, true, callback);
                     }
