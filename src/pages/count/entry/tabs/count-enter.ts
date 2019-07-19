@@ -259,7 +259,7 @@ export class CountEntryEnterTab {
         });
     }
 
-    setLocation(locId, isScan=false, callback=null) {
+    setLocation(locId=null, isScan=false, callback=null) {
 
         if (locId) {
             this.enteredData.location = locId;
@@ -282,8 +282,13 @@ export class CountEntryEnterTab {
 
             this.dismissLoader();
 
-            if (isScan)
+            if (isScan){
                 this.utils.playScanSuccessSound();
+            } else {
+                setTimeout(()=> {
+                    this.itemInput.setFocus();
+                });
+            }
 
             if (callback != null)
                 callback();
@@ -301,7 +306,7 @@ export class CountEntryEnterTab {
 
     }
 
-    setItem(itemId, isScan=false, callback=null) {
+    setItem(itemId=null, isScan=false, callback=null) {
 
         if (itemId) {
             this.enteredData.item = itemId;
@@ -323,8 +328,13 @@ export class CountEntryEnterTab {
 
                 this.setCountLine(isScan).then(()=> {
 
-                    if (isScan)
+                    if (isScan){
                         this.utils.playScanSuccessSound();
+                    } else {
+                        setTimeout(()=> {
+                            this.qtyInput.setFocus();
+                        });
+                    }
 
                     if (callback != null)
                         callback();
