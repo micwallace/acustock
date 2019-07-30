@@ -355,12 +355,17 @@ export class EnterTab {
 
     validateItemQty(qty:any) {
 
-        var reqQty = qty ? qty : parseFloat(this.enteredData.qty);
-        var srcQty = this.currentLocationItems.hasOwnProperty(this.enteredData.item) ? this.currentLocationItems[this.enteredData.item].QtyOnHand.value : 0;
-        var curPendingQty = this.transferProvider.getItemLocPendingQty(this.enteredData.location, this.enteredData.item);
+        let reqQty = qty ? qty : parseFloat(this.enteredData.qty);
+        let srcQty = this.currentLocationItems.hasOwnProperty(this.enteredData.item) ? this.currentLocationItems[this.enteredData.item].QtyOnHand.value : 0;
+        let shippedQty = this.currentLocationItems.hasOwnProperty(this.enteredData.item) &&
+                         this.currentLocationItems[this.enteredData.item].QtySOShipped ? this.currentLocationItems[this.enteredData.item].QtySOShipped.value : 0;
+        let curPendingQty = this.transferProvider.getItemLocPendingQty(this.enteredData.location, this.enteredData.item);
+
+        srcQty -= shippedQty;
 
         if (srcQty < curPendingQty + reqQty) {
-            this.utils.showAlert("Error", "There is only " + srcQty + " available for transfer from the current location. " + (curPendingQty ? curPendingQty + " are pending." : ""));
+            this.utils.showAlert("Error", "There is only " + srcQty + " available for transfer from the current location. " +
+                                                        (curPendingQty ? curPendingQty + " are already pending. " : "") + (shippedQty ? shippedQty + " are on confirmed shipment and cannot be transferred." : ""));
             if (!qty)
                 this.enteredData.qty = srcQty - curPendingQty;
             return false;
@@ -393,7 +398,11 @@ export class EnterTab {
         if (!this.validateItemQty(null))
             return;
 
-        var srcQty = this.currentLocationItems.hasOwnProperty(this.enteredData.item) ? this.currentLocationItems[this.enteredData.item].QtyOnHand.value : 0;
+        // No need to check if value exists because it is done in the validateItemQty function.
+        let itemAvail = this.currentLocationItems[this.enteredData.item];
+        let srcQty = itemAvail.QtyOnHand ? itemAvail.QtyOnHand.value : 0;
+
+        srcQty -= itemAvail.QtySOShipped ? itemAvail.QtySOShipped.value : 0;
 
         this.transferProvider.addPendingItem(this.enteredData.location, this.enteredData.toLocation, this.enteredData.item, this.enteredData.qty, srcQty);
 
@@ -422,14 +431,14 @@ export class EnterTab {
 
                             let curPendingQty = this.transferProvider.getItemLocPendingQty(this.enteredData.location, item.InventoryID.value);
 
-                            let shippedQty = item.QtySOShipped ? item.QtySOShipped.value : 0;
+                            let addQty = item.QtyOnHand.value - curPendingQty;
 
-                            let addQty = item.QtyOnHand.value - curPendingQty - shippedQty;
+                            addQty -= item.QtySOShipped ? item.QtySOShipped.value : 0;
 
                             if (addQty < 1)
                                 continue;
 
-                            this.transferProvider.addPendingItem(this.enteredData.location, this.enteredData.toLocation, item.InventoryID.value, addQty, item.QtyOnHand.value);
+                            this.transferProvider.addPendingItem(this.enteredData.location, this.enteredData.toLocation, item.InventoryID.value, addQty, addQty);
                         }
                     }
                 }

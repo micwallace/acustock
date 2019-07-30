@@ -90,6 +90,10 @@
                     <ion-col col-7>On-Hand:</ion-col>
                     <ion-col col-5>{{currentLocationItems[enteredData.item].QtyOnHand.value}}</ion-col>
                 </ion-row>
+                <ion-row *ngIf="showQty && currentLocationItems.hasOwnProperty(enteredData.item) && currentLocationItems[enteredData.item].QtySOShipped;">
+                    <ion-col col-7>Shipped:</ion-col>
+                    <ion-col col-5>{{currentLocationItems[enteredData.item].QtySOShipped.value}}</ion-col>
+                </ion-row>
             </ion-col>
             <ion-col col-6 text-right>
                 <button type="button" ion-button small (click)="cancelForm();" style="margin-left: 10px;">Cancel</button>
