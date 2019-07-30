@@ -365,7 +365,7 @@ export class EnterTab {
 
         if (srcQty < curPendingQty + reqQty) {
             this.utils.showAlert("Error", "There is only " + srcQty + " available for transfer from the current location. " +
-                                                        (curPendingQty ? curPendingQty + " are already pending. " : "") + (shippedQty ? shippedQty + " are on confirmed shipment and cannot be transferred." : ""));
+                                                        (curPendingQty ? curPendingQty + " are already pending. " : "") + (shippedQty ? shippedQty + " are on confirmed shipments and cannot be transferred." : ""));
             if (!qty)
                 this.enteredData.qty = srcQty - curPendingQty;
             return false;
