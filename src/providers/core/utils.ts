@@ -111,7 +111,7 @@ export class UtilsProvider {
             let email = {
                 to: this.prefs.getPreference('error_email'),
                 attachments: [
-                    'base64:error-information.json//' + btoa(JSON.stringify(errorData, Object.getOwnPropertyNames(errorData)))
+                    'base64:error-information.json//' + btoa(JSON.stringify(errorData))
                 ],
                 subject: 'AcuStock Error Report',
                 body: (exception.hasOwnProperty('message') ? 'Error Summary: ' + exception.message + '<br/>' : '') +

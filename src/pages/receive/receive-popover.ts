@@ -27,15 +27,15 @@ import {UserguidePage} from "../about/userguide/userguide";
         <button ion-item (click)="openUserguide()">About Receipts</button>
         <ion-item>
             <ion-label>Release Receipts</ion-label>
-            <ion-toggle [(ngModel)]="prefs.preferences['release_receipts']"></ion-toggle>
+            <ion-toggle [(ngModel)]="prefs.preferences['release_receipts']" (ionChange)="prefs.savePreferences();"></ion-toggle>
         </ion-item>
         <ion-item>
             <ion-label>Keep Location</ion-label>
-            <ion-toggle [(ngModel)]="prefs.preferences['receipt_keep_loc']"></ion-toggle>
+            <ion-toggle [(ngModel)]="prefs.preferences['receipt_keep_loc']" (ionChange)="prefs.savePreferences();"></ion-toggle>
         </ion-item>
         <ion-item>
             <ion-label>Scan auto complete</ion-label>
-            <ion-toggle [(ngModel)]="prefs.preferences['receipt_scan_complete']"></ion-toggle>
+            <ion-toggle [(ngModel)]="prefs.preferences['receipt_scan_complete']" (ionChange)="prefs.savePreferences();"></ion-toggle>
         </ion-item>
     </ion-list>
   `

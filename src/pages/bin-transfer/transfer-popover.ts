@@ -27,7 +27,7 @@ import { UserguidePage } from "../about/userguide/userguide";
       <button ion-item (click)="openUserguide()">About Transfers</button>
       <ion-item>
         <ion-label>Release Transfers</ion-label>
-        <ion-toggle [(ngModel)]="prefs.preferences['release_transfers']"></ion-toggle>
+        <ion-toggle [(ngModel)]="prefs.preferences['release_transfers']" (ionChange)="prefs.savePreferences();"></ion-toggle>
       </ion-item>
     </ion-list>
   `

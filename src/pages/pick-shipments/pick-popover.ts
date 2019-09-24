@@ -27,7 +27,7 @@ import { PreferencesProvider } from "../../providers/core/preferences";
         <button ion-item (click)="openUserguide()">About Picking</button>
         <ion-item>
             <ion-label>Scan auto complete</ion-label>
-            <ion-toggle [(ngModel)]="prefs.preferences['pick_scan_complete']"></ion-toggle>
+            <ion-toggle [(ngModel)]="prefs.preferences['pick_scan_complete']" (ionChange)="prefs.savePreferences();"></ion-toggle>
         </ion-item>
     </ion-list>
   `

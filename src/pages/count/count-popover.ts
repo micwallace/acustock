@@ -19,17 +19,22 @@
 import { Component } from '@angular/core';
 import { ViewController, NavController } from "ionic-angular";
 import { UserguidePage } from "../about/userguide/userguide";
+import {PreferencesProvider} from "../../providers/core/preferences";
 
 @Component({
     template: `
     <ion-list no-margin>
-      <button ion-item (click)="openUserguide()">About Counts</button>
+        <button ion-item (click)="openUserguide()">About Counts</button>
+        <ion-item>
+            <ion-label>Confirm new lines</ion-label>
+            <ion-toggle [(ngModel)]="prefs.preferences['count_confirm_new']" (ionChange)="prefs.savePreferences();"></ion-toggle>
+        </ion-item>
     </ion-list>
   `
 })
 export class CountPopover {
 
-    constructor(public viewCtrl: ViewController, public navCtrl:NavController) {}
+    constructor(public viewCtrl: ViewController, public navCtrl:NavController, public prefs:PreferencesProvider) {}
 
     dismiss() {
         this.viewCtrl.dismiss();

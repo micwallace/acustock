@@ -292,6 +292,19 @@ export class PreferencesProvider {
             ]
         },
         {
+            title: "Counting",
+            preferences: [
+                {
+                    key: "count_confirm_new",
+                    min_key: "ccn",
+                    title: "Confirm new lines",
+                    caption: "Confirm before adding new lines to the count sheet.",
+                    type: "toggle",
+                    def_value: true
+                }
+            ]
+        },
+        {
             title: "Notifications",
             preferences: [
                 {

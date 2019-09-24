@@ -370,6 +370,9 @@ export class CountEntryEnterTab {
                 return resolve(line);
             }
 
+            if (!this.countProvider.prefs.getPreference('count_confirm_new'))
+                return this.addNewCountLine(resolve, reject);
+
             let alertDialog = this.alertCtrl.create({
                 title: "Create Count Line",
                 message: "There is no count line which matches the currently entered item/location. Create a new line?",
@@ -384,28 +387,7 @@ export class CountEntryEnterTab {
                     {
                         text: "Yes",
                         handler: ()=> {
-
-                            this.loader = this.loadingCtrl.create({content: "Adding line..."});
-                            this.loader.present();
-
-                            this.countProvider.addNewCountLine(this.enteredData).then((line)=>{
-
-                                this.currentSourceLine = line;
-                                this.showQty = true;
-                                this.enteredData.qty = 1;
-
-                                this.dismissLoader();
-
-                                resolve(line);
-
-                            }).catch((err)=>{
-
-                                this.dismissLoader().then(()=>{
-                                    this.utils.processApiError("Error", err.message, err, this.appCtrl.getRootNav(), this.countProvider.getErrorReportingData());
-                                });
-
-                                this.utils.playFailedSound();
-                            });
+                            this.addNewCountLine(resolve, reject);
                         }
                     }
                 ]
@@ -414,6 +396,33 @@ export class CountEntryEnterTab {
             alertDialog.present();
 
             this.utils.playPromptSound(isScan);
+        });
+    }
+
+    addNewCountLine(resolve, reject){
+
+        this.loader = this.loadingCtrl.create({content: "Adding line..."});
+        this.loader.present();
+
+        this.countProvider.addNewCountLine(this.enteredData).then((line)=>{
+
+            this.currentSourceLine = line;
+            this.showQty = true;
+            this.enteredData.qty = 1;
+
+            this.dismissLoader();
+
+            resolve(line);
+
+        }).catch((err)=>{
+
+            this.dismissLoader().then(()=>{
+                this.utils.processApiError("Error", err.message, err, this.appCtrl.getRootNav(), this.countProvider.getErrorReportingData());
+            });
+
+            this.utils.playFailedSound();
+
+            reject();
         });
     }
 

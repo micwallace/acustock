@@ -27,7 +27,7 @@ import { UserguidePage } from "../about/userguide/userguide";
         <button ion-item (click)="openUserguide()">About Adjustments</button>
       <ion-item>
         <ion-label>Release Adjustments</ion-label>
-        <ion-toggle [(ngModel)]="prefs.preferences['release_adjustments']"></ion-toggle>
+        <ion-toggle [(ngModel)]="prefs.preferences['release_adjustments']" (ionChange)="prefs.savePreferences();"></ion-toggle>
       </ion-item>
     </ion-list>
   `
