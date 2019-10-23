@@ -114,7 +114,8 @@ export class UtilsProvider {
                     'base64:error-information.json//' + btoa(JSON.stringify(errorData))
                 ],
                 subject: 'AcuStock Error Report',
-                body: (exception.hasOwnProperty('message') ? 'Error Summary: ' + exception.message + '<br/>' : '') +
+                body: (exception.hasOwnProperty('message') ? 'Error Summary: ' + exception.message + '<br/><br/>' : '') +
+                        (exception.hasOwnProperty('stack') ? 'Stacktrace: ' + exception.stack + '<br/><br/>' : '') +
                         '<br/>Additional Information:' +
                         '<br/>Device: ' + this.prefs.getPreference('device') +
                         '<br/>Company: ' + this.prefs.getPreference('connection_company') +
