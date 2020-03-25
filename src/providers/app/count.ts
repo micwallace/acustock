@@ -220,7 +220,8 @@ export class CountProvider {
         let key = countLine.InventoryID.value + "-" + countLine.LocationID.value;
 
         if (!this.pendingCounts.hasOwnProperty(key)) {
-            this.pendingCounts[key] = countLine;
+            this.pendingCounts[key] = JSON.parse(JSON.stringify(countLine));
+            delete this.pendingCounts[key].id; // remove session ID
             this.pendingCounts[key].PendingQty = 0;
         }
 
@@ -246,18 +247,18 @@ export class CountProvider {
 
     public savePendingCounts() {
 
-        let receipts = JSON.parse(localStorage.getItem("unconfirmed_counts"));
+        let counts = JSON.parse(localStorage.getItem("unconfirmed_counts"));
 
-        if (!receipts)
-            receipts = {};
+        if (!counts)
+            counts = {};
 
         if (Object.keys(this.pendingCounts).length > 0) {
-            receipts[this.physicalCount.ReferenceNbr.value] = this.pendingCounts;
+            counts[this.physicalCount.ReferenceNbr.value] = this.pendingCounts;
         } else {
-            delete receipts[this.physicalCount.ReferenceNbr.value];
+            delete counts[this.physicalCount.ReferenceNbr.value];
         }
 
-        localStorage.setItem("unconfirmed_counts", JSON.stringify(receipts));
+        localStorage.setItem("unconfirmed_counts", JSON.stringify(counts));
 
         console.log("Counts saved");
         this.calculateTotals();
@@ -306,7 +307,7 @@ export class CountProvider {
 
                 for (let i in this.pendingCounts){
 
-                    let line = this.pendingCounts[i];
+                    let line = JSON.parse(JSON.stringify(this.pendingCounts[i]));
 
                     // Get physical count line from count index.
                     let key = line.InventoryID.value + "-" + line.LocationID.value;
