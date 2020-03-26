@@ -160,7 +160,13 @@ export class CountEntryEnterTab {
     openCountLine(item){
         this.enteredData.location = item.LocationID.value;
         this.enteredData.item = item.InventoryID.value;
-        this.setCountLine().then();
+        this.setCountLine().catch((err) => {
+												this.showQty = false;
+												this.enteredData.item = "";
+												this.dismissLoader().then(() => {
+																this.utils.showAlert("Error", err.message);
+												});
+								});
     }
 
     clearCounts(){
@@ -342,16 +348,19 @@ export class CountEntryEnterTab {
                 }).catch((err) => {
                     this.showQty = false;
                     this.enteredData.item = "";
+																				this.dismissLoader().then(() => {
+																								this.utils.showAlert("Error", err.message);
+																				});
+																				this.utils.playFailedSound(isScan);
                 });
             }
 
         }).catch((err) => {
             this.showQty = false;
             this.enteredData.item = "";
-            this.dismissLoader().then(()=> {
+            this.dismissLoader().then(() => {
                 this.utils.showAlert("Error", err.message);
             });
-
             this.utils.playFailedSound(isScan);
         });
     }

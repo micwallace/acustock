@@ -174,7 +174,7 @@ export class CountProvider {
                 let key = data.item + "-" + data.location;
 
                 if (!this.countIndex.hasOwnProperty(key))
-                    reject({message: "Could not locate count object in index."});
+                    return reject({message: "Could not locate count object in index.", responseData: res});
 
                 return resolve(this.countIndex[key]);
 
