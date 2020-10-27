@@ -260,7 +260,7 @@ export class Api {
 
 								return new Promise((resolve, reject) => {
 
-												this.put('InventoryLocations2', data).then((res:any) => {
+												this.put('InventoryLocations2?$expand=Results', data).then((res:any) => {
 																resolve(res.Results);
 												}).catch((err) => {
 																reject(err);
