@@ -234,16 +234,39 @@ export class Api {
     }
 
     getItemWarehouseLocations(itemId:string, warehouse:string) {
-        var warehouseFilter = warehouse ? " and Warehouse eq '" + warehouse + "'" : "";
-
-        return this.get("InventoryLocations?$filter=InventoryID eq '" + itemId + "' and QtyOnHand gt 0M" + warehouseFilter);
+        //var warehouseFilter = warehouse ? " and Warehouse eq '" + warehouse + "'" : "";
+        //return this.get("InventoryLocations?$filter=InventoryID eq '" + itemId + "' and QtyOnHand gt 0M" + warehouseFilter);
+								return this.getItemLocations(itemId, warehouse, null);
     }
 
     getLocationContents(locationId:string, warehouse:string) {
-        var warehouseFilter = warehouse ? " and Warehouse eq '" + warehouse + "'" : "";
-
-        return this.get("InventoryLocations?$filter=Location eq '" + locationId + "' and QtyOnHand gt 0M" + warehouseFilter);
+        //var warehouseFilter = warehouse ? " and Warehouse eq '" + warehouse + "'" : "";
+        //return this.get("InventoryLocations?$filter=Location eq '" + locationId + "' and QtyOnHand gt 0M" + warehouseFilter);
+								return this.getItemLocations(null, warehouse, locationId);
     }
+
+    getItemLocations(itemId:string, warehouseId:string, locationId:string){
+
+								let filter = [];
+
+								if (itemId)
+												filter.push("InventoryID eq '" + itemId + "'");
+
+								if (warehouseId)
+												filter.push("Warehouse eq '" + warehouseId + "'");
+
+								if (locationId)
+												filter.push("Location eq '" + locationId + "'");
+
+								return new Promise((resolve, reject) => {
+
+												this.put('InventoryLocations2', filter).then((res:any) => {
+																resolve(res.Results);
+												}).catch((err) => {
+																reject(err);
+												});
+								});
+				}
 
     getItemAllocationInfo(itemId:string, warehouseId:string, locationId:string){
 
