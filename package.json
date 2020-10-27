@@ -1,6 +1,6 @@
 {
   "name": "acustock",
-  "version": "1.2.17",
+  "version": "1.2.17ioni",
   "versionType": "stable",
   "minAcumaticaVersion": "1.2.3",
   "author": "Michael Wallace",
@@ -9,9 +9,7 @@
   "scripts": {
     "clean": "ionic-app-scripts clean",
     "build": "ionic-app-scripts build",
-    "lint": "ionic-app-scripts lint",
-    "ionic:build": "ionic-app-scripts build",
-    "ionic:serve": "ionic-app-scripts serve"
+    "lint": "ionic-app-scripts lint"
   },
   "dependencies": {
     "@angular/common": "5.0.3",
@@ -50,8 +48,7 @@
     "cordova-plugin-whitelist": "^1.3.3",
     "cordova-plugin-x-socialsharing": "^5.4.1",
     "es6-promise-plugin": "^4.2.2",
-    "ionic": "^4.10.3",
-    "ionic-angular": "3.9.2",
+    "ionic-angular": "3.9.10",
     "ionic2-auto-complete": "^1.6.2-alpha",
     "ionicons": "3.0.0",
     "phonegap-plugin-barcodescanner": "~8.0.0",
@@ -61,7 +58,6 @@
   },
   "devDependencies": {
     "@ionic/app-scripts": "3.1.8",
-    "ionic": "^4.10.3",
     "typescript": "2.4.2"
   },
   "description": "An Ionic project",
