@@ -247,20 +247,20 @@ export class Api {
 
     getItemLocations(itemId:string, warehouseId:string, locationId:string){
 
-								let filter = [];
+								let data:any = {};
 
 								if (itemId)
-												filter.push("InventoryID eq '" + itemId + "'");
+												data.InventoryID = {value: itemId};
 
 								if (warehouseId)
-												filter.push("Warehouse eq '" + warehouseId + "'");
+												data.Warehouse = {value: warehouseId};
 
 								if (locationId)
-												filter.push("Location eq '" + locationId + "'");
+												data.Location = {value: locationId};
 
 								return new Promise((resolve, reject) => {
 
-												this.put('InventoryLocations2', filter).then((res:any) => {
+												this.put('InventoryLocations2', data).then((res:any) => {
 																resolve(res.Results);
 												}).catch((err) => {
 																reject(err);
