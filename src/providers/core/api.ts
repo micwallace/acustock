@@ -485,10 +485,9 @@ export class Api {
 		 // Refresh session after certain time period
 		 let now = (new Date()).getTime();
 		 if (this.loginTime != null && now - this.loginTime > 600000){
-			 let self = this;
 			 try {
-				 await self.logout();
-				 await self.login();
+				 await this.logout();
+				 await this.login();
 			 } catch (err){
 				 return new Promise((resolve, reject) => {
 					 reject(this.processApiError(err));
