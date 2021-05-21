@@ -35,6 +35,7 @@ export class Api {
     private username:string = '';
     private password:string = '';
     private company:string = '';
+    private loginTime:number = null;
 
     private jsReqOptions:RequestOptions = new RequestOptions();
 
@@ -179,7 +180,7 @@ export class Api {
         return 0;
     }
 
-    login() {
+    async login() {
 
         var data = {
             name: this.username,
@@ -196,6 +197,7 @@ export class Api {
 
                 this.http.post(this.url + '/entity/auth/login', data, {}).then((res)=>{
                     resolve(res);
+                    this.loginTime = (new Date()).getTime();
                 }, (err)=>{
                     reject(this.processApiError(err));
                 }).catch((err)=> {
@@ -213,8 +215,12 @@ export class Api {
         });
     }
 
-    logout() {
-        return this.http.post(this.url + '/entity/auth/logout', null, {});
+    async logout() {
+		if (this.useNativeHttp()) {
+			return this.http.post(this.url + '/entity/auth/logout', null, {});
+		} else {
+		 	return this.jsHttp.post(this.url + '/entity/auth/logout', null).toPromise();
+		}
     }
 
     getItem(itemId) {
@@ -474,7 +480,22 @@ export class Api {
         return this.request('delete', endpoint, null, headers);
     }
 
-    request(method:string, endpoint:string, body?:any, headers?:any, params?:any, loginAttempt:boolean=false, returnFullResponse?:any) {
+    async request(method:string, endpoint:string, body?:any, headers?:any, params?:any, loginAttempt:boolean=false, returnFullResponse?:any) {
+
+		 // Refresh session after certain time period
+		 let now = (new Date()).getTime();
+		 if (this.loginTime != null && now - this.loginTime > 600000){
+			 let self = this;
+			 try {
+				 await self.logout();
+				 await self.login();
+			 } catch (err){
+				 return new Promise((resolve, reject) => {
+					 reject(this.processApiError(err));
+				 });
+			 }
+		 }
+
         return new Promise((resolve, reject) => {
 
             let url = this.url + this.api_endpoint + '/' + endpoint;

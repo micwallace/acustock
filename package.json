@@ -21,7 +21,7 @@
     "@angular/platform-browser": "5.0.3",
     "@angular/platform-browser-dynamic": "5.0.3",
     "@ionic-native/barcode-scanner": "^4.5.3",
-    "@ionic-native/core": "4.4.0",
+    "@ionic-native/core": "^4.4.0",
     "@ionic-native/dialogs": "^4.6.0",
     "@ionic-native/email-composer": "^4.12.0",
     "@ionic-native/http": "^4.5.3",
