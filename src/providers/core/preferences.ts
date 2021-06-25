@@ -406,7 +406,8 @@ export class PreferencesProvider {
         { label: "Alert 4", value: "alert-4" },
         { label: "Alert 5", value: "alert-5" },
         { label: "Alert 6", value: "alert-6" },
-        { label: "Alert 7", value: "alert-7" }
+        { label: "Alert 7", value: "alert-7" },
+        { label: "Alert 8", value: "alert-8" }
     ];
 
     preferences = {};
