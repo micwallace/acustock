@@ -101,7 +101,7 @@ export class Api {
 
 	 private checkVersion(resolve, reject, alertCtrl, newEndpointCheck:boolean = false){
 
-		 this.get('AcuStockConfig').then((res:any)=>{
+		 this.put('AcuStockConfig', {}).then((res:any)=>{
 
 			 if (res.length > 0){
 
