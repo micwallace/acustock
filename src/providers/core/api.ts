@@ -147,7 +147,10 @@ export class Api {
 		 }).catch((err)=>{
 
 			 // Check if using old endpoint version, if so, try update endpoint version and retry
-			 if (err.status == 404) {
+			 if (
+				 err.hasOwnProperty('responseData') &&
+				 err.responseData.exceptionType == "System.Collections.Generic.KeyNotFoundException"
+			 ) {
 				 if (this.endpoint_version == "6.00.001") {
 					 this.endpoint_version = "20.200.001";
 					 this.checkVersion(resolve, reject, alertCtrl, true);

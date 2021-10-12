@@ -126,7 +126,7 @@ export class UtilsProvider {
             this.emailComposer.open(email);
 
         }).catch((err)=>{
-            this.showAlert("Email not available", "The email composer plugin is not available on this platform. Error Details:\r\n"+JSON.stringify(exception) + "\r\n" + JSON.stringify(exception));
+            this.showAlert("Email not available", "The email composer plugin is not available on this platform. Error Details:\r\n"+JSON.stringify(exception) + "\r\n" + JSON.stringify(additionalData));
         });
     }
 
