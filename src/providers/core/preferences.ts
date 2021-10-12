@@ -39,6 +39,17 @@ export class PreferencesProvider {
                     placeholder: "https://acumaticainstance/url",
                     def_value: ""
                 },
+					 {
+						  key: "endpoint_version",
+						  min_key: "evn",
+						  title: "Endpoint version",
+						  type: "select",
+						  options: [
+								{label: "6.00.001", value: "6.00.001"},
+								{label: "20.200.001", value: "20.200.001"},
+						   ],
+						  def_value: "6.00.001"
+					 },
                 {
                     key: "connection_username",
                     min_key: "usr",

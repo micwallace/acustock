@@ -29,9 +29,10 @@ const { minAcumaticaVersion : minAcumaticaVersion } = require('../../../package.
  */
 @Injectable()
 export class Api {
-    private api_endpoint:string = '/entity/AcuStock/6.00.001';
+    private api_endpoint:string = '/entity/AcuStock/';
 
     private url:string = '';
+	 private endpoint_version:string = '';
     private username:string = '';
     private password:string = '';
     private company:string = '';
@@ -64,6 +65,7 @@ export class Api {
 
     updateSettings(username, password) {
         this.url = this.prefs.getPreference('connection_url');
+		  this.endpoint_version = this.prefs.getPreference('endpoint_version');
         this.company = this.prefs.getPreference('connection_company');
         this.username = username != null ? username : this.prefs.getPreference('connection_username');
         this.password = password != null ? password : this.prefs.getPreference('connection_password');
@@ -89,55 +91,77 @@ export class Api {
                     this.prefs.setPreference("connection_password", "", true);
                 }
 
-                this.get('AcuStockConfig').then((res:any)=>{
+                this.checkVersion(resolve, reject, alertCtrl);
 
-                    if (res.length > 0){
-
-                        var config = res[0];
-
-                        if (this.versionCompare(config.Version.value, minAcumaticaVersion) > -1)
-                            return resolve();
-
-
-                        let confirmAlert = alertCtrl.create({
-                            title: "Version Mismatch",
-                            message: "The current version of Acustock requires at least Acumatica customisation version " + minAcumaticaVersion +
-                                    " but " + config.Version.value + " is installed. Please update the customisation project or reinstall a version compatible with " + config.Version.value +
-                                    ". You can continue using the app but some things may not work as expected.",
-                            buttons: [
-                                {
-                                    text: 'Continue',
-                                    handler: () => {
-                                        resolve();
-                                    }
-                                },
-                                {
-                                    text: 'Cancel',
-                                    handler: () => {
-                                        reject("version_mismatch");
-                                    }
-                                }
-                            ]
-                        });
-
-                        confirmAlert.present();
-
-                        return;
-                    }
-
-                    reject({message: Api.MSG_CUST_NOT_INSTALLED});
-
-                }).catch((err)=>{
-                    err.message = Api.MSG_CUST_NOT_INSTALLED;
-                    reject(err);
-                });
-
-                //resolve();
             }).catch((err)=> {
                 reject(err);
             });
         });
     }
+
+	 private checkVersion(resolve, reject, alertCtrl, newEndpointCheck:boolean = false){
+
+		 this.get('AcuStockConfig').then((res:any)=>{
+
+			 if (res.length > 0){
+
+				 var config = res[0];
+
+				 // New endpoint version check successful, update config.
+				 if (newEndpointCheck){
+					 this.prefs.setPreference('endpoint_version', this.endpoint_version, true);
+				 }
+
+				 if (this.versionCompare(config.Version.value, minAcumaticaVersion) > -1)
+					 return resolve();
+
+
+				 let confirmAlert = alertCtrl.create({
+					 title: "Version Mismatch",
+					 message: "The current version of Acustock requires at least Acumatica customisation version " + minAcumaticaVersion +
+						 " but " + config.Version.value + " is installed. Please update the customisation project or reinstall a version compatible with " + config.Version.value +
+						 ". You can continue using the app but some things may not work as expected.",
+					 buttons: [
+						 {
+							 text: 'Continue',
+							 handler: () => {
+								 resolve();
+							 }
+						 },
+						 {
+							 text: 'Cancel',
+							 handler: () => {
+								 reject("version_mismatch");
+							 }
+						 }
+					 ]
+				 });
+
+				 confirmAlert.present();
+
+				 return;
+			 }
+
+			 reject({message: Api.MSG_CUST_NOT_INSTALLED});
+
+		 }).catch((err)=>{
+
+			 // Check if using old endpoint version, if so, try update endpoint version and retry
+			 if (err.status == 404) {
+				 if (this.endpoint_version == "6.00.001") {
+					 this.endpoint_version = "20.200.001";
+					 this.checkVersion(resolve, reject, alertCtrl, true);
+				 } else {
+					 if (newEndpointCheck)
+						 this.endpoint_version = "6.00.001";
+				 }
+			 }
+
+			 err.message = Api.MSG_CUST_NOT_INSTALLED;
+			 reject(err);
+		 });
+
+	 }
 
     // Taken from here because I couldn't be bothered to re invent the wheel:
     // https://stackoverflow.com/questions/6832596
@@ -497,10 +521,8 @@ export class Api {
 
         return new Promise((resolve, reject) => {
 
-            let url = this.url + this.api_endpoint + '/' + endpoint;
+            let url = this.url + this.api_endpoint + this.endpoint_version + '/' + endpoint;
             var promise;
-
-            console.log(url);
 
             if (this.useNativeHttp()) {
 
