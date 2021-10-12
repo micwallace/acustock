@@ -154,6 +154,7 @@ export class Api {
 				 if (this.endpoint_version == "6.00.001") {
 					 this.endpoint_version = "20.200.001";
 					 this.checkVersion(resolve, reject, alertCtrl, true);
+					 return;
 				 } else {
 					 if (newEndpointCheck)
 						 this.endpoint_version = "6.00.001";
