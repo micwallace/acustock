@@ -101,11 +101,9 @@ export class Api {
 
 	 private checkVersion(resolve, reject, alertCtrl, newEndpointCheck:boolean = false){
 
-		 this.put('AcuStockConfig', {}).then((res:any)=>{
+		 this.put('AcuStockConfig', {}).then((config:any)=>{
 
-			 if (res.length > 0){
-
-				 var config = res[0];
+			 if (config.hasOwnProperty('Version')){
 
 				 // New endpoint version check successful, update config.
 				 if (newEndpointCheck){
